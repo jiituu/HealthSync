@@ -9,7 +9,11 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
     "@hookform/resolvers": "^3.9.1",
+    "@mui/icons-material": "^6.2.0",
+    "@mui/material": "^6.2.0",
     "@radix-ui/react-dialog": "^1.1.2",
     "@radix-ui/react-label": "^2.1.0",
     "@radix-ui/react-popover": "^1.1.2",
@@ -17,9 +21,13 @@
     "@radix-ui/react-slot": "^1.1.0",
     "@radix-ui/react-toast": "^1.2.2",
     "@reduxjs/toolkit": "^2.5.0",
+    "ant": "^0.2.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "d": "^1.0.2",
+    "framer-motion": "^11.14.4",
     "lucide-react": "^0.468.0",
+    "material": "^0.9.20",
     "next": "14.2.3",
     "react": "^18",
     "react-dom": "^18",
@@ -30,6 +38,7 @@
     "zod": "^3.24.1"
   },
   "devDependencies": {
+    "@types/antd": "^1.0.4",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
