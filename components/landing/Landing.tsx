@@ -1,8 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { motion, AnimatePresence } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import GettingStarted from "./Home";
+import Login from "../auth/Login";
+import { Box } from "@mui/material";
 
 const Landing = ()=>{
     const [showSecondPage, setShowSecondPage] = useState(false);
@@ -20,20 +22,12 @@ const Landing = ()=>{
                 <AnimatePresence>
                     {
                         !showSecondPage?
-                        <GettingStarted 
+                        <GettingStarted
+                            key="firstPage" 
                             slideUpAnimation={slideUpAnimation} 
                             setShowSecondPage={setShowSecondPage}
                         />
-                        :<motion.div
-                            key="secondPage"
-                            className="absolute inset-0 bg-gray-800 flex items-center justify-center"
-                            initial={{ y: '100%' }}
-                            animate={{ y: '0%' }}
-                            exit={{ y: '-100%' }}
-                            transition={slideUpAnimation.transition}
-                        >
-                            <h1 className="text-2xl text-white">Page Inprogress</h1>
-                        </motion.div>
+                        :<Login  key="secondPage" slideUpAnimation={slideUpAnimation} />
                     }
                 </AnimatePresence>
 

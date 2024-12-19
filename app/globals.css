@@ -102,3 +102,11 @@
   background-color: var(--accent) !important;
   color:var(--neutral) !important;
 }
+
+.primary-button-white-text{
+  color: var(--neutral);
+}
+
+.primary-button-white-text:hover{
+  color: var(--primary-foreground) !important;
+}
