@@ -89,6 +89,8 @@
   }
 }
 
+/* Ant D Button */
+
 .primary-button{
   background-color: var(--accent);
   border: none;
@@ -109,4 +111,11 @@
 
 .primary-button-white-text:hover{
   color: var(--primary-foreground) !important;
+}
+
+
+/* Ant D form */
+
+.ant-form-item-margin-offset{
+  margin-bottom:10px !important;
 }

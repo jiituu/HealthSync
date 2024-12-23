@@ -1,10 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence } from 'framer-motion';
 import GettingStarted from "./Home";
-import Login from "../auth/Login";
-import { Box } from "@mui/material";
+import Auth from "../auth/Auth";
 
 const Landing = ()=>{
     const [showSecondPage, setShowSecondPage] = useState(false);
@@ -27,7 +26,7 @@ const Landing = ()=>{
                             slideUpAnimation={slideUpAnimation} 
                             setShowSecondPage={setShowSecondPage}
                         />
-                        :<Login  key="secondPage" slideUpAnimation={slideUpAnimation} />
+                        :<Auth  key="secondPage" slideUpAnimation={slideUpAnimation} />
                     }
                 </AnimatePresence>
 
