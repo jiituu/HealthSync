@@ -10,6 +10,10 @@ const useNavigation = (): any => {
     const [isMedicalhistoryActive, setIsMedicalhistoryActive] = useState<boolean>(false);
     const [isActivevisitsActive, setIsActivevisitsActive] = useState<boolean>(false);
     const [isChatActive, setIsChatActive] = useState<boolean>(false);
+    const [ isSettingActive, setIsSettingActive ] = useState<boolean>(false);
+    const [ isPaymentActive, setIsPaymentActive ] = useState<boolean>(false);
+    const [ isAccountsActive, setIsAccountsActive ] = useState<boolean>(false);
+    const [ isHelpActive, setIsHelpActive ] = useState<boolean>(false);
 
   useEffect(() => {
     setIsDashboardActive(false);
@@ -17,6 +21,10 @@ const useNavigation = (): any => {
     setIsMedicalhistoryActive(false);
     setIsActivevisitsActive(false);
     setIsChatActive(false);
+    setIsSettingActive(false);
+    setIsPaymentActive(false);
+    setIsAccountsActive(false);
+    setIsHelpActive(false);
 
 
     if (pathname === "/doctor/dashboard") {
@@ -28,8 +36,18 @@ const useNavigation = (): any => {
     } else if (pathname.includes("/doctor/education")) {
         setIsEducationCenterActive(true);
     } else if (pathname.includes("/doctor/chat")) {
-      setIsChatActive(true);
+        setIsChatActive(true);
+    } else if (pathname.includes("/doctor/settings")) {
+        setIsSettingActive(true);
+    } else if (pathname.includes("/doctor/payment")) {
+        setIsPaymentActive(true);
+    } else if (pathname.includes("/doctor/accounts")) {
+        setIsAccountsActive(true);
+    } else if (pathname.includes("/doctor/help")) {
+        setIsHelpActive(true);
     }
+
+
   }, [pathname]);
 
   return {
@@ -38,6 +56,10 @@ const useNavigation = (): any => {
     isMedicalhistoryActive,
     isActivevisitsActive,
     isChatActive,
+    isSettingActive,
+    isPaymentActive,
+    isAccountsActive,
+    isHelpActive,
   };
 };
 

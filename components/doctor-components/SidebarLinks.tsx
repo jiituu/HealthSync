@@ -13,7 +13,7 @@ const SidebarLink: React.FC<Props> = ({ title, Icon, link, isActive, collapsed }
   return (
     <Link href={link}>
       <div
-        className={`flex items-center p-4 mx-5 rounded-xl ${
+        className={`flex items-center p-3 mx-5 rounded-xl ${
           isActive ? "bg-primary text-white" : ""
         }`} 
       >

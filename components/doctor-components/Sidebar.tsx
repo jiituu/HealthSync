@@ -2,7 +2,7 @@ import { HiX } from "react-icons/hi";
 import { FiChevronsLeft } from "react-icons/fi";
 import SidebarLink from "./SidebarLinks";
 import useNavigation from "@/hooks/useNavigation";
-
+import { useEffect, useState } from "react"; // Added import
 
 import { LuLayoutDashboard } from "react-icons/lu";
 import { FaBookMedical } from "react-icons/fa";
@@ -36,7 +36,23 @@ const Sidebar: React.FC<Props> = ({ open, onClose, collapse, onCollapse }) => {
     isActivevisitsActive,
     isEducationCenterActive,
     isChatActive,
+    isSettingActive,
+    isPaymentActive,
+    isAccountsActive,
+    isHelpActive,
   } = useNavigation();
+
+  const [isSmallScreen, setIsSmallScreen] = useState<boolean>(false);
+
+  useEffect(() => {
+    const checkScreenSize = () => {
+      setIsSmallScreen(window.innerWidth < 768);
+    };
+
+    checkScreenSize();
+    window.addEventListener("resize", checkScreenSize);
+    return () => window.removeEventListener("resize", checkScreenSize);
+  }, []);
 
   const links: ILink[] = [
     {
@@ -77,14 +93,47 @@ const Sidebar: React.FC<Props> = ({ open, onClose, collapse, onCollapse }) => {
   ];
 
 
+  const Otherlinks: ILink[] = [
+    {
+      title: "Settings",
+      icon: IoSettings,
+      link: "/doctor/settings",
+      isActive: isSettingActive,
+      collapsed: collapse,
+    },
+    {
+      title: "Payment",
+      icon: MdPayments,
+      link: "/doctor/payment",
+      isActive: isPaymentActive,
+      collapsed: collapse,
+    },
+    {
+      title: "Accounts",
+      icon: MdAccountCircle,
+      link: "/doctor/accounts",
+      isActive: isAccountsActive,
+      collapsed: collapse,
+    },
+    {
+      title: "Help",
+      icon: IoMdHelpCircle,
+      link: "/doctor/help",
+      isActive: isHelpActive,
+      collapsed: collapse,
+    },
+  ];
+
 
  
 
   return (
     <div
-      className={`sm:none duration-175 linear fixed !z-50 flex min-h-full bg-[#84D0CC1A] flex-col pb-10 shadow-white/5 transition-all md:!z-50 lg:!z-50 xl:!z-0 ${
+      className={`sm:none duration-175 linear fixed !z-40 flex flex-col pb-10 bg-white shadow-white/5 transition-all ${
         open ? "translate-x-0" : "-translate-x-96"
-      } ${collapse ? "w-[90px]" : "w-[260px]"} ${open && window.innerWidth < 768 ? "!z-[1000] bg-white" : ""}`} // Increased z-index and set background to white on small screens
+      } ${collapse ? "w-[90px]" : "w-[260px]"} ${
+        open && isSmallScreen ? "!z-40" : ""
+      } overflow-y-auto`}
     >
       <span
         className="absolute top-5 right-5 block cursor-pointer md:hidden"
@@ -94,7 +143,7 @@ const Sidebar: React.FC<Props> = ({ open, onClose, collapse, onCollapse }) => {
         <HiX className="h-[40px] w-[40px]" />
       </span>
 
-      <div className={`h-[200px] w-full flex items-center px-6 overflow-hidden`}>
+      <div className={`h-[110px] w-full flex items-center px-6 overflow-hidden`}>
         <div
           className={`text-3xl font-bold ${collapse ? "opacity-0" : "opacity-100"}`}
         >
@@ -116,10 +165,26 @@ const Sidebar: React.FC<Props> = ({ open, onClose, collapse, onCollapse }) => {
         );
       })}
 
-      
+      <hr className="my-5 mx-5" />
+
+
+    {Otherlinks.map((link: ILink, index: number) => {
+        return (
+          <SidebarLink
+            title={link.title}
+            Icon={link.icon}
+            link={link.link}
+            isActive={link.isActive}
+            collapsed={link.collapsed}
+            key={index}
+          />
+        );
+      })}
+
+      <hr className="my-5 mx-5" />
 
       <span
-        className="my-5 mx-auto cursor-pointer hidden md:block"
+        className="my-2 mx-auto cursor-pointer hidden md:block"
         onClick={onCollapse}
         aria-label="Collapse-Icon"
       >

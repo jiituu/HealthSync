@@ -27,7 +27,7 @@ export default function RootLayout({
 
   return (
     <>
-      <div className="flex bg-surface">
+      <div className="flex bg-surface min-h-screen">
         <Sidebar
           open={open}
           onClose={() => {
@@ -40,7 +40,7 @@ export default function RootLayout({
         />
         <div className={`w-full h-full ${collapse ? "md:ml-[90px]" : "md:ml-72"} transition-all duration-200`}>
           <Navbar onMenuClick={() => setOpen(!open)} /> 
-          <div className="max-w-[1300px] mx-auto p-4">{children}</div>
+          <div className="max-w-[1300px] mx-auto p-4 overflow-y-auto h-full pt-16">{children}</div> {/* Ensured pt-16 for Navbar */}
         </div>
       </div>
     </>
