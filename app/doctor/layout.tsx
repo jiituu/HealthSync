@@ -1,15 +1,48 @@
+"use client";
+import Navbar from "@/components/doctor-components/Navbar";
+import Sidebar from "@/components/doctor-components/Sidebar";
+import { useState, useEffect } from "react";
 
-import { ReactNode } from 'react';
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>): JSX.Element {
+  const [open, setOpen] = useState<boolean>(true);
+  const [collapse, setCollapse] = useState<boolean>(false);
 
-interface DoctorLayoutProps {
-    children: ReactNode;
-}
+  const handleResize = () => {
+    if (window.innerWidth < 768) { 
+      setOpen(false);
+    } else {
+      setOpen(true);
+    }
+  };
 
-export default function DoctorLayout({ children }: DoctorLayoutProps) {
-    return (
-        <div className="admin-layout">
-            {/* we will import and put doctor side bar component defined somewhere */}
-            <main>{children}</main>
+  useEffect(() => {
+    window.addEventListener("resize", handleResize);
+    handleResize();
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  return (
+    <>
+      <div className="flex bg-surface">
+        <Sidebar
+          open={open}
+          onClose={() => {
+            setOpen(false);
+          }}
+          collapse={collapse}
+          onCollapse={() => {
+            setCollapse(!collapse);
+          }}
+        />
+        <div className={`w-full h-full ${collapse ? "md:ml-[90px]" : "md:ml-72"} transition-all duration-200`}>
+          <Navbar onMenuClick={() => setOpen(!open)} /> 
+          <div className="max-w-[1300px] mx-auto p-4">{children}</div>
         </div>
-    );
+      </div>
+    </>
+  );
 }
