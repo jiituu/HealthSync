@@ -1,7 +1,7 @@
 import { HiX } from "react-icons/hi";
 import { FiChevronsLeft } from "react-icons/fi";
 import SidebarLink from "./SidebarLinks";
-import useNavigation from "@/hooks/useNavigation";
+import useNavigation from "@/hooks/doctor/useNavigation";
 import { useEffect, useState } from "react"; // Added import
 
 import { LuLayoutDashboard } from "react-icons/lu";
