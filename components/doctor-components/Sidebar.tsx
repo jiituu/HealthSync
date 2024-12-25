@@ -129,7 +129,7 @@ const Sidebar: React.FC<Props> = ({ open, onClose, collapse, onCollapse }) => {
 
   return (
     <div
-      className={`sm:none duration-175 linear fixed !z-40 flex flex-col pb-10 bg-white shadow-white/5 transition-all ${
+      className={`sm:none duration-175 linear fixed !z-40 flex flex-col pb-10 bg-[#f2fffe] shadow-white/5 transition-all ${
         open ? "translate-x-0" : "-translate-x-96"
       } ${collapse ? "w-[90px]" : "w-[260px]"} ${
         open && isSmallScreen ? "!z-40" : ""

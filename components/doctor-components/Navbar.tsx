@@ -5,7 +5,7 @@ import { HiMenu } from "react-icons/hi";
 
 const Navbar = ({ onMenuClick }: { onMenuClick: () => void }) => { 
   return (
-    <nav className="bg-white border-b-2 flex items-center justify-between px-6 py-3">
+    <nav className="sticky top-0 bg-white border-b-2 flex items-center justify-between px-6 py-3 z-50">
       <div className="flex items-center relative w-80">
         <button
           className="md:hidden mr-4"
