@@ -94,20 +94,20 @@ const Sidebar: React.FC<Props> = ({ open, onClose, collapse, onCollapse }) => {
 
 
   const Otherlinks: ILink[] = [
-    {
-      title: "Settings",
-      icon: IoSettings,
-      link: "/doctor/settings",
-      isActive: isSettingActive,
-      collapsed: collapse,
-    },
-    {
-      title: "Payment",
-      icon: MdPayments,
-      link: "/doctor/payment",
-      isActive: isPaymentActive,
-      collapsed: collapse,
-    },
+    // {
+    //   title: "Settings",
+    //   icon: IoSettings,
+    //   link: "/doctor/settings",
+    //   isActive: isSettingActive,
+    //   collapsed: collapse,
+    // },
+    // {
+    //   title: "Payment",
+    //   icon: MdPayments,
+    //   link: "/doctor/payment",
+    //   isActive: isPaymentActive,
+    //   collapsed: collapse,
+    // },
     {
       title: "Accounts",
       icon: MdAccountCircle,

@@ -13,7 +13,7 @@ const Analysis = () => {
                 </div>
                 <ResponsiveBarChart/>
             </div>
-            <div className="md:col-span-4 h-full border-l-2 p-4 flex items-center justify-center">
+            <div className="md:col-span-4 h-full md:border-l-2 p-4 flex items-center justify-center">
                 <UpcomingVisits/>
             </div>
         </div>

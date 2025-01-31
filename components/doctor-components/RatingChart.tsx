@@ -13,7 +13,7 @@ const RatingChart = () => {
   const COLORS = ['#FFA07A', '#E0E0E0']; 
 
   return (
-    <div className='w-full flex flex-col items-center'>
+    <div className='flex flex-col items-center justify-center'>
       <h2 className='text-lg font-bold'>Your Rating</h2>
       <PieChart width={300} height={300}>
         <Pie
@@ -22,9 +22,12 @@ const RatingChart = () => {
           nameKey="name"
           cx="50%"
           cy="50%"
-          outerRadius={100}
-          innerRadius={60} 
-          fill="#8884d8"
+          innerRadius={60}
+          outerRadius={80}
+          startAngle={90}
+          endAngle={-270}
+          paddingAngle={5}
+          isAnimationActive={true}
         >
           {data.map((entry, index) => (
             <Cell key={`cell-${index}`} fill={COLORS[index]} />
