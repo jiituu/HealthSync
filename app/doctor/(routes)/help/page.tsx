@@ -1,9 +1,10 @@
+import Help from '@/pages/doctor/Help'
 import React from 'react'
 
 const page = () => {
   return (
     <div>
-      help
+      <Help/>
     </div>
   )
 }

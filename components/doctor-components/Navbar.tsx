@@ -2,6 +2,9 @@ import React from 'react';
 import { FaBell } from "react-icons/fa";
 import { CiSearch } from "react-icons/ci";
 import { HiMenu } from "react-icons/hi"; 
+import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
+import DoctorNotification from './DoctorNotification';
+import Link from 'next/link';
 
 const Navbar = ({ onMenuClick }: { onMenuClick: () => void }) => { 
   return (
@@ -26,19 +29,25 @@ const Navbar = ({ onMenuClick }: { onMenuClick: () => void }) => {
 
       <div className="flex items-center space-x-4">
         <div className="relative">
-          <button className="flex items-center space-x-2 text-sm text-gray-700 focus:outline-none">
+          <Link href='/doctor/accounts' className="flex items-center space-x-2 text-sm text-gray-700 focus:outline-none">
             <div className="w-8 h-8 bg-teal-400 rounded-full flex items-center justify-center text-white">
               D
             </div>
             <span className="hidden sm:inline">Dr Belete Abebe</span> 
-          </button>
+          </Link>
         </div>
 
         <div className="relative">
-          <button>
-            <FaBell className='text-[#B0C3CC]' size={25}/>
-          </button>
-          {/* <span className="absolute top-0 right-0 w-3 h-3 bg-red-500 rounded-full border-2 border-white"/> */}  
+          <Popover>
+            <PopoverTrigger asChild>
+              <button>
+                <FaBell className='text-[#B0C3CC]' size={25}/>
+              </button>
+            </PopoverTrigger>
+            <PopoverContent className="w-96 h-64 bg-[#e3ffff] shadow-lg rounded-lg mr-2">
+              <DoctorNotification />
+            </PopoverContent>
+          </Popover>
         </div>
       </div>
     </nav>
