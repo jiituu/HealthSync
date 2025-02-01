@@ -18,6 +18,15 @@ const Login = ({ setTab }: LoginProb) => {
   const [isLoggingIn, setIsLoggingIn] = useState(false);
 
   const onFinish = async (values: FormValues) => {
+    const { phone, password } = values;
+    const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(phone);
+    const isPhone = /^\+?[1-9]\d{1,14}$/.test(phone);
+
+    if (!isEmail && !isPhone) {
+      message.error("Please enter a valid email or phone number");
+      return;
+    }
+
     try {
       setIsLoggingIn(true);
       const res = await fetch(`http://localhost:5000/api/login/patient`, {
@@ -25,8 +34,12 @@ const Login = ({ setTab }: LoginProb) => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(values),
+        body: JSON.stringify({
+          password,
+          [isEmail ? "email" : "phone"]: phone,
+        }),
       });
+
       const data = await res.json();
 
       if (res.ok) {
