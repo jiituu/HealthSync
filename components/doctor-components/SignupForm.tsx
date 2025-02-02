@@ -50,7 +50,7 @@ const DoctorSignupForm = () => {
         if (key === "licenses" && values[key].length > 0) {
           formData.append("licenses", values[key][0]);
         } else {
-          formData.append(key, values[key] as string | number);
+          formData.append(key, (values as any)[key] as any);
         }
       });
 
