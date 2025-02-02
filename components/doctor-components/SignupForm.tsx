@@ -9,14 +9,15 @@ import {
   InputNumber,
   Upload,
   Col,
+  Divider,
 } from "antd";
 import { InboxOutlined } from "@ant-design/icons";
 
 const { Dragger } = Upload;
 
 const formItemLayout = {
-  labelCol: { span: 6 },
-  wrapperCol: { span: 18 },
+  labelCol: { span: 24 },
+  wrapperCol: { span: 24 },
 };
 
 interface DoctorSignupFormValues {
@@ -66,7 +67,6 @@ const DoctorSignupForm = () => {
       }
 
       message.success("Registration successful!");
-      // Handle successful registration (e.g., redirect, clear form, etc.)
     } catch (error) {
       message.error("Registration failed. Please try again.");
     } finally {
@@ -80,12 +80,15 @@ const DoctorSignupForm = () => {
       message.error(`${file.name} must be smaller than 15MB!`);
       return false;
     }
-    return false;
+    return true;
   };
 
   const formList = [
     // Step 1: Personal Details
-    <Row key="step-1" gutter={[16, 16]} justify="center">
+    <Row key="step-1" justify="center">
+      <Col span={24}>
+        <Divider orientation="left">Personal Details</Divider>
+      </Col>
       {[
         "First Name",
         "Last Name",
@@ -94,11 +97,12 @@ const DoctorSignupForm = () => {
         "Gender",
         "Age",
       ].map((label, index) => (
-        <Col span={12} key={label}>
+        <Col span={24} key={label}>
           <Form.Item
             {...formItemLayout}
             label={label}
             name={label.replace(/\s+/g, "").toLowerCase()}
+            className="m-0"
             rules={[{ required: true, message: `${label} is required` }]}
           >
             {label === "Gender" ? (
@@ -118,9 +122,9 @@ const DoctorSignupForm = () => {
         </Col>
       ))}
 
-      <Col span={24} className="flex justify-center" key="continue-button">
+      <Col span={24} key="continue-button">
         <Button
-          className="primary-button primary-button-white-text"
+          className="primary-button primary-button-white-text mt-2"
           onClick={() => goToStep(current + 1)}
         >
           Continue
@@ -129,47 +133,52 @@ const DoctorSignupForm = () => {
     </Row>,
 
     // Step 2: Professional Details
-    <Row key="step-2" gutter={[16, 16]} justify="center">
-      {["Specializations", "Qualifications", "Licenses", "Password"].map(
-        (label) => (
-          <Col span={24} key={label}>
-            <Form.Item
-              {...formItemLayout}
-              label={label}
-              name={label.replace(/\s+/g, "").toLowerCase()}
-              rules={[{ required: true, message: `${label} is required` }]}
-            >
-              {label === "Licenses" ? (
-                <Dragger
-                  beforeUpload={beforeUpload}
-                  maxCount={1}
-                  listType="picture-card"
-                  className="w-full"
-                >
-                  <p className="ant-upload-drag-icon">
-                    <InboxOutlined style={{ fontSize: "25px" }} />
-                  </p>
-                  <p className="ant-upload-text">
-                    Click or drag file to this area to upload
-                  </p>
-                </Dragger>
-              ) : label === "Password" ? (
-                <Input.Password
-                  autoComplete="new-password"
-                  className="w-full"
-                />
-              ) : (
-                <Input
-                  placeholder={`Enter your ${label.toLowerCase()}`}
-                  className="w-full"
-                />
-              )}
-            </Form.Item>
-          </Col>
-        )
-      )}
+    <Row key="step-2" gutter={[16, 8]} justify="center">
+      <Col span={24}>
+        <Divider orientation="left">Professional Details</Divider>
+      </Col>
+      {["Specializations", "Qualifications"].map((label) => (
+        <Col span={24} key={label}>
+          <Form.Item
+            {...formItemLayout}
+            label={label}
+            name={label.replace(/\s+/g, "").toLowerCase()}
+            className="m-0"
+            rules={[{ required: true, message: `${label} is required` }]}
+          >
+            <Input
+              className="w-full"
+              placeholder={`Enter your ${label.toLowerCase()}`}
+            />
+          </Form.Item>
+        </Col>
+      ))}
 
-      <Col span={24} className="flex justify-center gap-5" key="buttons">
+      <Col span={24}>
+        <Form.Item
+          {...formItemLayout}
+          label="Licenses"
+          name="licenses"
+          className="m-0"
+          rules={[{ required: true, message: "Please upload your licenses" }]}
+        >
+          <Dragger
+            beforeUpload={beforeUpload}
+            maxCount={1}
+            listType="picture-card"
+            className="w-full"
+          >
+            <p className="ant-upload-drag-icon">
+              <InboxOutlined style={{ fontSize: "25px" }} />
+            </p>
+            <p className="ant-upload-text">
+              Click or drag file to this area to upload
+            </p>
+          </Dragger>
+        </Form.Item>
+      </Col>
+
+      <Col span={24} key="continue-button">
         <Button
           className="primary-button primary-button-white-text"
           onClick={() => goToStep(current - 1)}
@@ -177,7 +186,40 @@ const DoctorSignupForm = () => {
           Back
         </Button>
         <Button
+          className="primary-button primary-button-white-text ml-2 mt-2"
+          onClick={() => goToStep(current + 1)}
+        >
+          Continue
+        </Button>
+      </Col>
+    </Row>,
+
+    // Step 3: Password
+    <Row key="step-3" gutter={[16, 8]} justify="center">
+      <Col span={24}>
+        <Divider orientation="left">Password</Divider>
+      </Col>
+      <Col span={24}>
+        <Form.Item
+          {...formItemLayout}
+          label="Password"
+          name="password"
+          className="m-0"
+          rules={[{ required: true, message: "Password is required" }]}
+        >
+          <Input.Password autoComplete="new-password" className="w-full" />
+        </Form.Item>
+      </Col>
+
+      <Col span={24} key="submit-button">
+        <Button
           className="primary-button primary-button-white-text"
+          onClick={() => goToStep(current - 1)}
+        >
+          Back
+        </Button>
+        <Button
+          className="primary-button primary-button-white-text ml-2"
           htmlType="submit"
           loading={isRegistering}
         >
