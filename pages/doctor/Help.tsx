@@ -62,7 +62,7 @@ const Help = () => {
       </div>
       <div className="mt-6 w-full bg-primaryColor p-8 rounded-lg shadow-md space-y-4">
         <p className="font-bold text-xl text-center mb-6">
-          Have any questions? We're here to assist you.
+          Have any questions? We are here to assist you.
         </p>
         <form className="relative mb-6">
           <div className="w-full flex justify-center">
