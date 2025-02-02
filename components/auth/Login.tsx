@@ -61,7 +61,7 @@ const Login = ({ setTab }: LoginProb) => {
         onFinishFailed={() => {
           message.error("Please submit the form correctly");
         }}
-        className="w-[100%] flex flex-col gap-7 mt-20"
+        className="w-[100%] flex flex-col gap-7 mt-20 p-4 md:p-0"
       >
         <Form.Item
           layout="vertical"

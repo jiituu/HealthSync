@@ -12,7 +12,7 @@ const Signup = () => {
   return (
     <>
       <Row className="w-[100%] justify-center">
-        <Row className="w-[80%] h-[35px] rounded-3xl mt-6 bg-[#D9D9D9] relative overflow-hidden">
+        <Row className="w-full md:w-[80%] h-[35px] rounded-3xl mt-6 bg-[#D9D9D9] relative overflow-hidden">
           {/* Sliding Indicator */}
           <div
             className={`absolute h-full w-[50%] bg-accent rounded-3xl transition-transform duration-300`}
