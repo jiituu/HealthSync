@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Button, Divider, Form, Input, message, Row, Select } from "antd";
+import { useRouter } from "next/navigation";
 
 interface PatientSignupFormValues {
   firstname: string;
@@ -40,6 +41,8 @@ const PatientSignupForm = () => {
     blood: "A+",
   });
 
+  const router = useRouter();
+
   const onFinish = async (values: PatientSignupFormValues) => {
     try {
       setIsRegistering(true);
@@ -55,6 +58,21 @@ const PatientSignupForm = () => {
 
       if (res.ok) {
         message.success("Registration successful.");
+        form.resetFields();
+        setFormValues({
+          firstname: "",
+          lastname: "",
+          email: "",
+          phoneNumber: "",
+          gender: "male",
+          age: 0,
+          nationality: "",
+          password: "",
+          height: 0,
+          weight: 0,
+          blood: "A+",
+        });
+        router.push("/");
       } else {
         message.error(data.error);
       }
