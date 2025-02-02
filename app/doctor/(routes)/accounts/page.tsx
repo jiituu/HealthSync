@@ -1,9 +1,10 @@
 import React from 'react'
+import Accounts from '@/pages/doctor/Accounts'
 
 const page = () => {
   return (
     <div>
-      {/* in this page we will redirect to the doctor dashboard */}
+      <Accounts />
     </div>
   )
 }

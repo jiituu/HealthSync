@@ -18,52 +18,52 @@ const Auth = ({slideUpAnimation}:{slideUpAnimation:SlideUpAnimationProb})=>{
     return (
         <motion.div
             key="secondPage"
-            className="absolute inset-0 bg-gray-800"
+            className="absolute inset-0 bg-gray-800 overflow-auto"
             initial={{ y: '100%' }}
             animate={{ y: '0%' }}
             exit={{ y: '-100%' }}
             transition={slideUpAnimation.transition}
         >
-            <Box className='bg-[url("../public/images/landing-bg.png")] bg-cover bg-center h-screen flex justify-center items-center'>
-                <Row className="w-[85%] h-fit bg-neutral-100 py-10">
+            <Box className='bg-[url("../public/images/landing-bg.png")] bg-cover bg-center min-h-screen flex justify-center items-center'>
+                <Row className="w-full md:w-[85%] h-fit bg-neutral-100 py-10 flex flex-col md:flex-row">
                     {/* Health sync text */}
-                    <Box className="w-[50%] h-auto flex justify-center items-center flex-col gap-11">
-                        <Typography className="text-primary text-7xl font-bold max-sm:text-xl max-sm:flex-[0.6]">Health<span className="text-accent">Sync</span></Typography>
-                        <Typography className="text-center w-[70%]">Lorem ipsum dolor sit amet, consectetur adipiscingelit, sed do eiusmod tempor incididunt</Typography>
+                    <Box className="w-full md:w-[50%] h-auto flex justify-center items-center flex-col gap-11 p-4 md:p-0">
+                        <Typography className="text-primary text-7xl font-bold max-sm:text-xl max-sm:flex-[0.6]">
+                          Health<span className="text-accent">Sync</span>
+                        </Typography>
+                        <Typography className="text-center w-[70%]">
+                            An AI-powered telemedicine platform that connects patients with verified doctors, enabling seamless virtual consultations, prescriptions, and healthcare management
+                        </Typography>
                     </Box>
 
                     {/* Forms */}
-                    <Row className="w-[50%] px-10">
-                    <Row className="w-[100%] h-[44px] rounded-3xl bg-[#D9D9D9] relative overflow-hidden">
-                        {/* Sliding Indicator */}
-                        <div
-                            className={`absolute h-full w-[50%] bg-primary rounded-3xl transition-transform duration-300`}
-                            style={{
-                            transform: tab === 0 ? 'translateX(0)' : 'translateX(100%)',
-                            }}
-                        />
-                        <Row
-                            className={`w-[50%] justify-center items-center cursor-pointer z-10 transition-colors duration-300 ${
-                                tab === 0 ? 'text-neutral-100' : 'text-black'
-                            }`}
-                            onClick={() => setTab(0)}
-                        >
-                            <Typography>Login</Typography>
+                    <Row className="w-full md:w-[50%] px-10 mt-10 md:mt-0">
+                        <Row className="w-full h-[44px] rounded-3xl bg-[#D9D9D9] relative overflow-hidden">
+                            {/* Sliding Indicator */}
+                            <div
+                                className={`absolute h-full w-[50%] bg-primary rounded-3xl transition-transform duration-300`}
+                                style={{
+                                  transform: tab === 0 ? 'translateX(0)' : 'translateX(100%)',
+                                }}
+                            />
+                            <Row
+                                className={`w-[50%] justify-center items-center cursor-pointer z-10 transition-colors duration-300 ${
+                                    tab === 0 ? 'text-neutral-100' : 'text-black'
+                                }`}
+                                onClick={() => setTab(0)}
+                            >
+                                <Typography>Login</Typography>
+                            </Row>
+                            <Row
+                                className={`w-[50%] justify-center items-center cursor-pointer z-10 transition-colors duration-300 ${
+                                    tab === 1 ? 'text-neutral-100' : 'text-black'
+                                }`}
+                                onClick={() => setTab(1)}
+                            >
+                                <Typography>Signup</Typography>
+                            </Row>
                         </Row>
-                        <Row
-                            className={`w-[50%] justify-center items-center cursor-pointer z-10 transition-colors duration-300 ${
-                            tab === 1 ? 'text-neutral-100' : 'text-black'
-                            }`}
-                            onClick={() => setTab(1)}
-                        >
-                            <Typography>Signup</Typography>
-                        </Row>
-                    </Row>
-                        {
-                            tab==0?
-                            <Login setTab={setTab}/>
-                            :<Signup/>
-                        }
+                        { tab === 0 ? <Login setTab={setTab}/> : <Signup/> }
                     </Row>
                 </Row>
             </Box>
