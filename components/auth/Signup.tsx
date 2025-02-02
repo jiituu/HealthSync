@@ -1,20 +1,8 @@
-import { Typography } from "@mui/material";
-import {
-  Button,
-  Divider,
-  Form,
-  Input,
-  InputNumber,
-  message,
-  Row,
-  Select,
-  UploadFile,
-} from "antd";
-import { InboxOutlined } from "@ant-design/icons";
-import { useStepsForm } from "sunflower-antd";
 import { useState } from "react";
-import Dragger from "antd/es/upload/Dragger";
-import { RcFile } from "antd/es/upload";
+
+import { Typography } from "@mui/material";
+import { Row } from "antd";
+
 import PatientSignupForm from "../patient-components/SignupForm";
 import DoctorSignupForm from "../doctor-components/SignupForm";
 
