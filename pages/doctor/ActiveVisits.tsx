@@ -23,6 +23,7 @@ const ActiveVisits = () => {
     setCanMoves()
     emblaApi.on('select', setCanMoves)
     return () => emblaApi.off('select', setCanMoves)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [emblaApi])
 
   const goLeft = () => {

@@ -16,15 +16,15 @@ const useNavigation = (): any => {
     const [ isHelpActive, setIsHelpActive ] = useState<boolean>(false);
 
   useEffect(() => {
-    setIsDashboardActive(pathname.includes("/doctor/dashboard"));
-    setIsEducationCenterActive(pathname.includes("/doctor/education"));
-    setIsMedicalhistoryActive(pathname.includes("/doctor/medicalhistory"));
-    setIsActivevisitsActive(pathname.includes("/doctor/activevisits"));
-    setIsChatActive(pathname.includes("/doctor/chat"));
-    setIsSettingActive(pathname.includes("/doctor/settings"));
-    setIsPaymentActive(pathname.includes("/doctor/payment"));
-    setIsAccountsActive(pathname.includes("/doctor/accounts"));
-    setIsHelpActive(pathname.includes("/doctor/help"));
+    setIsDashboardActive(pathname?.includes("/doctor/dashboard") ?? false);
+    setIsEducationCenterActive(pathname?.includes("/doctor/education")?? false);
+    setIsMedicalhistoryActive(pathname?.includes("/doctor/medicalhistory") ?? false);
+    setIsActivevisitsActive(pathname?.includes("/doctor/activevisits") ?? false);
+    setIsChatActive(pathname?.includes("/doctor/chat") ?? false);
+    setIsSettingActive(pathname?.includes("/doctor/settings") ?? false);
+    setIsPaymentActive(pathname?.includes("/doctor/payment") ?? false);
+    setIsAccountsActive(pathname?.includes("/doctor/accounts") ?? false);
+    setIsHelpActive(pathname?.includes("/doctor/help") ?? false);
 
   }, [pathname]);
 
