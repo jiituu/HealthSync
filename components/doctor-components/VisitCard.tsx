@@ -30,6 +30,7 @@ const VisitCard = () => {
         </div>
       </div>
       </div>
+      
   )
 }
 
