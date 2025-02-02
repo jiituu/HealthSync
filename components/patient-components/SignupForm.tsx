@@ -156,7 +156,7 @@ const PatientSignupForm = () => {
             <Input />
           </Form.Item>
 
-          <Row className="w-[100%] justify-center mt-8">
+          <Row className="w-[100%] mt-2">
             <Button
               className="primary-button primary-button-white-text"
               onClick={() => goToStep(1)} // Go to step 2
@@ -202,21 +202,18 @@ const PatientSignupForm = () => {
             />
           </Form.Item>
 
-          <Row className="w-[100%] justify-center mt-8">
-            <Button
-              className="primary-button primary-button-white-text"
-              onClick={() => goToStep(2)} // Go to step 3 (Password)
-            >
-              Continue
-            </Button>
-          </Row>
-
-          <Row className="w-[100%] justify-center mt-4">
+          <Row className="w-[100%] mt-2">
             <Button
               className="primary-button primary-button-white-text"
               onClick={() => goToStep(0)} // Go back to step 1
             >
               Back
+            </Button>
+            <Button
+              className="primary-button primary-button-white-text ml-2"
+              onClick={() => goToStep(2)} // Go to step 3 (Password)
+            >
+              Continue
             </Button>
           </Row>
         </>
@@ -236,22 +233,19 @@ const PatientSignupForm = () => {
             <Input.Password autoComplete="new-password" />
           </Form.Item>
 
-          <Row className="w-[100%] justify-center mt-8">
-            <Button
-              className="primary-button primary-button-white-text"
-              htmlType="submit"
-              loading={isRegistering}
-            >
-              Signup
-            </Button>
-          </Row>
-
-          <Row className="w-[100%] justify-center mt-4">
+          <Row className="w-[100%] mt-8">
             <Button
               className="primary-button primary-button-white-text"
               onClick={() => goToStep(1)} // Go back to step 2
             >
               Back
+            </Button>
+            <Button
+              className="primary-button primary-button-white-text ml-2"
+              htmlType="submit"
+              loading={isRegistering}
+            >
+              Register
             </Button>
           </Row>
         </>
