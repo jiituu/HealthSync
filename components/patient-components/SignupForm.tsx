@@ -2,17 +2,17 @@ import React, { useState } from "react";
 import { Button, Divider, Form, Input, message, Row, Select } from "antd";
 
 interface PatientSignupFormValues {
-  firstName: string;
-  lastName: string;
+  firstname: string;
+  lastname: string;
   email: string;
-  phone: string;
+  phoneNumber: string;
   gender: "male" | "female";
   age: number;
   nationality: string;
   password: string;
   height: number;
   weight: number;
-  bloodType: "A+" | "A-" | "B+" | "B-" | "AB+" | "AB-" | "O+" | "O-";
+  blood: "A+" | "A-" | "B+" | "B-" | "AB+" | "AB-" | "O+" | "O-";
 }
 
 const generateOptions = (start: number, end: number) => {
@@ -26,6 +26,19 @@ const PatientSignupForm = () => {
   const [form] = Form.useForm();
   const [isRegistering, setIsRegistering] = useState(false);
   const [currentStep, setCurrentStep] = useState(0); // Step state
+  const [formValues, setFormValues] = useState<PatientSignupFormValues>({
+    firstname: "",
+    lastname: "",
+    email: "",
+    phoneNumber: "",
+    gender: "male",
+    age: 0,
+    nationality: "",
+    password: "",
+    height: 0,
+    weight: 0,
+    blood: "A+",
+  });
 
   const onFinish = async (values: PatientSignupFormValues) => {
     try {
@@ -35,7 +48,7 @@ const PatientSignupForm = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(values),
+        body: JSON.stringify(formValues), // Submit the complete formValues state
       });
 
       const data = await res.json();
@@ -46,12 +59,18 @@ const PatientSignupForm = () => {
         message.error(data.error);
       }
     } catch (error) {
+      message.error("An error occurred during registration.");
     } finally {
       setIsRegistering(false);
     }
   };
 
   const goToStep = (step: number) => setCurrentStep(step); // Navigation between steps
+
+  const handleStepChange = (changedValues: any) => {
+    // Update formValues when fields change
+    setFormValues((prevValues) => ({ ...prevValues, ...changedValues }));
+  };
 
   return (
     <Form
@@ -60,6 +79,7 @@ const PatientSignupForm = () => {
       onFinishFailed={() => {
         message.error("Please submit the form correctly");
       }}
+      onValuesChange={handleStepChange} // Listen for form value changes
       className="w-[100%] flex flex-col gap-4 mt-20"
     >
       {currentStep === 0 && ( // Step 1: Personal Details
@@ -69,7 +89,7 @@ const PatientSignupForm = () => {
           <Form.Item
             layout="vertical"
             label="First Name"
-            name="firstName"
+            name="firstname"
             rules={[{ required: true, message: "First name is required" }]}
           >
             <Input />
@@ -78,7 +98,7 @@ const PatientSignupForm = () => {
           <Form.Item
             layout="vertical"
             label="Last Name"
-            name="lastName"
+            name="lastname"
             rules={[{ required: true, message: "Last name is required" }]}
           >
             <Input />
@@ -102,7 +122,7 @@ const PatientSignupForm = () => {
           <Form.Item
             layout="vertical"
             label="Phone"
-            name="phone"
+            name="phoneNumber"
             rules={[
               { required: true, message: "Phone number is required" },
               {
@@ -192,7 +212,7 @@ const PatientSignupForm = () => {
           <Form.Item
             layout="vertical"
             label="Blood Type"
-            name="bloodType"
+            name="blood"
             rules={[{ required: true, message: "Blood type is required" }]}
           >
             <Select
