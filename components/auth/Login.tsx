@@ -3,6 +3,7 @@ import { Box, Typography } from "@mui/material";
 import { Button, Divider, Form, Input, message, Row } from "antd";
 import { GoogleCircleFilled } from "@ant-design/icons";
 import FacebookRoundedIcon from "@mui/icons-material/FacebookRounded";
+import { useRouter } from "next/navigation";
 
 type LoginProb = {
   setTab: any;
@@ -16,7 +17,7 @@ interface FormValues {
 const Login = ({ setTab }: LoginProb) => {
   const [form] = Form.useForm();
   const [isLoggingIn, setIsLoggingIn] = useState(false);
-
+  const router = useRouter();
   const onFinish = async (values: FormValues) => {
     const { phone, password } = values;
     const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(phone);
@@ -44,6 +45,7 @@ const Login = ({ setTab }: LoginProb) => {
 
       if (res.ok) {
         message.success("Login successful.");
+        router.push('patient/dashboard');
       } else {
         message.error(data.error);
       }
