@@ -51,7 +51,7 @@ const MedicalHistory = () => {
   const paginatedData = dummyData.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
 
   return (
-    <div className="">
+    <div className="mr-5">
       {/* Profile Section */}
       <div className="flex justify-between items-center shadow-sm py-3 w-full">
         <div className="flex items-center">

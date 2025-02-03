@@ -15,7 +15,7 @@ const About = ()=>{
                     About Us
                 </Typography>
                 <Typography className="text-neutral-100 max-w-lg break-words">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis
+                    At HealthSync, we bridge the gap between patients, providers, and data-driven insights to create a smarter, more connected healthcare experience. Our technology enables seamless health data synchronization, remote monitoring, and AI-powered analytics to enhance patient care and well-being.
                 </Typography>
             </Box>
             <Box className='flex-[0.6]'></Box>

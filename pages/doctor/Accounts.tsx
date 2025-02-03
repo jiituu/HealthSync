@@ -196,7 +196,7 @@ const Accounts = () => {
                 </FormItem>
                 <div className="mt-4 flex justify-end">
                   <Button type="submit" className="btn btn-primary bg-secondaryColor text-white">
-                    Request document verification
+                    Request document change
                   </Button>
                 </div>
               </form>

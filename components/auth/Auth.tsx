@@ -32,7 +32,7 @@ const Auth = ({slideUpAnimation}:{slideUpAnimation:SlideUpAnimationProb})=>{
                           Health<span className="text-accent">Sync</span>
                         </Typography>
                         <Typography className="text-center w-[70%]">
-                            An AI-powered telemedicine platform that connects patients with verified doctors, enabling seamless virtual consultations, prescriptions, and healthcare management
+                            An AI-powered platform that connects patients with verified doctors, enabling virtual consultations, prescriptions, and healthcare management
                         </Typography>
                     </Box>
 

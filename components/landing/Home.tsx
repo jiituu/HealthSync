@@ -7,6 +7,7 @@ import { motion } from 'framer-motion';
 import MenuIcon from '@mui/icons-material/Menu';
 import { useState } from "react";
 import About from "./About";
+import { ContactUs } from "./ContactUs";
 
 
 type SlideUpAnimationProb = {
@@ -60,7 +61,7 @@ const Home = ({slideUpAnimation,setShowSecondPage}:{slideUpAnimation:SlideUpAnim
                         <Row className="flex flex-col justify-center items-center gap-16">
                             <Typography className="text-primary text-6xl font-bold max-sm:text-4xl">Health<span className="text-accent">Sync</span></Typography>
                             <Typography className="text-neutral-100 max-w-lg text-center break-words">
-                                An AI-powered telemedicine platform that connects patients with verified doctors, enabling seamless virtual consultations, prescriptions, and healthcare management
+                                An AI-powered platform that connects patients with verified doctors, enabling virtual consultations, prescriptions, and healthcare management
                             </Typography>
                             <Button
                                 className="primary-button"
@@ -72,6 +73,8 @@ const Home = ({slideUpAnimation,setShowSecondPage}:{slideUpAnimation:SlideUpAnim
                     </Row>
                     :page == 'about'?
                     <About/>
+                    :page == 'contact'?
+                    <ContactUs/>
                     :<></>
                 }
             </Box>
