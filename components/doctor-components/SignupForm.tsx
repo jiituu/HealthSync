@@ -55,7 +55,7 @@ const DoctorSignupForm = () => {
       });
 
       const response = await fetch(
-        "http://localhost:5000/api/register/doctor",
+        "https://healthsync-backend-bfrv.onrender.com/api/register/doctor",
         {
           method: "POST",
           body: formData,

@@ -46,7 +46,7 @@ const PatientSignupForm = () => {
   const onFinish = async (values: PatientSignupFormValues) => {
     try {
       setIsRegistering(true);
-      const res = await fetch(`http://localhost:5000/api/register/patient`, {
+      const res = await fetch(`https://healthsync-backend-bfrv.onrender.com/api/register/patient`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -29,7 +29,7 @@ const Login = ({ setTab }: LoginProb) => {
 
     try {
       setIsLoggingIn(true);
-      const res = await fetch(`http://localhost:5000/api/login/patient`, {
+      const res = await fetch(`https://healthsync-backend-bfrv.onrender.com/api/login/patient`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
