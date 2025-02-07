@@ -1,6 +1,6 @@
 "use client";
 import Navbar from "@/components/doctor-components/Navbar";
-import Sidebar from "@/components/doctor-components/Sidebar";
+import Sidebar from "@/components/common-components/Sidebar";
 import { useState, useEffect } from "react";
 
 export default function RootLayout({
@@ -29,6 +29,7 @@ export default function RootLayout({
     <>
       <div className="flex bg-surface min-h-screen">
         <Sidebar
+          type='Doctor'
           open={open}
           onClose={() => {
             setOpen(false);

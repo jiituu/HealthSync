@@ -2,20 +2,18 @@ import { HiX } from "react-icons/hi";
 import { FiChevronsLeft } from "react-icons/fi";
 import SidebarLink from "./SidebarLinks";
 import useNavigation from "@/hooks/doctor/useNavigation";
-import { useEffect, useState } from "react"; // Added import
-
+import { useEffect, useState } from "react";
 import { LuLayoutDashboard } from "react-icons/lu";
 import { FaBookMedical } from "react-icons/fa";
 import { TbLayoutSidebarInactive } from "react-icons/tb";
 import { MdCastForEducation } from "react-icons/md";
 import { IoChatboxEllipses } from "react-icons/io5";
-import { IoSettings } from "react-icons/io5";
-import { MdPayments } from "react-icons/md";
 import { MdAccountCircle } from "react-icons/md";
 import { IoMdHelpCircle } from "react-icons/io";
 
 
 interface Props {
+  type: 'Doctor'|'Patient'|'Admin'
   open: boolean;
   onClose: React.MouseEventHandler<HTMLSpanElement>;
   collapse: boolean;
@@ -29,7 +27,8 @@ interface ILink {
   collapsed: boolean;
 }
 
-const Sidebar: React.FC<Props> = ({ open, onClose, collapse, onCollapse }) => {
+
+const Sidebar: React.FC<Props> = ({ type, open, onClose, collapse, onCollapse }) => {
   const {
     isDashboardActive,
     isMedicalhistoryActive,
@@ -54,7 +53,7 @@ const Sidebar: React.FC<Props> = ({ open, onClose, collapse, onCollapse }) => {
     return () => window.removeEventListener("resize", checkScreenSize);
   }, []);
 
-  const links: ILink[] = [
+  const docLinks: ILink[] = [
     {
       title: "Dashboard",
       icon: LuLayoutDashboard,
@@ -92,8 +91,7 @@ const Sidebar: React.FC<Props> = ({ open, onClose, collapse, onCollapse }) => {
     }
   ];
 
-
-  const Otherlinks: ILink[] = [
+  const docOtherLinks: ILink[] = [
     // {
     //   title: "Settings",
     //   icon: IoSettings,
@@ -124,8 +122,88 @@ const Sidebar: React.FC<Props> = ({ open, onClose, collapse, onCollapse }) => {
     },
   ];
 
+  const patientLinks: ILink[] = [
+    {
+      title: "Dashboard",
+      icon: LuLayoutDashboard,
+      link: "/patient/dashboard",
+      isActive: isDashboardActive,
+      collapsed: collapse,
+    },
+    {
+      title: "Medical History",
+      icon: FaBookMedical,
+      link: "/patient/medicalhistory",
+      isActive: isMedicalhistoryActive,
+      collapsed: collapse,
+    },
+    {
+      title: "Active Visits",
+      icon: TbLayoutSidebarInactive,
+      link: "/patient/activevisits",
+      isActive: isActivevisitsActive,
+      collapsed: collapse,
+    },
+    {
+      title: "Education Center",
+      icon: MdCastForEducation,
+      link: "/patient/education",
+      isActive: isEducationCenterActive,
+      collapsed: collapse,
+    },
+    {
+      title: "Chat",
+      icon: IoChatboxEllipses,
+      link: "/patient/chat",
+      isActive: isChatActive,
+      collapsed: collapse,
+    }
+  ];
+
+  const patientOtherLinks: ILink[] = [
+    // {
+    //   title: "Settings",
+    //   icon: IoSettings,
+    //   link: "/doctor/settings",
+    //   isActive: isSettingActive,
+    //   collapsed: collapse,
+    // },
+    // {
+    //   title: "Payment",
+    //   icon: MdPayments,
+    //   link: "/doctor/payment",
+    //   isActive: isPaymentActive,
+    //   collapsed: collapse,
+    // },
+    {
+      title: "Accounts",
+      icon: MdAccountCircle,
+      link: "/patient/accounts",
+      isActive: isAccountsActive,
+      collapsed: collapse,
+    },
+    {
+      title: "Help",
+      icon: IoMdHelpCircle,
+      link: "/patient/help",
+      isActive: isHelpActive,
+      collapsed: collapse,
+    },
+  ];
+
+  const adminLinks:ILink[] = [];
+
+  const adminOtherLinks:ILink[] = [];
+
 
  
+  const getLinks = (type:'Doctor'|'Patient'|'Admin', link:'otherLinks'|'links')=>{
+    return (
+      type=='Doctor'?(link=='links'?docLinks:docOtherLinks):
+      type=='Patient'?(link=='links'?patientLinks:patientOtherLinks):
+      type=='Admin'?(link=='links'?adminLinks:adminOtherLinks):[]
+    )
+  }
 
   return (
     <div
@@ -152,7 +230,7 @@ const Sidebar: React.FC<Props> = ({ open, onClose, collapse, onCollapse }) => {
         </div>
       </div>
 
-      {links.map((link: ILink, index: number) => {
+      {getLinks(type,'links').map((link: ILink, index: number) => {
         return (
           <SidebarLink
             title={link.title}
@@ -168,7 +246,7 @@ const Sidebar: React.FC<Props> = ({ open, onClose, collapse, onCollapse }) => {
       <hr className="my-5 mx-5" />
 
 
-    {Otherlinks.map((link: ILink, index: number) => {
+    {getLinks(type,'otherLinks').map((link: ILink, index: number) => {
         return (
           <SidebarLink
             title={link.title}
@@ -188,7 +266,7 @@ const Sidebar: React.FC<Props> = ({ open, onClose, collapse, onCollapse }) => {
         onClick={onCollapse}
         aria-label="Collapse-Icon"
       >
-        <FiChevronsLeft className={`h-[40px] w-[40px] ${collapse ? "rotate-180" : ""}`} />
+        <FiChevronsLeft size={30} className={`${collapse ? "rotate-180" : ""}`} />
       </span>
     </div>
   );

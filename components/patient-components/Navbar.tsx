@@ -12,7 +12,7 @@ const notifications: NotificationModel[] = [
     id: '1',
     targetID:'e8e8-455r',
     triggerID: "@Mihret223",
-    message: "has requested your service.\nName:Mihret\nage:23\nGender:Female",
+    message: "has requested your service.",
     time: "9:42 AM",
     type: "visitRequest"
   },
@@ -27,7 +27,6 @@ const notifications: NotificationModel[] = [
 ];
 
 const Navbar = ({ onMenuClick }: { onMenuClick: () => void }) => { 
-  
   return (
     <nav className="sticky top-0 bg-white border-b-2 flex items-center justify-between px-6 py-3 z-20">
       <div className="flex items-center relative w-80">
@@ -52,9 +51,9 @@ const Navbar = ({ onMenuClick }: { onMenuClick: () => void }) => {
         <div className="relative">
           <Link href='/doctor/accounts' className="flex items-center space-x-2 text-sm text-gray-700 focus:outline-none">
             <div className="w-8 h-8 bg-teal-400 rounded-full flex items-center justify-center text-white">
-              D
+              B
             </div>
-            <span className="hidden sm:inline">Dr Belete Abebe</span> 
+            <span className="hidden sm:inline">Mr Belete</span> 
           </Link>
         </div>
 

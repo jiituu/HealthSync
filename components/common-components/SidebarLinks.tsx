@@ -18,9 +18,9 @@ const SidebarLink: React.FC<Props> = ({ title, Icon, link, isActive, collapsed }
         }`} 
       >
         <div>
-          <Icon size={20} /> 
+          <Icon className={isActive?`text-white`:`text-[#3a3a3acc]`} size={18} /> 
         </div>
-        <p className={`${collapsed ? "hidden" : "block"} ml-3`}>{title}</p> 
+        <p className={`${collapsed ? "hidden" : "block"} ml-3 text-[15px]`}>{title}</p> 
       </div>
     </Link>
   );
