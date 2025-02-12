@@ -6,8 +6,6 @@ import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover
 import Link from 'next/link';
 import Notification from '../common-components/Notification';
 import { NotificationModel } from '../models/notification';
-import { motion } from 'framer-motion';
-import { X } from "lucide-react";
 import { Row } from 'antd';
 import { useRouter } from 'next/navigation';
 
@@ -152,7 +150,6 @@ const Navbar = ({ onMenuClick }: { onMenuClick: () => void }) => {
   // Close the modal if the user clicks outside the container
   useEffect(() => {
     const handleClickOutside = (event:MouseEvent) => {
-      console.log("hii")
       if (
         containerRef.current &&
         !containerRef.current.contains(event.target)
