@@ -29,7 +29,7 @@ export default function RootLayout({
     <>
       <div className="flex bg-surface min-h-screen">
         <Sidebar
-          type='Doctor'
+          type='Patient'
           open={open}
           onClose={() => {
             setOpen(false);
