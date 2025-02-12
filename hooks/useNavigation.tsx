@@ -20,6 +20,12 @@ const useNavigation = (): any => {
     const [ isAdminContentActive, setIsAdminContentActive ] = useState<boolean>(false);
     const [ isAdminAccountsActive, setIsAdminAccountsActive ] = useState<boolean>(false); 
     const [ isAdminHelpActive, setIsAdminHelpActive ] = useState<boolean>(false);
+    const [ isPatientDashboardActive, setIsPatientDashboardActive ] = useState<boolean>(false);
+    const [ isPatientMedicalhistoryActive, setIsPatientMedicalhistoryActive ] = useState<boolean>(false);
+    const [ isPatientBlogActive, setIsPatientBlogActive ] = useState<boolean>(false);
+    const [ isPatientChatActive, setIsPatientChatActive ] = useState<boolean>(false);
+    const [ isPatientAccountsActive, setIsPatientAccountsActive ] = useState<boolean>(false);
+    const [ isPatientHelpActive, setIsPatientHelpActive ] = useState<boolean>(false);
 
   useEffect(() => {
     setIsDashboardActive(pathname?.includes("/doctor/dashboard") ?? false);
@@ -37,6 +43,12 @@ const useNavigation = (): any => {
     setIsAdminContentActive(pathname?.includes("/admin/content") ?? false);
     setIsAdminAccountsActive(pathname?.includes("/admin/accounts") ?? false);
     setIsAdminHelpActive(pathname?.includes("/admin/help") ?? false);
+    setIsPatientDashboardActive(pathname?.includes("/patient/dashboard") ?? false);
+    setIsPatientMedicalhistoryActive(pathname?.includes("/patient/medicalhistory") ?? false);
+    setIsPatientBlogActive(pathname?.includes("/patient/blog") ?? false);
+    setIsPatientChatActive(pathname?.includes("/patient/chat") ?? false);
+    setIsPatientAccountsActive(pathname?.includes("/patient/accounts") ?? false);
+    setIsPatientHelpActive(pathname?.includes("/patient/help") ?? false);
 
   }, [pathname]);
 
@@ -56,6 +68,12 @@ const useNavigation = (): any => {
     isAdminContentActive,
     isAdminAccountsActive,
     isAdminHelpActive,
+    isPatientDashboardActive,
+    isPatientMedicalhistoryActive,
+    isPatientBlogActive,
+    isPatientChatActive,
+    isPatientAccountsActive,
+    isPatientHelpActive,
   };
 };
 

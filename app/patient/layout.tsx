@@ -1,32 +1,33 @@
 "use client";
-import Sidebar from '@/components/common-components/Sidebar';
-import Navbar from '@/components/patient-components/Navbar';
-import { ReactNode, useEffect, useState } from 'react';
+import Navbar from "@/components/patient-components/PatientNavbar";
+import Sidebar from "@/components/common-components/Sidebar";
+import { useState, useEffect } from "react";
 
-interface PatientLayoutProps {
-    children: ReactNode;
-}
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>): JSX.Element {
+  const [open, setOpen] = useState<boolean>(true);
+  const [collapse, setCollapse] = useState<boolean>(false);
 
-export default function PatientLayout({ children }: PatientLayoutProps) {
-    const [open, setOpen] = useState<boolean>(true);
-    const [collapse, setCollapse] = useState<boolean>(false);
-
-    const handleResize = () => {
+  const handleResize = () => {
     if (window.innerWidth < 768) { 
-        setOpen(false);
+      setOpen(false);
     } else {
-        setOpen(true);
+      setOpen(true);
     }
-    };
+  };
 
-    useEffect(() => {
+  useEffect(() => {
     window.addEventListener("resize", handleResize);
     handleResize();
     return () => window.removeEventListener("resize", handleResize);
-    }, []);
-    
-    return (
-        <div className="flex bg-surface min-h-screen">
+  }, []);
+
+  return (
+    <>
+      <div className="flex bg-surface min-h-screen">
         <Sidebar
           type='Doctor'
           open={open}
@@ -43,5 +44,6 @@ export default function PatientLayout({ children }: PatientLayoutProps) {
           <div className="max-w-[1300px] mx-auto overflow-y-auto h-full pt-8">{children}</div>
         </div>
       </div>
-    );
+    </>
+  );
 }

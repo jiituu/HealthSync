@@ -17,12 +17,16 @@ if (pathname === "/admin") {
 }
 
 
+if (pathname === "/patient") {
+    url.pathname = "/patient/dashboard";
+    return NextResponse.redirect(url);
+}
 
     return NextResponse.next();
 };
 
 export const config = {
-    matcher: ["/doctor/:path*", "/admin/:path*"],
+    matcher: ["/doctor/:path*", "/admin/:path*", "/patient/:path*"],
 };
 
 

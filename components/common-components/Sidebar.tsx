@@ -43,6 +43,13 @@ const Sidebar: React.FC<Props> = ({ type, open, onClose, collapse, onCollapse })
     isAdminContentActive,
     isAdminAccountsActive,
     isAdminHelpActive,
+    isPatientDashboardActive,
+    isPatientMedicalhistoryActive,
+    isPatientBlogActive,
+    isPatientChatActive,
+    isPatientAccountsActive,
+    isPatientHelpActive,
+
 
   } = useNavigation();
 
@@ -119,35 +126,28 @@ const Sidebar: React.FC<Props> = ({ type, open, onClose, collapse, onCollapse })
       title: "Dashboard",
       icon: LuLayoutDashboard,
       link: "/patient/dashboard",
-      isActive: isDashboardActive,
+      isActive: isPatientDashboardActive,
       collapsed: collapse,
     },
     {
       title: "Medical History",
       icon: FaBookMedical,
       link: "/patient/medicalhistory",
-      isActive: isMedicalhistoryActive,
+      isActive: isPatientMedicalhistoryActive,
       collapsed: collapse,
     },
     {
-      title: "Active Visits",
+      title: "Blog",
       icon: TbLayoutSidebarInactive,
-      link: "/patient/activevisits",
-      isActive: isActivevisitsActive,
-      collapsed: collapse,
-    },
-    {
-      title: "Education Center",
-      icon: MdCastForEducation,
-      link: "/patient/education",
-      isActive: isEducationCenterActive,
+      link: "/patient/blog",
+      isActive: isPatientBlogActive,
       collapsed: collapse,
     },
     {
       title: "Chat",
       icon: IoChatboxEllipses,
       link: "/patient/chat",
-      isActive: isChatActive,
+      isActive: isPatientChatActive,
       collapsed: collapse,
     }
   ];
@@ -157,14 +157,14 @@ const Sidebar: React.FC<Props> = ({ type, open, onClose, collapse, onCollapse })
       title: "Accounts",
       icon: MdAccountCircle,
       link: "/patient/accounts",
-      isActive: isAccountsActive,
+      isActive: isPatientAccountsActive,
       collapsed: collapse,
     },
     {
       title: "Help",
       icon: IoMdHelpCircle,
       link: "/patient/help",
-      isActive: isHelpActive,
+      isActive: isPatientHelpActive,
       collapsed: collapse,
     },
   ];
