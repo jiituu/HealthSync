@@ -14,6 +14,12 @@ const useNavigation = (): any => {
     const [ isPaymentActive, setIsPaymentActive ] = useState<boolean>(false);
     const [ isAccountsActive, setIsAccountsActive ] = useState<boolean>(false);
     const [ isHelpActive, setIsHelpActive ] = useState<boolean>(false);
+    const [ isAdminDashboardActive, setIsAdminDashboardActive ] = useState<boolean>(false);
+    const [ isAdminUserManagementActive, setIsAdminUserManagementActive ] = useState<boolean>(false);
+    const [ isAdminDoctorManagementActive, setIsAdminDoctorManagementActive ] = useState<boolean>(false);
+    const [ isAdminContentActive, setIsAdminContentActive ] = useState<boolean>(false);
+    const [ isAdminAccountsActive, setIsAdminAccountsActive ] = useState<boolean>(false); 
+    const [ isAdminHelpActive, setIsAdminHelpActive ] = useState<boolean>(false);
 
   useEffect(() => {
     setIsDashboardActive(pathname?.includes("/doctor/dashboard") ?? false);
@@ -25,6 +31,12 @@ const useNavigation = (): any => {
     setIsPaymentActive(pathname?.includes("/doctor/payment") ?? false);
     setIsAccountsActive(pathname?.includes("/doctor/accounts") ?? false);
     setIsHelpActive(pathname?.includes("/doctor/help") ?? false);
+    setIsAdminDashboardActive(pathname?.includes("/admin/dashboard") ?? false);
+    setIsAdminUserManagementActive(pathname?.includes("/admin/userManagement") ?? false);
+    setIsAdminDoctorManagementActive(pathname?.includes("/admin/doctorManagement") ?? false);
+    setIsAdminContentActive(pathname?.includes("/admin/content") ?? false);
+    setIsAdminAccountsActive(pathname?.includes("/admin/accounts") ?? false);
+    setIsAdminHelpActive(pathname?.includes("/admin/help") ?? false);
 
   }, [pathname]);
 
@@ -38,6 +50,12 @@ const useNavigation = (): any => {
     isPaymentActive,
     isAccountsActive,
     isHelpActive,
+    isAdminDashboardActive,
+    isAdminUserManagementActive,
+    isAdminDoctorManagementActive,
+    isAdminContentActive,
+    isAdminAccountsActive,
+    isAdminHelpActive,
   };
 };
 

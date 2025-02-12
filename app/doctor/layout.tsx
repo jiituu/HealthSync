@@ -1,5 +1,5 @@
 "use client";
-import Navbar from "@/components/doctor-components/Navbar";
+import Navbar from "@/components/doctor-components/DoctorNavbar";
 import Sidebar from "@/components/common-components/Sidebar";
 import { useState, useEffect } from "react";
 

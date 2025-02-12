@@ -1,7 +1,7 @@
 import { HiX } from "react-icons/hi";
 import { FiChevronsLeft } from "react-icons/fi";
 import SidebarLink from "./SidebarLinks";
-import useNavigation from "@/hooks/doctor/useNavigation";
+import useNavigation from "@/hooks/useNavigation";
 import { useEffect, useState } from "react";
 import { LuLayoutDashboard } from "react-icons/lu";
 import { FaBookMedical } from "react-icons/fa";
@@ -35,10 +35,15 @@ const Sidebar: React.FC<Props> = ({ type, open, onClose, collapse, onCollapse })
     isActivevisitsActive,
     isEducationCenterActive,
     isChatActive,
-    isSettingActive,
-    isPaymentActive,
     isAccountsActive,
     isHelpActive,
+    isAdminDashboardActive,
+    isAdminUserManagementActive,
+    isAdminDoctorManagementActive,
+    isAdminContentActive,
+    isAdminAccountsActive,
+    isAdminHelpActive,
+
   } = useNavigation();
 
   const [isSmallScreen, setIsSmallScreen] = useState<boolean>(false);
@@ -92,20 +97,6 @@ const Sidebar: React.FC<Props> = ({ type, open, onClose, collapse, onCollapse })
   ];
 
   const docOtherLinks: ILink[] = [
-    // {
-    //   title: "Settings",
-    //   icon: IoSettings,
-    //   link: "/doctor/settings",
-    //   isActive: isSettingActive,
-    //   collapsed: collapse,
-    // },
-    // {
-    //   title: "Payment",
-    //   icon: MdPayments,
-    //   link: "/doctor/payment",
-    //   isActive: isPaymentActive,
-    //   collapsed: collapse,
-    // },
     {
       title: "Accounts",
       icon: MdAccountCircle,
@@ -122,6 +113,7 @@ const Sidebar: React.FC<Props> = ({ type, open, onClose, collapse, onCollapse })
     },
   ];
 
+  // Patient Links Links and Other Links  
   const patientLinks: ILink[] = [
     {
       title: "Dashboard",
@@ -161,20 +153,6 @@ const Sidebar: React.FC<Props> = ({ type, open, onClose, collapse, onCollapse })
   ];
 
   const patientOtherLinks: ILink[] = [
-    // {
-    //   title: "Settings",
-    //   icon: IoSettings,
-    //   link: "/doctor/settings",
-    //   isActive: isSettingActive,
-    //   collapsed: collapse,
-    // },
-    // {
-    //   title: "Payment",
-    //   icon: MdPayments,
-    //   link: "/doctor/payment",
-    //   isActive: isPaymentActive,
-    //   collapsed: collapse,
-    // },
     {
       title: "Accounts",
       icon: MdAccountCircle,
@@ -191,9 +169,56 @@ const Sidebar: React.FC<Props> = ({ type, open, onClose, collapse, onCollapse })
     },
   ];
 
-  const adminLinks:ILink[] = [];
 
-  const adminOtherLinks:ILink[] = [];
+
+  // Admin Links Links and Other Links
+  const adminLinks:ILink[] = [
+    {
+      title: "Dashboard",
+      icon: MdAccountCircle,
+      link: "/admin/dashboard",
+      isActive: isAdminDashboardActive,
+      collapsed: collapse,
+    },
+    {
+      title: "User Management",
+      icon: MdAccountCircle,
+      link: "/admin/userManagement",
+      isActive: isAdminUserManagementActive,
+      collapsed: collapse,
+    },
+    {
+      title: "Doctor Management",
+      icon: IoMdHelpCircle,
+      link: "/admin/doctorManagement",
+      isActive: isAdminDoctorManagementActive,
+      collapsed: collapse,
+    },
+    {
+      title: "Content Management",
+      icon: IoMdHelpCircle,
+      link: "/admin/contentManagement",
+      isActive: isAdminContentActive,
+      collapsed: collapse,
+    },
+  ];
+
+  const adminOtherLinks:ILink[] = [
+    {
+      title: "Accounts",
+      icon: MdAccountCircle,
+      link: "/admin/accounts",
+      isActive: isAdminAccountsActive,
+      collapsed: collapse,
+    },
+    {
+      title: "Help",
+      icon: IoMdHelpCircle,
+      link: "/admin/help",
+      isActive: isAdminHelpActive,
+      collapsed: collapse,
+    },
+  ];
 
 
  
