@@ -1,7 +1,7 @@
 import { HiX } from "react-icons/hi";
 import { FiChevronsLeft } from "react-icons/fi";
 import SidebarLink from "./SidebarLinks";
-import useNavigation from "@/hooks/doctor/useNavigation";
+import useNavigation from "@/hooks/useNavigation";
 import { useEffect, useState } from "react";
 import { LuLayoutDashboard } from "react-icons/lu";
 import { FaBookMedical } from "react-icons/fa";
@@ -35,10 +35,22 @@ const Sidebar: React.FC<Props> = ({ type, open, onClose, collapse, onCollapse })
     isActivevisitsActive,
     isEducationCenterActive,
     isChatActive,
-    isSettingActive,
-    isPaymentActive,
     isAccountsActive,
     isHelpActive,
+    isAdminDashboardActive,
+    isAdminUserManagementActive,
+    isAdminDoctorManagementActive,
+    isAdminContentActive,
+    isAdminAccountsActive,
+    isAdminHelpActive,
+    isPatientDashboardActive,
+    isPatientMedicalhistoryActive,
+    isPatientBlogActive,
+    isPatientChatActive,
+    isPatientAccountsActive,
+    isPatientHelpActive,
+
+
   } = useNavigation();
 
   const [isSmallScreen, setIsSmallScreen] = useState<boolean>(false);
@@ -92,20 +104,6 @@ const Sidebar: React.FC<Props> = ({ type, open, onClose, collapse, onCollapse })
   ];
 
   const docOtherLinks: ILink[] = [
-    // {
-    //   title: "Settings",
-    //   icon: IoSettings,
-    //   link: "/doctor/settings",
-    //   isActive: isSettingActive,
-    //   collapsed: collapse,
-    // },
-    // {
-    //   title: "Payment",
-    //   icon: MdPayments,
-    //   link: "/doctor/payment",
-    //   isActive: isPaymentActive,
-    //   collapsed: collapse,
-    // },
     {
       title: "Accounts",
       icon: MdAccountCircle,
@@ -122,78 +120,105 @@ const Sidebar: React.FC<Props> = ({ type, open, onClose, collapse, onCollapse })
     },
   ];
 
+  // Patient Links Links and Other Links  
   const patientLinks: ILink[] = [
     {
       title: "Dashboard",
       icon: LuLayoutDashboard,
       link: "/patient/dashboard",
-      isActive: isDashboardActive,
+      isActive: isPatientDashboardActive,
       collapsed: collapse,
     },
     {
       title: "Medical History",
       icon: FaBookMedical,
       link: "/patient/medicalhistory",
-      isActive: isMedicalhistoryActive,
+      isActive: isPatientMedicalhistoryActive,
       collapsed: collapse,
     },
     {
-      title: "Active Visits",
+      title: "Blog",
       icon: TbLayoutSidebarInactive,
-      link: "/patient/activevisits",
-      isActive: isActivevisitsActive,
-      collapsed: collapse,
-    },
-    {
-      title: "Education Center",
-      icon: MdCastForEducation,
-      link: "/patient/education",
-      isActive: isEducationCenterActive,
+      link: "/patient/blog",
+      isActive: isPatientBlogActive,
       collapsed: collapse,
     },
     {
       title: "Chat",
       icon: IoChatboxEllipses,
       link: "/patient/chat",
-      isActive: isChatActive,
+      isActive: isPatientChatActive,
       collapsed: collapse,
     }
   ];
 
   const patientOtherLinks: ILink[] = [
-    // {
-    //   title: "Settings",
-    //   icon: IoSettings,
-    //   link: "/doctor/settings",
-    //   isActive: isSettingActive,
-    //   collapsed: collapse,
-    // },
-    // {
-    //   title: "Payment",
-    //   icon: MdPayments,
-    //   link: "/doctor/payment",
-    //   isActive: isPaymentActive,
-    //   collapsed: collapse,
-    // },
     {
       title: "Accounts",
       icon: MdAccountCircle,
       link: "/patient/accounts",
-      isActive: isAccountsActive,
+      isActive: isPatientAccountsActive,
       collapsed: collapse,
     },
     {
       title: "Help",
       icon: IoMdHelpCircle,
       link: "/patient/help",
-      isActive: isHelpActive,
+      isActive: isPatientHelpActive,
       collapsed: collapse,
     },
   ];
 
-  const adminLinks:ILink[] = [];
 
-  const adminOtherLinks:ILink[] = [];
+
+  // Admin Links Links and Other Links
+  const adminLinks:ILink[] = [
+    {
+      title: "Dashboard",
+      icon: MdAccountCircle,
+      link: "/admin/dashboard",
+      isActive: isAdminDashboardActive,
+      collapsed: collapse,
+    },
+    {
+      title: "User Management",
+      icon: MdAccountCircle,
+      link: "/admin/userManagement",
+      isActive: isAdminUserManagementActive,
+      collapsed: collapse,
+    },
+    {
+      title: "Doctor Management",
+      icon: IoMdHelpCircle,
+      link: "/admin/doctorManagement",
+      isActive: isAdminDoctorManagementActive,
+      collapsed: collapse,
+    },
+    {
+      title: "Content Management",
+      icon: IoMdHelpCircle,
+      link: "/admin/contentManagement",
+      isActive: isAdminContentActive,
+      collapsed: collapse,
+    },
+  ];
+
+  const adminOtherLinks:ILink[] = [
+    {
+      title: "Accounts",
+      icon: MdAccountCircle,
+      link: "/admin/accounts",
+      isActive: isAdminAccountsActive,
+      collapsed: collapse,
+    },
+    {
+      title: "Help",
+      icon: IoMdHelpCircle,
+      link: "/admin/help",
+      isActive: isAdminHelpActive,
+      collapsed: collapse,
+    },
+  ];
 
 
  

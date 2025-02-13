@@ -11,17 +11,22 @@ export const middleware = async (req: NextRequest): Promise<NextResponse> => {
         return NextResponse.redirect(url);
     }
 
-    if(pathname === "/patient"){
-        url.pathname = "/patient/dashboard";
-        return NextResponse.redirect(url);
-    }
+if (pathname === "/admin") {
+    url.pathname = "/admin/dashboard";
+    return NextResponse.redirect(url);
+}
 
+
+if (pathname === "/patient") {
+    url.pathname = "/patient/dashboard";
+    return NextResponse.redirect(url);
+}
 
     return NextResponse.next();
 };
 
 export const config = {
-    matcher: ["/doctor/:path*","/patient/:path*"]
+    matcher: ["/doctor/:path*", "/admin/:path*", "/patient/:path*"],
 };
 
 

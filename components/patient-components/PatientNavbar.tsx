@@ -233,9 +233,9 @@ const Navbar = ({ onMenuClick }: { onMenuClick: () => void }) => {
         <div className="relative">
           <Link href='/patient/accounts' className="flex items-center space-x-2 text-sm text-gray-700 focus:outline-none">
             <div className="w-8 h-8 bg-teal-400 rounded-full flex items-center justify-center text-white">
-              B
+              P
             </div>
-            <span className="hidden sm:inline">Mr Belete</span> 
+            <span className="hidden sm:inline">Mr. Aweke</span> 
           </Link>
         </div>
 
