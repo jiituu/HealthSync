@@ -4,6 +4,7 @@ import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@
 import { Button } from '@/components/ui/button';
 import { IoChatbubbleSharp } from "react-icons/io5";
 import Link from 'next/link';
+import { MdEmail } from "react-icons/md";
 
 const doctorData = [
   {
@@ -45,9 +46,9 @@ const RecentVisits = () => {
                   <Button 
                     variant="outline" 
                     size="icon" 
-                    className="bg-transparent hover:bg-gray-100 text-gray-500 border-gray-300"
+                    className="bg-transparent hover:bg-gray-100 text-gray-500 border-gray-300 flex justify-center w-full"
                   >
-                    <span className="text-lg">✉️</span>
+                    <span className="text-lg text-center"><MdEmail size={35}/></span>
                   </Button>
                 </TableCell>
               </TableRow>

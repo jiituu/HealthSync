@@ -10,6 +10,7 @@ import { CiSearch } from "react-icons/ci";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
+import SearchComponent from "@/components/common-components/SearchComponent";
 
 
 
@@ -40,6 +41,7 @@ const ITEMS_PER_PAGE = 7;
 
 const MedicalHistory = () => {
   const [currentPage, setCurrentPage] = useState(1);
+  const [filteredData, setFilteredData] = useState(dummyData);
   const totalPages = Math.ceil(dummyData.length / ITEMS_PER_PAGE);
 
   const handlePageChange = (page: any) => {
@@ -48,7 +50,7 @@ const MedicalHistory = () => {
     }
   };
 
-  const paginatedData = dummyData.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
+  const paginatedData = filteredData.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
 
   return (
     <div className="mr-5">
@@ -78,9 +80,13 @@ const MedicalHistory = () => {
                     placeholder="Search"
                     className="px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-[#F6F6FB] pr-10 w-full rounded-lg"
                 />
-                <div className="absolute right-2 top-1/2 transform -translate-y-1/2">
-                    <CiSearch className='text-[#B0C3CC]' size={20}/>
-                </div>
+
+                <SearchComponent
+                  data={dummyData}
+                  value="patient"
+                  onFilter={setFilteredData}
+                />
+
             </div>
             <Select>
                 <SelectTrigger>Sort by: Newest</SelectTrigger>

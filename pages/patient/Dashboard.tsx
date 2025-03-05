@@ -7,9 +7,11 @@ import React, { useState, useEffect } from 'react';
 import { MdTipsAndUpdates } from "react-icons/md";
 
 const messages = [
-  "posting more education content will increase your exposure through out the platform",
-  "interacting with a patient in a respectful and ethical manner will increase your rating and bring you to the top",
-  "your rating will fully depend on the review given by the patients. so make sure to satisfy them"
+  "Remember to take your medications on time.",
+  "Stay hydrated and drink plenty of water.",
+  "Regular exercise can improve your overall health.",
+  "Don't forget to schedule your next appointment.",
+  "Maintain a balanced diet for better health."
 ];
 
 // todo: here lets try to change the messages customed to patient tips
