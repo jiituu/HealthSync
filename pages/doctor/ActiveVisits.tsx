@@ -16,15 +16,15 @@ interface Visit {
 }
 
 const visitsData: Visit[] = [
-  { id: 1, name: 'Alemayehu T', contact: '0908818109', status: 'active', days: 'In 10 days', image: 'https://via.placeholder.com/40' },
-  { id: 2, name: 'Bekele M', contact: '0908818110', status: 'active', days: 'In 8 days', image: 'https://via.placeholder.com/40' },
-  { id: 3, name: 'Chaltu A', contact: '0908818111', status: 'active', days: 'In 5 days', image: "https://via.placeholder.com/40" },
-  { id: 4, name: 'Desta K', contact: '0908818112', status: 'active', days: 'In 12 days', image: "https://via.placeholder.com/40" },
-  { id: 5, name: 'Eleni G', contact: '0908818113', status: 'active', days: 'In 7 days', image: "https://via.placeholder.com/40" },
-  { id: 6, name: 'Fikru L', contact: '0908818114', status: 'active', days: 'In 3 days', image: "https://via.placeholder.com/40" },
-  { id: 7, name: 'Genet S', contact: '0908818115', status: 'ended', days: '2 days ago', image: 'https://via.placeholder.com/40' },
-  { id: 8, name: 'Haile T', contact: '0908818116', status: 'ended', days: '5 days ago', image: "https://via.placeholder.com/40" },
-  { id: 9, name: 'Ibrahim B', contact: '0908818117', status: 'ended', days: '1 week ago', image: 'https://via.placeholder.com/40' },
+  { id: 1, name: 'Alemayehu T', contact: '0908818109', status: 'active', days: 'In 10 days', image: '' },
+  { id: 2, name: 'Bekele M', contact: '0908818110', status: 'active', days: 'In 8 days', image: '' },
+  { id: 3, name: 'Chaltu A', contact: '0908818111', status: 'active', days: 'In 5 days', image: "" },
+  { id: 4, name: 'Desta K', contact: '0908818112', status: 'active', days: 'In 12 days', image: "" },
+  { id: 5, name: 'Eleni G', contact: '0908818113', status: 'active', days: 'In 7 days', image: "" },
+  { id: 6, name: 'Fikru L', contact: '0908818114', status: 'active', days: 'In 3 days', image: "" },
+  { id: 7, name: 'Genet S', contact: '0908818115', status: 'ended', days: '2 days ago', image: '' },
+  { id: 8, name: 'Haile T', contact: '0908818116', status: 'ended', days: '5 days ago', image: "" },
+  { id: 9, name: 'Ibrahim B', contact: '0908818117', status: 'ended', days: '1 week ago', image: '' },
 ];
 
 const ActiveVisits: React.FC = () => {
@@ -114,7 +114,7 @@ const ActiveVisits: React.FC = () => {
           variant="ghost"
           onClick={scrollNext}
           disabled={!nextBtnEnabled}
-          className="absolute right-0 top-1/2 -translate-y-1/2 bg-primaryColor hover:bg-white rounded-full p-2 shadow-lg w-10 h-10 min-w-0"
+          className="absolute rigbg-primaryColor hover:bg-white rounded-full p-2 shadow-lg w-10 h-10 min-w-0"
         >
           <svg className="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
