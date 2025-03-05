@@ -1,9 +1,10 @@
+import ChatPatient from '@/pages/patient/Chat'
 import React from 'react'
 
 const page = () => {
   return (
-    <div>
-      patient chat page
+    <div className=''>
+      <ChatPatient/>
     </div>
   )
 }

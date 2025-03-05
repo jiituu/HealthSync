@@ -4,7 +4,7 @@ import { IoMdCheckmarkCircle } from "react-icons/io";
 import Rating from "@/components/common-components/Rating";
 import { Button, Row } from "antd";
 import { useEffect, useState } from "react";
-import { doctors } from "@/components/patient-components/Navbar";
+import { doctors } from "@/components/patient-components/PatientNavbar";
 
 interface prob{
     doctorID:string

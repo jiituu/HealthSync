@@ -1,10 +1,10 @@
-import Help from '@/pages/doctor/Help'
+import Help from '@/pages/common/Help'
 import React from 'react'
 
 const page = () => {
   return (
     <div>
-      <Help/>
+      <Help isDoctor={true}/>
     </div>
   )
 }

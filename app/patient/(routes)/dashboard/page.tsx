@@ -1,5 +1,12 @@
-const Dashboard = ()=>{
-    return <>Patient dashboard</>
+import Dashboard from '@/pages/patient/Dashboard'
+import React from 'react'
+
+const page = () => {
+  return (
+    <div>
+      <Dashboard />
+    </div>
+  )
 }
 
-export default Dashboard;
+export default page

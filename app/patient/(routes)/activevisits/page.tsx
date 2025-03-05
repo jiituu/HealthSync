@@ -1,9 +1,10 @@
+import DiagnosisComponent from '@/pages/patient/DiagnosisComponent'
 import React from 'react'
 
 const page = () => {
   return (
     <div>
-        accounts
+      <DiagnosisComponent/>
     </div>
   )
 }

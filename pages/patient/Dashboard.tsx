@@ -1,0 +1,59 @@
+'use client';
+import ActiveMedication from '@/components/patient-components/ActiveMedication';
+import Appointment from '@/components/patient-components/Appointment';
+import FromBlogs from '@/components/patient-components/FromBlogs';
+import RecentVisits from '@/components/patient-components/RecentVisits';
+import React, { useState, useEffect } from 'react';
+import { MdTipsAndUpdates } from "react-icons/md";
+
+const messages = [
+  "posting more education content will increase your exposure through out the platform",
+  "interacting with a patient in a respectful and ethical manner will increase your rating and bring you to the top",
+  "your rating will fully depend on the review given by the patients. so make sure to satisfy them"
+];
+
+// todo: here lets try to change the messages customed to patient tips
+
+
+const Dashboard = () => {
+
+  const [currentMessage, setCurrentMessage] = useState(messages[0]);
+  
+    useEffect(() => {
+      const interval = setInterval(() => {
+        setCurrentMessage(prevMessage => {
+          const currentIndex = messages.indexOf(prevMessage);
+          const nextIndex = (currentIndex + 1) % messages.length;
+          return messages[nextIndex];
+        });
+      }, 10000);
+  
+      return () => clearInterval(interval);
+    }, []);
+
+
+  return (
+    <div>
+      <h1 className='text-xl mb-7'>Welcome back <span className='font-bold'>Yeabsira</span>!</h1>
+      <div className="bg-[#FFA07A] text-white p-4 flex justify-between items-center rounded-3xl">
+        <div className="flex items-center gap-2">
+          <MdTipsAndUpdates className='text-primaryColor' size={40}/>
+          <div className="flex flex-col items-start gap-1">
+            <p className='font-bold'>Reminder for patients</p>
+            <p>{currentMessage}</p>
+          </div>
+        </div>
+      </div>
+      <div className="flex items-center gap-4 mt-8 h-[550px]">
+        <Appointment/>
+        <FromBlogs/>
+      </div>
+      <div className="flex items-center gap-4 mt-8 mb-40">
+        <ActiveMedication/>
+        <RecentVisits/>
+      </div>
+    </div>
+  )
+}
+
+export default Dashboard

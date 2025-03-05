@@ -41,10 +41,9 @@ const Sidebar: React.FC<Props> = ({ type, open, onClose, collapse, onCollapse })
     isAdminUserManagementActive,
     isAdminDoctorManagementActive,
     isAdminContentActive,
-    isAdminAccountsActive,
-    isAdminHelpActive,
     isPatientDashboardActive,
     isPatientMedicalhistoryActive,
+    isPatientActivevisitsActive,
     isPatientBlogActive,
     isPatientChatActive,
     isPatientAccountsActive,
@@ -137,6 +136,13 @@ const Sidebar: React.FC<Props> = ({ type, open, onClose, collapse, onCollapse })
       collapsed: collapse,
     },
     {
+      title: "Active Visit",
+      icon: FaBookMedical,
+      link: "/patient/activevisits",
+      isActive: isPatientActivevisitsActive,
+      collapsed: collapse,
+    },
+    {
       title: "Blog",
       icon: TbLayoutSidebarInactive,
       link: "/patient/blog",
@@ -203,22 +209,6 @@ const Sidebar: React.FC<Props> = ({ type, open, onClose, collapse, onCollapse })
     },
   ];
 
-  const adminOtherLinks:ILink[] = [
-    {
-      title: "Accounts",
-      icon: MdAccountCircle,
-      link: "/admin/accounts",
-      isActive: isAdminAccountsActive,
-      collapsed: collapse,
-    },
-    {
-      title: "Help",
-      icon: IoMdHelpCircle,
-      link: "/admin/help",
-      isActive: isAdminHelpActive,
-      collapsed: collapse,
-    },
-  ];
 
 
  
@@ -226,7 +216,7 @@ const Sidebar: React.FC<Props> = ({ type, open, onClose, collapse, onCollapse })
     return (
       type=='Doctor'?(link=='links'?docLinks:docOtherLinks):
       type=='Patient'?(link=='links'?patientLinks:patientOtherLinks):
-      type=='Admin'?(link=='links'?adminLinks:adminOtherLinks):[]
+      type=='Admin'?(link=='links'?adminLinks:[]):[]
     )
   }
 

@@ -20,6 +20,16 @@ import {
 import { Input } from "@/components/ui/input";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogClose,
+} from "@/components/ui/dialog";
+import { FaStar, FaRegStar } from "react-icons/fa";
+import Link from "next/link";
 
 // Dummy user data
 const usersData = [
@@ -58,6 +68,7 @@ const UserManagement = () => {
   const [dateFilter, setDateFilter] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6; 
+  const [selectedUser, setSelectedUser] = useState<any>(null);
 
   const filteredUsers = usersData.filter(user =>
     (roleFilter !== "all" ? user.role === roleFilter : true) &&
@@ -72,7 +83,7 @@ const UserManagement = () => {
   );
 
   return (
-    <div className="p-4 w-full">
+    <div className="mt-10 p-4 w-full">
       <div className="flex flex-wrap gap-4 mb-4">
         <Select value={roleFilter} onValueChange={(value) => { setRoleFilter(value); setCurrentPage(1); }}>
           <SelectTrigger className="w-[150px]">
@@ -106,8 +117,8 @@ const UserManagement = () => {
         />
       </div>
 
-      <div className="relative h-[500px]">
-      <Table className="w-full bg-[#eeffff]">
+      <div className="">
+      <Table className="w-full">
         <TableHeader>
           <TableRow>
             <TableHead>ID</TableHead>
@@ -128,7 +139,26 @@ const UserManagement = () => {
                 <TableCell>{user.joined}</TableCell>
                 <TableCell>{user.role}</TableCell>
                 <TableCell>
-                  <Button variant="outline" className="bg-secondaryColor text-white">More</Button>
+                  <Button
+                    variant="outline"
+                    className="bg-secondaryColor text-white"
+                    onClick={() =>
+                      setSelectedUser({
+                        ...user,
+                        phone: "555-1234",
+                        email: "user@example.com",
+                        gender: user.role === "Doctor" ? "Male" : "Female",
+                        age: user.role === "Doctor" ? 45 : 30,
+                        specialization: user.role === "Doctor" ? "Cardiology" : undefined,
+                        status: user.role === "Doctor" ? "Active" : undefined,
+                        license: user.role === "Doctor" ? "/license.pdf" : undefined,
+                        licenseVerified: user.role === "Doctor" ? true : undefined,
+                        rating: user.role === "Doctor" ? 4 : undefined,
+                      })
+                    }
+                  >
+                    More
+                  </Button>
                 </TableCell>
               </TableRow>
             ))
@@ -143,7 +173,7 @@ const UserManagement = () => {
       </Table>
 
       {totalPages > 1 && (
-        <Pagination className="mt-4 absolute bottom-0">
+        <Pagination className="">
           <PaginationContent>
             <PaginationPrevious onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))} />
             {[...Array(totalPages)].map((_, i) => (
@@ -158,6 +188,63 @@ const UserManagement = () => {
         </Pagination>
       )}
       </div>
+
+      {selectedUser && (
+        <Dialog open={true} onOpenChange={(open) => { if (!open) setSelectedUser(null); }}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>{selectedUser.role} Details</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-2">
+              <p><span className="font-bold">Full Name</span>: {selectedUser.name}</p>
+              <p><span className="font-bold">Phone</span>: {selectedUser.phone}</p>
+              <p><span className="font-bold">Email</span>: {selectedUser.email}</p>
+              <p><span className="font-bold">Gender</span>: {selectedUser.gender}</p>
+              <p><span className="font-bold">Age</span>: {selectedUser.age}</p>
+              <p><span className="font-bold">Role</span>: {selectedUser.role}</p>
+              <p><span className="font-bold">Joined</span>: {selectedUser.joined}</p>
+              {selectedUser.role === "Doctor" && (
+                <>
+                  <p><span className="font-bold">Specialization</span>: {selectedUser.specialization}</p>
+                  <p><span className="font-bold">Status</span>: {selectedUser.status}</p>
+                  <p>
+                  <span className="font-bold">License Document</span>
+                    :{" "}
+                    <Link href={selectedUser.license} target="_blank" rel="noreferrer" className="text-blue-500 underline">
+                      View
+                    </Link>{" "}
+                    ({selectedUser.licenseVerified ? "Verified" : "Not Verified"})
+                  </p>
+                  <p className="flex items-center">
+                  <span className="font-bold">Rating</span>: {Array.from({ length: 5 }, (_, i) => i < selectedUser.rating ? <FaStar key={i} color="orange" /> : <FaRegStar key={i} color="orange" />)}
+                  </p>
+                </>
+              )}
+              {selectedUser.role === "Patient" && (
+                <p><span className="font-bold">Address</span>: {selectedUser.address}</p>
+              )}
+            </div>
+            <DialogFooter>
+              {selectedUser.role === "Doctor" && (
+                <Button
+                  variant="destructive"
+                  onClick={() => {
+                    if (selectedUser) {
+                      const newStatus = selectedUser.status === "Active" ? "Banned" : "Active";
+                      setSelectedUser({ ...selectedUser, status: newStatus });
+                    }
+                  }}
+                >
+                  {selectedUser.status === "Active" ? "Ban" : "Resume"}
+                </Button>
+              )}
+              <DialogClose asChild>
+                <Button>Close</Button>
+              </DialogClose>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   );
 };
