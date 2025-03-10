@@ -30,8 +30,11 @@ const visitsData: Visit[] = [
 const ActiveVisits: React.FC = () => {
   const [emblaRef, emblaApi] = useEmblaCarousel({ 
     align: 'start',
-    slidesToScroll: 1,
-    skipSnaps: true
+    slidesToScroll: 'auto',
+    containScroll: 'trimSnaps',
+    breakpoints: {
+      '(min-width: 768px)': { slidesToScroll: 1 }
+    }
   });
   const [prevBtnEnabled, setPrevBtnEnabled] = useState(false);
   const [nextBtnEnabled, setNextBtnEnabled] = useState(false);
@@ -48,64 +51,71 @@ const ActiveVisits: React.FC = () => {
     if (!emblaApi) return;
     onSelect(emblaApi);
     emblaApi.on('select', onSelect);
+    return () => {
+      emblaApi.off('select', onSelect);
+    };
   }, [emblaApi, onSelect]);
 
   const activeVisits = visitsData.filter(visit => visit.status === 'active');
   const endedVisits = visitsData.filter(visit => visit.status === 'ended');
 
   return (
-    <div className="container mx-auto p-4">
-      <style jsx>{`
-        .embla__slide {
-          flex: 0 0 300px;
-          min-width: 300px;
-        }
-      `}</style>
-
+    <div className="container mx-auto p-4 sm:p-6 max-w-6xl">
       {/* Active Visits Carousel */}
-      <h2 className="text-lg font-bold text-gray-800 mb-4">Active Visits</h2>
-      <div className="relative">
+      <h2 className="text-lg md:text-xl font-bold text-gray-800 mb-4">Active Visits</h2>
+      <div className="relative group">
         <div className="embla overflow-hidden" ref={emblaRef}>
           <div className="embla__container flex">
             {activeVisits.map((visit) => (
-              <div key={visit.id} className="embla__slide mr-4">
-                <div className="bg-white rounded-lg shadow-md p-4 border border-gray-200 space-y-5">
-                  <div className="flex items-center justify-between mb-2">
-                    <Avatar className="w-10 h-10 mr-2">
+              <div key={visit.id} className="embla__slide min-w-0 sm:min-w-[300px] flex-grow-0 flex-shrink-0 basis-[80%] sm:basis-[300px] pr-4">
+                <div className="rounded-tl-lg rounded-tr-lg shadow-md p-4 border border-gray-200 space-y-3 sm:space-y-4 bg-gray-50">
+                  <div className="flex items-center justify-between">
+                    <Avatar className="w-8 h-8 sm:w-10 sm:h-10 mr-2">
                       <AvatarImage src={visit.image} alt={`${visit.name} profile`} />
-                      <AvatarFallback>{visit.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+                      <AvatarFallback className="text-xs sm:text-sm">
+                        {visit.name.split(' ').map(n => n[0]).join('')}
+                      </AvatarFallback>
                     </Avatar>
-                    <span className="text-sm text-teal-500">{visit.days}</span>
+                    <span className="text-xs sm:text-sm text-teal-500">{visit.days}</span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <p className="text-gray-800 font-bold">Name</p>
-                    <span>{visit.name}</span>
+                    <p className="text-sm sm:text-base text-gray-800 font-semibold">Name</p>
+                    <span className="text-xs sm:text-sm">{visit.name}</span>
                   </div>
+                  <hr />
                   <div className="flex justify-between items-center">
-                    <p className="text-gray-800 font-bold">Contact</p>
-                    <span>{visit.contact}</span>
+                    <p className="text-sm sm:text-base text-gray-800 font-semibold">Contact</p>
+                    <span className="text-xs sm:text-sm">{visit.contact}</span>
                   </div>
-                  <div className="mt-4 flex justify-between">
-                    <Button variant="outline" className="bg-red-200 text-red-800 hover:bg-red-300">
+                  <div className="pt-3 flex justify-between gap-2">
+                    <Button 
+                      variant="outline" 
+                      className="text-xs sm:text-sm bg-secondaryColor text-white px-2 sm:px-4 py-1 sm:py-2"
+                    >
                       Cancel
                     </Button>
-                    <Button variant="outline" className="bg-teal-200 text-teal-800 hover:bg-teal-300">
+                    <Button 
+                      variant="outline" 
+                      className="text-xs sm:text-sm bg-primaryColor text-white px-2 sm:px-4 py-1 sm:py-2"
+                    >
                       Edit
                     </Button>
                   </div>
                 </div>
+                <div className="w-full bg-primaryColor h-2 rounded-bl-lg rounded-br-lg"></div>
               </div>
             ))}
           </div>
         </div>
 
+        {/* Navigation Buttons */}
         <Button
           variant="ghost"
           onClick={scrollPrev}
           disabled={!prevBtnEnabled}
-          className="absolute left-0 top-1/2 -translate-y-1/2 bg-primaryColor hover:bg-white rounded-full p-2 shadow-lg w-10 h-10 min-w-0"
+          className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white rounded-full p-1 sm:p-2 shadow-lg w-8 h-8 sm:w-10 sm:h-10 min-w-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
         >
-          <svg className="w-8 h-8 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-5 h-5 sm:w-6 sm:h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
         </Button>
@@ -114,42 +124,51 @@ const ActiveVisits: React.FC = () => {
           variant="ghost"
           onClick={scrollNext}
           disabled={!nextBtnEnabled}
-          className="absolute rigbg-primaryColor hover:bg-white rounded-full p-2 shadow-lg w-10 h-10 min-w-0"
+          className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white rounded-full p-1 sm:p-2 shadow-lg w-8 h-8 sm:w-10 sm:h-10 min-w-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
         >
-          <svg className="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-5 h-5 sm:w-6 sm:h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
           </svg>
         </Button>
       </div>
 
       {/* Recently Ended Visits */}
-      <h2 className="text-lg font-semibold text-gray-800 mt-8 mb-4">Recently Ended</h2>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {endedVisits.map((visit) => (
-          <div key={visit.id} className="bg-white rounded-lg shadow-md p-4 border border-gray-200 space-y-5">
-            <div className="flex items-center justify-between mb-2">
-              <Avatar className="w-10 h-10 mr-2">
-                <AvatarImage src={visit.image} alt={`${visit.name} profile`} />
-                <AvatarFallback>{visit.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
-              </Avatar>
-              <span className="text-sm text-teal-500">{visit.days}</span>
+      <div className="mt-8 sm:mt-12 md:pr-4">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-lg md:text-xl font-semibold text-gray-800">Recently Ended</h2>
+          <Link href='/doctor/medicalhistory' className='text-sm text-secondaryColor hover:underline'>See More</Link>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+          {endedVisits.map((visit) => (
+            <div key={visit.id} className="bg-white rounded-lg shadow-md p-4 border border-gray-200 space-y-3 sm:space-y-4">
+              <div className="flex items-center justify-between">
+                <Avatar className="w-8 h-8 sm:w-10 sm:h-10 mr-2">
+                  <AvatarImage src={visit.image} alt={`${visit.name} profile`} />
+                  <AvatarFallback className="text-xs sm:text-sm">
+                    {visit.name.split(' ').map(n => n[0]).join('')}
+                  </AvatarFallback>
+                </Avatar>
+                <span className="text-xs sm:text-sm text-teal-500">{visit.days}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <p className="text-sm sm:text-base text-gray-800 font-semibold">Name</p>
+                <span className="text-xs sm:text-sm">{visit.name}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <p className="text-sm sm:text-base text-gray-800 font-semibold">Contact</p>
+                <span className="text-xs sm:text-sm">{visit.contact}</span>
+              </div>
+              <div className="pt-3 flex justify-center">
+                <Button 
+                  variant="outline" 
+                  className="text-xs sm:text-sm bg-secondaryColor text-white px-4 sm:px-6 py-1 sm:py-2"
+                >
+                  View History
+                </Button>
+              </div>
             </div>
-            <div className="flex justify-between items-center">
-              <p className="text-gray-800 font-bold">Name</p>
-              <span>{visit.name}</span>
-            </div>
-            <div className="flex justify-between items-center">
-              <p className="text-gray-800 font-bold">Contact</p>
-              <span>{visit.contact}</span>
-            </div>
-            <div className="mt-4 flex justify-center">
-              <Button variant="outline" className="bg-secondaryColor text-white hover:bg-orange-300">
-                View History
-              </Button>
-            </div>
-          </div>
-        ))}
-        <Link href='/doctor/medicalhistory' className='text-secondaryColor hover:underline'>See More</Link>
+          ))}
+        </div>
       </div>
     </div>
   );

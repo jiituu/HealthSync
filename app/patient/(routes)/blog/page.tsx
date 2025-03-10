@@ -19,7 +19,7 @@ const Blogpage = () => {
               <Link href="" className={`list-group-item list-group-item-action italic ${index === 1 ? "border-b-4 border-primaryColor text-secondaryColor" : ""}`} onClick={() => setindex(1)}>Saved</Link>
             </div>
           </div>
-          <div className="col-md-9 py-8">
+          <div className="col-md-9 py-8 px-8">
             {index === 0 && <Blog />}
             {index === 1 && <SavedBlogs />}
           </div>

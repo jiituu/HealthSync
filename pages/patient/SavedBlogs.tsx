@@ -2,7 +2,7 @@
 import Image from 'next/image';
 import React from 'react';
 import imgg from '@/public/images/doctor.png'
-import { CiBookmarkRemove } from "react-icons/ci";
+import { FaBookmark } from "react-icons/fa";
 
 
 interface Advice {
@@ -51,7 +51,7 @@ const SavedBlogs: React.FC = () => {
               <p className="mt-2 text-gray-800">{advice.message}</p>
             </div>
             <button className="">
-              <CiBookmarkRemove className='text-[#ff8787] hover:text-[#ff4949]' size={35}/>
+              <FaBookmark className='text-[#ff8787] hover:text-[#ff4949]' size={35}/>
             </button>
           </div>
         ))}

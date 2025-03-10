@@ -4,7 +4,7 @@ import React from 'react';
 import imgg from '@/public/images/doctor.png'
 import { Button } from '@/components/ui/button';
 import { FaBookmark } from "react-icons/fa";
-
+import { FaRegBookmark } from "react-icons/fa6";
 interface Advice {
     id: number;
     name: string;
@@ -68,9 +68,13 @@ const Blog: React.FC = () => {
             {
                 advice.status === 'unsaved' ? (
                     <button className="">
+                        <FaRegBookmark className='text-[#ff8787] hover:text-[#ff4949]' size={35}/>
+                    </button>
+                ) : (
+                  <button className="">
                         <FaBookmark className='text-[#ff8787] hover:text-[#ff4949]' size={35}/>
                     </button>
-                ) : ("")
+                )
             }
           </div>
         ))}

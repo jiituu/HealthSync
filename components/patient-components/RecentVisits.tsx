@@ -2,8 +2,8 @@
 import React from 'react'
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@/components/ui/table'
 import { Button } from '@/components/ui/button';
-import { IoChatbubbleSharp } from "react-icons/io5";
-import Link from 'next/link';
+// import { IoChatbubbleSharp } from "react-icons/io5";
+// import Link from 'next/link';
 import { MdEmail } from "react-icons/md";
 
 const doctorData = [
@@ -23,7 +23,7 @@ const doctorData = [
 
 const RecentVisits = () => {
   return (
-    <div className="container mx-auto p-4 basis-1/2 relative">
+    <div className="container mx-auto p-4 basis-1/2">
       <div className="bg-white rounded-xl shadow-md border border-gray-200">
         <div className="p-4 border-b border-gray-200">
           <h2 className="text-lg font-semibold text-gray-800">DOCTOR VIEWS</h2>
@@ -56,10 +56,6 @@ const RecentVisits = () => {
           </TableBody>
         </Table>
       </div>
-    <Link href='/patient/chat' className='absolute bottom-0 right-0 p-4 translate-y-20 flex items-center justify-center'>
-      <IoChatbubbleSharp className='text-primaryColor' size={80}/>
-      <span className='absolute text-white text-md font-bold'>Your AI</span>
-    </Link>
     </div>
   )
 }

@@ -10,7 +10,6 @@ const ChatDoctor = () => {
 
   return (
     <div>
-      {/* Button Navigation */}
       <div className="flex items-center justify-center gap-6 border-b-2 relative">
         <button
           onClick={() => setIndex(0)}
@@ -30,9 +29,8 @@ const ChatDoctor = () => {
         </button>
       </div>
 
-      {/* Chat Sections */}
       <div className="mt-4">
-        {index === 0 && (<div className="flex h-[800px] bg-gray-100">
+        {index === 0 && (<div className="flex h-[600px] bg-gray-100 fixed">
                           <Sidebar isDoctor={true} />
                           <ChatArea isDoctor={true} />
                         </div>)}
