@@ -10,6 +10,7 @@ import { CiSearch } from "react-icons/ci";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
+import SearchComponent from "@/components/common-components/SearchComponent";
 
 
 
@@ -40,6 +41,7 @@ const ITEMS_PER_PAGE = 7;
 
 const MedicalHistory = () => {
   const [currentPage, setCurrentPage] = useState(1);
+  const [filteredData, setFilteredData] = useState(dummyData);
   const totalPages = Math.ceil(dummyData.length / ITEMS_PER_PAGE);
 
   const handlePageChange = (page: any) => {
@@ -48,7 +50,7 @@ const MedicalHistory = () => {
     }
   };
 
-  const paginatedData = dummyData.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
+  const paginatedData = filteredData.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
 
   return (
     <div className="mr-5">
@@ -69,19 +71,11 @@ const MedicalHistory = () => {
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-xl font-semibold">Medical History</h3>
           <div className="flex items-center space-x-4">
-            <div className="flex items-center relative w-80">
-                <Button className="md:hidden mr-4">
-                    <HiMenu size={24} />
-                </Button>
-                <Input
-                    type="text"
-                    placeholder="Search"
-                    className="px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-[#F6F6FB] pr-10 w-full rounded-lg"
+            <SearchComponent
+                  data={dummyData}
+                  value="patient"
+                  onFilter={setFilteredData}
                 />
-                <div className="absolute right-2 top-1/2 transform -translate-y-1/2">
-                    <CiSearch className='text-[#B0C3CC]' size={20}/>
-                </div>
-            </div>
             <Select>
                 <SelectTrigger>Sort by: Newest</SelectTrigger>
                 <SelectContent>

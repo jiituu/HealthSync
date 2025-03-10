@@ -1,11 +1,14 @@
+'use client';
+import ContentManagement from '@/components/admin-components/ContentManagement';
 import React from 'react'
 
-const page = () => {
+
+const Content = () => {
   return (
-    <div>
-        content management
+    <div className=''>
+      <ContentManagement/>
     </div>
   )
 }
 
-export default page
+export default Content

@@ -3,6 +3,7 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 import DocSearch from "@/pages/common/DocSearch";
+import Back from "@/components/navigation/Back";
 
 const DocSearchWrapper = () => {
   const router = useRouter();
@@ -17,6 +18,7 @@ const DocSearchWrapper = () => {
 const Page = () => {
   return (
     <Suspense fallback={<div>Loading...</div>}>
+      <Back/>
       <DocSearchWrapper />
     </Suspense>
   );

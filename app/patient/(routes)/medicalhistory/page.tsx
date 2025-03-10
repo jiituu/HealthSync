@@ -1,9 +1,10 @@
+import PatientMedicalHistory from '@/pages/patient/MedicalHistory'
 import React from 'react'
 
 const page = () => {
   return (
     <div>
-      patient medical history
+      <PatientMedicalHistory/>
     </div>
   )
 }
