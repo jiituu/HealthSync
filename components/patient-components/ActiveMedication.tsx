@@ -57,7 +57,7 @@ const ActiveMedication = () => {
   return (
     <div className="container mx-auto flex flex-col basis-1/2 space-y-5">
       <h1 className='font-bold text-start'>Active Medications</h1>
-      <div className="overflow-y-auto max-h-96 space-y-5">
+      <div className="overflow-y-auto max-h-96 space-y-5 px-2">
         {activeMedicines.map((medication, index) => (
           <Card key={index} className={`shadow-md rounded-xl border border-gray-200 hover:shadow-lg transition-shadow ${getCardBgColor(medication.status)}`}>
             <CardHeader className="p-4">

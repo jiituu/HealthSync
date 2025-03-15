@@ -37,7 +37,7 @@ const Dashboard = () => {
   return (
     <div>
       <h1 className='text-xl mb-7'>Welcome back <span className='font-bold'>Yeabsira</span>!</h1>
-      <div className="bg-[#FFA07A] text-white p-4 flex justify-between items-center rounded-3xl">
+      <div className="bg-[#FFA07A] text-white p-4 flex justify-between items-center rounded-3xl mr-4">
         <div className="flex items-center gap-2">
           <MdTipsAndUpdates className='text-primaryColor' size={40}/>
           <div className="flex flex-col items-start gap-1">

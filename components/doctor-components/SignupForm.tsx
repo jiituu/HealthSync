@@ -12,6 +12,8 @@ import {
   Divider,
 } from "antd";
 import { InboxOutlined } from "@ant-design/icons";
+import { qualifications, specializations } from "@/data/DoctorData";
+import { useAddDoctorMutation } from "@/redux/api/endpoints";
 
 const { Dragger } = Upload;
 
@@ -34,35 +36,40 @@ interface DoctorSignupFormValues {
 }
 
 const DoctorSignupForm = () => {
+  const [addDoctor] = useAddDoctorMutation();
   const [current, setCurrent] = useState(0);
   const [isRegistering, setIsRegistering] = useState(false);
   const [form] = Form.useForm();
 
   const goToStep = (step: number) => setCurrent(step);
 
-  const onFinish = async (values: DoctorSignupFormValues) => {
+  const onFinish = async (value: DoctorSignupFormValues) => {
+    const values = form.getFieldsValue(true);
     try {
       setIsRegistering(true);
-      console.log("Form Submitted:", values);
+      console.log("Form Submitted:",values );
 
-      const formData = new FormData();
-      Object.keys(values).forEach((key) => {
-        if (key === "licenses" && values[key].length > 0) {
-          formData.append("licenses", values[key][0]);
-        } else {
-          formData.append(key, (values as any)[key] as any);
-        }
-      });
+      const license = {
+        "url": "http://example.com/license3",
+        "type": "Medical License",
+        "isVerified": false
+      }
 
-      const response = await fetch(
-        "https://healthsync-backend-bfrv.onrender.com/api/register/doctor",
-        {
-          method: "POST",
-          body: formData,
-        }
-      );
+      // const response = await fetch(
+      //   "https://healthsync-backend-bfrv.onrender.com/api/doctors",
+      //   {
+      //     method: "POST",
+      //     headers: {
+      //       "Content-Type": "application/json",
+      //     },
+      //     body: JSON.stringify({...values,licenses:[license]}),
+      //     credentials:'include'
+      //   }
+      // );
 
-      if (!response.ok) {
+      const response = await addDoctor({...values,licenses:[license]})
+
+      if (response.error) {
         throw new Error("Failed to register doctor");
       }
 
@@ -93,7 +100,6 @@ const DoctorSignupForm = () => {
         "First Name",
         "Last Name",
         "Email",
-        "Phone Number",
         "Gender",
         "Age",
       ].map((label, index) => (
@@ -108,8 +114,8 @@ const DoctorSignupForm = () => {
             {label === "Gender" ? (
               <Select
                 options={[
-                  { label: "Male", value: "Male" },
-                  { label: "Female", value: "Female" },
+                  { label: "Male", value: "male" },
+                  { label: "Female", value: "female" },
                 ]}
                 className="w-full"
               />
@@ -121,6 +127,18 @@ const DoctorSignupForm = () => {
           </Form.Item>
         </Col>
       ))}
+
+      <Col span={24}>
+        <Form.Item
+          {...formItemLayout}
+          label='Phone Number'
+          name= 'phoneNumber'
+          className="m-0"
+          rules={[{ required: true, message: `Phone Number is required` }]}
+        >
+          <Input className="w-full" />
+        </Form.Item>
+      </Col>
 
       <Col span={24} key="continue-button">
         <Button
@@ -146,9 +164,12 @@ const DoctorSignupForm = () => {
             className="m-0"
             rules={[{ required: true, message: `${label} is required` }]}
           >
-            <Input
+            <Select
               className="w-full"
               placeholder={`Enter your ${label.toLowerCase()}`}
+              mode='multiple'
+              showSearch
+              options={(label=='Specializations'? specializations:qualifications).map((value)=>({label:value,value}))}
             />
           </Form.Item>
         </Col>

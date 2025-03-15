@@ -8,6 +8,7 @@ import Notification from '../common-components/Notification';
 import { NotificationModel } from '../models/notification';
 import { Row } from 'antd';
 import { useRouter } from 'next/navigation';
+import { useGetDoctorsQuery } from '@/redux/api/endpoints';
 
 const notifications: NotificationModel[] = [
   {
@@ -146,7 +147,10 @@ const Navbar = ({ onMenuClick }: { onMenuClick: () => void }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<any>(null);
+
+  const { data, status, error, isLoading } = useGetDoctorsQuery();
   
+  console.log(data,"doctors");
   // Close the modal if the user clicks outside the container
   useEffect(() => {
     const handleClickOutside = (event:MouseEvent) => {
