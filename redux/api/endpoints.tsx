@@ -29,7 +29,7 @@ export const endpointsApiFunc = createApi({
       query: (doctor) => ({
         url: '/doctors',
         method: 'POST',
-        body: JSON.stringify(doctor)
+        body: doctor
       }),
     }),
 
