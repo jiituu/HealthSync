@@ -35,7 +35,10 @@ interface DoctorSignupFormValues {
   password: string;
 }
 
-const DoctorSignupForm = () => {
+const DoctorSignupForm = (
+  {setParentTab}
+  :{setParentTab:any}
+) => {
   const [addDoctor] = useAddDoctorMutation();
   const [current, setCurrent] = useState(0);
   const [isRegistering, setIsRegistering] = useState(false);
@@ -47,25 +50,13 @@ const DoctorSignupForm = () => {
     const values = form.getFieldsValue(true);
     try {
       setIsRegistering(true);
-      console.log("Form Submitted:",values );
+      // console.log("Form Submitted:",values );
 
       const license = {
         "url": "http://example.com/license3",
         "type": "Medical License",
         "isVerified": false
       }
-
-      // const response = await fetch(
-      //   "https://healthsync-backend-bfrv.onrender.com/api/doctors",
-      //   {
-      //     method: "POST",
-      //     headers: {
-      //       "Content-Type": "application/json",
-      //     },
-      //     body: JSON.stringify({...values,licenses:[license]}),
-      //     credentials:'include'
-      //   }
-      // );
 
       const response = await addDoctor({...values,licenses:[license]})
 
@@ -74,6 +65,7 @@ const DoctorSignupForm = () => {
       }
 
       message.success("Registration successful!");
+      setParentTab(0);
     } catch (error) {
       message.error("Registration failed. Please try again.");
     } finally {

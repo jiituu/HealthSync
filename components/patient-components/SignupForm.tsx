@@ -23,7 +23,10 @@ const generateOptions = (start: number, end: number) => {
   }));
 };
 
-const PatientSignupForm = () => {
+const PatientSignupForm = (
+  {setParentTab}
+  :{setParentTab:any}
+) => {
   const [form] = Form.useForm();
   const [isRegistering, setIsRegistering] = useState(false);
   const [currentStep, setCurrentStep] = useState(0); // Step state
@@ -43,17 +46,18 @@ const PatientSignupForm = () => {
 
   const router = useRouter();
 
-  const onFinish = async (values: PatientSignupFormValues) => {
+  const onFinish = async (value: PatientSignupFormValues) => {
+    const values = form.getFieldsValue(true);
     try {
       setIsRegistering(true);
-      console.log(formValues)
+      console.log(values)
       const res = await fetch(`https://healthsync-backend-bfrv.onrender.com/api/register/patient`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         credentials:"include",
-        body: JSON.stringify(formValues), // Submit the complete formValues state
+        body: values,
       });
 
       const data = await res.json();
@@ -61,19 +65,7 @@ const PatientSignupForm = () => {
       if (res.ok) {
         message.success("Registration successful.");
         form.resetFields();
-        setFormValues({
-          firstname: "",
-          lastname: "",
-          email: "",
-          phoneNumber: "",
-          gender: "male",
-          age: 0,
-          nationality: "",
-          password: "",
-          height: 0,
-          weight: 0,
-          blood: "A+",
-        });
+        
         router.push("/");
       } else {
         message.error(data.error);

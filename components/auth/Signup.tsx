@@ -6,7 +6,13 @@ import { Row } from "antd";
 import PatientSignupForm from "../patient-components/SignupForm";
 import DoctorSignupForm from "../doctor-components/SignupForm";
 
-const Signup = () => {
+const Signup = (
+  {
+    setParentTab
+  }:{
+    setParentTab:any
+  }
+) => {
   const [tab, setTab] = useState<0 | 1>(0);
 
   return (
@@ -45,7 +51,7 @@ const Signup = () => {
         </Row>
       </Row>
 
-      {tab == 0 ? <PatientSignupForm /> : <DoctorSignupForm />}
+      {tab == 0 ? <PatientSignupForm setParentTab={setParentTab} /> : <DoctorSignupForm setParentTab={setParentTab} />}
     </>
   );
 };
