@@ -63,7 +63,7 @@ const Auth = ({slideUpAnimation}:{slideUpAnimation:SlideUpAnimationProb})=>{
                                 <Typography>Signup</Typography>
                             </Row>
                         </Row>
-                        { tab === 0 ? <Login setTab={setTab}/> : <Signup/> }
+                        { tab === 0 ? <Login setTab={setTab}/> : <Signup setParentTab={setTab}/> }
                     </Row>
                 </Row>
             </Box>
