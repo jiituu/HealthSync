@@ -8,7 +8,8 @@ import Notification from '../common-components/Notification';
 import { NotificationModel } from '../models/notification';
 import { Row } from 'antd';
 import { useRouter } from 'next/navigation';
-import { useGetDoctorsQuery } from '@/redux/api/endpoints';
+import { useGetDoctorsQuery } from '@/redux/api/doctorApi';
+
 
 const notifications: NotificationModel[] = [
   {

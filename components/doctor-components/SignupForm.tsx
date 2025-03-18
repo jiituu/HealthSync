@@ -13,7 +13,7 @@ import {
 } from "antd";
 import { InboxOutlined } from "@ant-design/icons";
 import { qualifications, specializations } from "@/data/DoctorData";
-import { useAddDoctorMutation } from "@/redux/api/endpoints";
+import { useAddDoctorMutation } from "@/redux/api/doctorApi";
 
 const { Dragger } = Upload;
 
