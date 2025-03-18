@@ -1,12 +1,22 @@
-import { configureStore } from '@reduxjs/toolkit';
-import { endpointsApiFunc } from './api/endpoints';
+import { configureStore } from "@reduxjs/toolkit";
+import { doctorApi } from "./api/doctorApi";
+import { patientApi } from "./api/patientApi";
+import { adminApi } from "./api/adminApi";
+import { commonApi } from "./api/commonApi";
 
 const store = configureStore({
   reducer: {
-    [endpointsApiFunc.reducerPath]: endpointsApiFunc.reducer,
+    [commonApi.reducerPath]: commonApi.reducer,
+    [doctorApi.reducerPath]: doctorApi.reducer,
+    [patientApi.reducerPath]: patientApi.reducer,
+    [adminApi.reducerPath]: adminApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().concat(endpointsApiFunc.middleware),
+    getDefaultMiddleware()
+      .concat(commonApi.middleware)
+      .concat(doctorApi.middleware)
+      .concat(patientApi.middleware)
+      .concat(adminApi.middleware),
 });
 
 export default store;
