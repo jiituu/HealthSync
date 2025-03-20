@@ -15,7 +15,16 @@ export const commonApi = createApi({
     credentials: "include",
   }),
   tagTypes: ["Doctor"],
-  endpoints: (builder) => ({}),
+  endpoints: (builder) => ({
+    //POST
+    addVisitRequest: builder.mutation<any, any>({
+      query: (visitRequest) => ({
+        url: '/doctors', //correct the url
+        method: 'POST',
+        body: visitRequest
+      }),
+    }),
+  }),
 });
 
-export const { } = commonApi;
+export const { useAddVisitRequestMutation } = commonApi;

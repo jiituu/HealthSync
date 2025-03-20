@@ -1,3 +1,4 @@
+import { DoctorModel } from "@/components/models/doctor";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 export const doctorApi = createApi({
@@ -16,21 +17,30 @@ export const doctorApi = createApi({
   }),
   tagTypes: ["Doctor"],
   endpoints: (builder) => ({
-    getDoctors: builder.query<any, void>({
+    //GET
+    getDoctors: builder.query<DoctorModel[], void>({
         query: () => ({
           url: '/doctors',
           method: 'GET',
         }),
+    }),
+
+    getVerifiedDoctors: builder.query<DoctorModel[], void>({
+      query: () => ({
+        url: '/doctors', // change the url to verified doctors and remove the comment
+        method: 'GET',
       }),
+    }),
   
-      addDoctor: builder.mutation<any, any>({
-        query: (doctor) => ({
-          url: '/doctors',
-          method: 'POST',
-          body: doctor
-        }),
+    //POST
+    addDoctor: builder.mutation<any, any>({
+      query: (doctor) => ({
+        url: '/doctors',
+        method: 'POST',
+        body: doctor
       }),
+    }),
   }),
 });
 
-export const {useGetDoctorsQuery, useAddDoctorMutation} = doctorApi;
+export const {useGetDoctorsQuery, useGetVerifiedDoctorsQuery ,useAddDoctorMutation} = doctorApi;
