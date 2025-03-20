@@ -1,3 +1,4 @@
+'use client';
 import { HiX } from "react-icons/hi";
 import { FiChevronsLeft } from "react-icons/fi";
 import SidebarLink from "./SidebarLinks";
@@ -10,7 +11,8 @@ import { MdCastForEducation } from "react-icons/md";
 import { IoChatboxEllipses } from "react-icons/io5";
 import { MdAccountCircle } from "react-icons/md";
 import { IoMdHelpCircle } from "react-icons/io";
-
+import Logout from '../auth/Logout';
+// import Cookies from "js-cookie";
 
 interface Props {
   type: 'Doctor'|'Patient'|'Admin'
@@ -53,15 +55,22 @@ const Sidebar: React.FC<Props> = ({ type, open, onClose, collapse, onCollapse })
   } = useNavigation();
 
   const [isSmallScreen, setIsSmallScreen] = useState<boolean>(false);
+  // const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  // useEffect(() => {
+  //   const token = Cookies.get("token"); // Replace with actual cookie name
+  //   setIsAuthenticated(!!token); // Convert to boolean
+  // }, []);
 
   useEffect(() => {
+
     const checkScreenSize = () => {
       setIsSmallScreen(window.innerWidth < 768);
     };
 
     checkScreenSize();
     window.addEventListener("resize", checkScreenSize);
-    return () => window.removeEventListener("resize", checkScreenSize);
+    return () => window.removeEventListener("resize", checkScreenSize); 
   }, []);
 
   const docLinks: ILink[] = [
@@ -207,6 +216,7 @@ const Sidebar: React.FC<Props> = ({ type, open, onClose, collapse, onCollapse })
       isActive: isAdminContentActive,
       collapsed: collapse,
     },
+    
   ];
 
 
@@ -274,6 +284,7 @@ const Sidebar: React.FC<Props> = ({ type, open, onClose, collapse, onCollapse })
         );
       })}
 
+      {<Logout />}
       <hr className="my-5 mx-5" />
 
       <span

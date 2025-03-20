@@ -1,32 +1,25 @@
-'use client';
+import { useLogoutMutation } from "@/redux/api/commonApi";
+import { useRouter } from "next/navigation";
+import { Button } from "../ui/button";
+import ErrorMessage from "../status/ErrorMessage";
 
-import { useRouter } from 'next/navigation';
-import { Button } from '@/components/ui/button';
-
-const Logout = () => {
+export default function Logout() {
+  const [logout, {isLoading, error}] = useLogoutMutation();
   const router = useRouter();
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     try {
-      localStorage.removeItem('token');
-      sessionStorage.removeItem('token');
-
-      if ('caches' in window) {
-        caches.keys().then((names) => {
-          names.forEach((name) => caches.delete(name));
-        });
-      }
-      // router.push('/login');
-    } catch (error) {
-      console.error('Logout failed:', error);
+      const response = await logout({}).unwrap(); 
+      router.push("/");
+    } catch (err) {
+      console.error("Logout failed:", err);
     }
   };
 
-  return (
-    <Button onClick={handleLogout} className="bg-red-500 hover:bg-red-600 text-white">
-      Logout
-    </Button>
+  return(
+    <div className="flex flex-col items-center justify-center space-y-4">
+      {error && <ErrorMessage message="Failed to logout. Please try again." />}
+      <Button isLoading={isLoading} onClick={handleLogout} className="w-fit mx-auto text-white bg-destructive">Logout</Button>
+    </div>
   );
-};
-
-export default Logout;
+}

@@ -1,21 +1,36 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { DoctorLoginPayload, DoctorSignupPayload } from "@/types/doctor";
+
 
 export const doctorApi = createApi({
   reducerPath: "doctorApi",
   baseQuery: fetchBaseQuery({
     baseUrl: "https://healthsync-backend-bfrv.onrender.com/api",
+    credentials: "include",
     prepareHeaders: (headers) => {
-      const token = localStorage.getItem("token");
-      if (token) {
-        headers.set("Authorization", `Bearer ${token}`);
-      }
       headers.set("Content-Type", `application/json`);
       return headers;
     },
-    credentials: "include",
   }),
   tagTypes: ["Doctor"],
   endpoints: (builder) => ({
+
+    loginDoctor: builder.mutation<any, DoctorLoginPayload>({
+        query: (doctor) => ({
+          url: '/login/doctor',
+          method: 'POST',
+          body: doctor
+        }),
+    }),
+
+    registerDoctor: builder.mutation<any, DoctorSignupPayload>({
+      query: (doctor) => ({
+      url: '/register/doctor',
+      method: 'POST',
+      body: doctor
+      }),
+    }),
+
     getDoctors: builder.query<any, void>({
         query: () => ({
           url: '/doctors',
@@ -23,14 +38,11 @@ export const doctorApi = createApi({
         }),
       }),
   
-      addDoctor: builder.mutation<any, any>({
-        query: (doctor) => ({
-          url: '/doctors',
-          method: 'POST',
-          body: doctor
-        }),
-      }),
   }),
 });
 
-export const {useGetDoctorsQuery, useAddDoctorMutation} = doctorApi;
+export const {
+  useGetDoctorsQuery,
+  useLoginDoctorMutation,
+  useRegisterDoctorMutation
+} = doctorApi;
