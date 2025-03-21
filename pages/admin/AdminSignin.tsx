@@ -15,7 +15,7 @@ export default function AdminSignin() {
   const [error, setError] = useState("");
   const [loginAdmin, { isLoading }] = useLoginAdminMutation();
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: any) => {
     e.preventDefault();
     setError("");
 
