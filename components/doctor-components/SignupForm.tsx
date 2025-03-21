@@ -7,16 +7,14 @@ import {
   Button,
   message,
   InputNumber,
-  Upload,
   Col,
   Divider,
 } from "antd";
-import { InboxOutlined } from "@ant-design/icons";
 import { qualifications, specializations } from "@/data/DoctorData";
 import { DoctorSignupPayload } from "@/types/doctor";
 import { useRegisterDoctorMutation } from "@/redux/api/doctorApi";
+import CloudinaryUploader from "./CloudinaryUploader";
 
-const { Dragger } = Upload;
 
 const formItemLayout = {
   labelCol: { span: 24 },
@@ -24,11 +22,7 @@ const formItemLayout = {
 };
 
 
-const DoctorSignupForm = (
-  {setParentTab}
-  :{setParentTab:any}
-) => {
-
+const DoctorSignupForm = ({ setParentTab }: { setParentTab: any }) => {
   const [form] = Form.useForm();
   const [current, setCurrent] = useState(0); 
   const [formValues, setFormValues] = useState<DoctorSignupPayload>({
@@ -45,32 +39,30 @@ const DoctorSignupForm = (
     licenses: []
   });
 
-  const [registerDoctor, {isLoading, isError, error}] = useRegisterDoctorMutation();
+  const [registerDoctor, { isLoading }] = useRegisterDoctorMutation();
 
   const goToStep = (step: number) => setCurrent(step);
 
   const onFinish = async (value: DoctorSignupPayload) => {
-      console.log("Form Values", formValues);
-        try {
-          await registerDoctor(formValues).unwrap();
-          message.success("Registration successful!");
-          setParentTab(0); 
-        } catch (error: any) {
-          message.error(error?.data?.error || "Registration failed, please try again");
-        }
-  };
-
-  const beforeUpload = (file: any) => {
-    const isLt15M = file.size / 1024 / 1024 <= 15;
-    if (!isLt15M) {
-      message.error(`${file.name} must be smaller than 15MB!`);
-      return false;
+    console.log("Form values", formValues);
+    try {
+      await registerDoctor(formValues).unwrap();
+      message.success("Registration successful!");
+      setParentTab(0); 
+    } catch (error: any) {
+      message.error(error?.data?.error || "Registration failed, please try again");
     }
-    return true;
   };
 
   const handleStepChange = (changedValues: any) => {
     setFormValues((prevValues) => ({ ...prevValues, ...changedValues }));
+  };
+
+  const handleLicenseUpload = (url: string) => {
+    setFormValues(prev => ({
+      ...prev,
+      licenses: [...prev.licenses, { url, type: "pdf", isVerified: false }]
+    }));
   };
 
   const formList = [
@@ -79,19 +71,12 @@ const DoctorSignupForm = (
       <Col span={24}>
         <Divider orientation="left">Personal Details</Divider>
       </Col>
-      {[
-        "First Name",
-        "Last Name",
-        "Email",
-        "Gender",
-        "Age",
-      ].map((label, index) => (
+      {["First Name", "Last Name", "Email", "Gender", "Age"].map((label) => (
         <Col span={24} key={label}>
           <Form.Item
             {...formItemLayout}
             label={label}
             name={label.replace(/\s+/g, "").toLowerCase()}
-            className="m-0"
             rules={[{ required: true, message: `${label} is required` }]}
           >
             {label === "Gender" ? (
@@ -100,33 +85,30 @@ const DoctorSignupForm = (
                   { label: "Male", value: "male" },
                   { label: "Female", value: "female" },
                 ]}
-                className="w-full"
               />
             ) : label === "Age" ? (
               <InputNumber min={1} max={120} className="w-full" />
             ) : (
-              <Input className="w-full" />
+              <Input />
             )}
           </Form.Item>
         </Col>
       ))}
-
       <Col span={24}>
         <Form.Item
           {...formItemLayout}
-          label='Phone Number'
-          name= 'phoneNumber'
-          className="m-0"
-          rules={[{ required: true, message: `Phone Number is required` }]}
+          label="Phone Number"
+          name="phoneNumber"
+          rules={[{ required: true, message: "Phone Number is required" }]}
         >
-          <Input className="w-full" />
+          <Input />
         </Form.Item>
       </Col>
-
-      <Col span={24} key="continue-button">
+      <Col span={24}>
         <Button
-          className="primary-button primary-button-white-text mt-2"
+          type="primary"
           onClick={() => goToStep(current + 1)}
+          className="primary-button primary-button-white-text" 
         >
           Continue
         </Button>
@@ -143,55 +125,42 @@ const DoctorSignupForm = (
           <Form.Item
             {...formItemLayout}
             label={label}
-            name={label.replace(/\s+/g, "").toLowerCase()}
-            className="m-0"
+            name={label.toLowerCase()}
             rules={[{ required: true, message: `${label} is required` }]}
           >
             <Select
-              className="w-full"
-              placeholder={`Enter your ${label.toLowerCase()}`}
-              mode='multiple'
+              mode="multiple"
               showSearch
-              options={(label=='Specializations'? specializations:qualifications).map((value)=>({label:value,value}))}
+              options={(label === "Specializations" ? specializations : qualifications).map(value => ({
+                label: value,
+                value
+              }))}
             />
           </Form.Item>
         </Col>
       ))}
-
       <Col span={24}>
         <Form.Item
           {...formItemLayout}
           label="Licenses"
           name="licenses"
-          className="m-0"
           rules={[{ required: true, message: "Please upload your licenses" }]}
         >
-          <Dragger
-            beforeUpload={beforeUpload}
-            maxCount={1}
-            listType="picture-card"
-            className="w-full"
-          >
-            <p className="ant-upload-drag-icon">
-              <InboxOutlined style={{ fontSize: "25px" }} />
-            </p>
-            <p className="ant-upload-text">
-              Click or drag file to this area to upload
-            </p>
-          </Dragger>
+          <CloudinaryUploader onUploadSuccess={handleLicenseUpload} />
         </Form.Item>
       </Col>
-
-      <Col span={24} key="continue-button">
+      <Col span={24}>
         <Button
-          className="primary-button primary-button-white-text"
           onClick={() => goToStep(current - 1)}
+          className="primary-button primary-button-white-text"
         >
           Back
         </Button>
         <Button
-          className="primary-button primary-button-white-text ml-2 mt-2"
+          type="primary"
           onClick={() => goToStep(current + 1)}
+          className="primary-button primary-button-white-text" 
+          style={{ marginLeft: 8 }}
         >
           Continue
         </Button>
@@ -208,29 +177,29 @@ const DoctorSignupForm = (
           {...formItemLayout}
           label="Password"
           name="password"
-          className="m-0"
           rules={[{ required: true, message: "Password is required" }]}
         >
-          <Input.Password autoComplete="new-password" className="w-full" />
+          <Input.Password />
         </Form.Item>
       </Col>
-
-      <Col span={24} key="submit-button">
+      <Col span={24}>
         <Button
-          className="primary-button primary-button-white-text"
           onClick={() => goToStep(current - 1)}
+          className="primary-button primary-button-white-text"
         >
           Back
         </Button>
         <Button
-          className="primary-button primary-button-white-text ml-2"
+          type="primary"
           htmlType="submit"
           loading={isLoading}
+          className="primary-button primary-button-white-text" 
+          style={{ marginLeft: 8 }}
         >
           Register
         </Button>
       </Col>
-    </Row>,
+    </Row>
   ];
 
   return (
@@ -238,12 +207,11 @@ const DoctorSignupForm = (
       form={form}
       onFinish={onFinish}
       onValuesChange={handleStepChange}
-      onFinishFailed={() => message.error("Please submit the form correctly")}
-      className="w-full flex flex-col gap-4 mt-8"
+      onFinishFailed={() => message.error("Please fill all required fields")}
+      layout="vertical"
     >
       {formList[current]}
     </Form>
-    
   );
 };
 
