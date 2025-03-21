@@ -1,20 +1,15 @@
 import React, { useState } from "react";
-import { Button, Divider, Form, Input, message, Row, Select } from "antd";
-import { useRouter } from "next/navigation";
+import { Button, Divider, Form, Input, message, Row, Select as AntdSelect } from "antd";
+import { useRegisterPatientMutation } from "@/redux/api/patientApi";
+import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "@/components/ui/select"; // Import Shadcn select component
+import {countries} from "@/data/countries"
+import { PatientSignupPayload } from "@/types/patient";
+import {allergyOptions} from '@/data/PatientData'
+import {conditionOptions} from '@/data/PatientData'
+import {pastTreatmentOptions} from '@/data/PatientData'
+import {majorAccidentOptions} from '@/data/PatientData'
+import { X } from "lucide-react"; 
 
-interface PatientSignupFormValues {
-  firstname: string;
-  lastname: string;
-  email: string;
-  phoneNumber: string;
-  gender: "male" | "female";
-  age: number;
-  nationality: string;
-  password: string;
-  height: number;
-  weight: number;
-  blood: "A+" | "A-" | "B+" | "B-" | "AB+" | "AB-" | "O+" | "O-";
-}
 
 const generateOptions = (start: number, end: number) => {
   return Array.from({ length: end - start + 1 }, (_, i) => ({
@@ -28,9 +23,8 @@ const PatientSignupForm = (
   :{setParentTab:any}
 ) => {
   const [form] = Form.useForm();
-  const [isRegistering, setIsRegistering] = useState(false);
-  const [currentStep, setCurrentStep] = useState(0); // Step state
-  const [formValues, setFormValues] = useState<PatientSignupFormValues>({
+  const [currentStep, setCurrentStep] = useState(0); 
+  const [formValues, setFormValues] = useState<PatientSignupPayload>({
     firstname: "",
     lastname: "",
     email: "",
@@ -42,45 +36,28 @@ const PatientSignupForm = (
     height: 0,
     weight: 0,
     blood: "A+",
+    allergies: [],
+    medicalConditions: [],
+    pastTreatments: [],
+    majorAccidents: [],
   });
 
-  const router = useRouter();
+  const [registerPatient, {isLoading, isError, error}] = useRegisterPatientMutation();
 
-  const onFinish = async (value: PatientSignupFormValues) => {
-    const values = form.getFieldsValue(true);
+  const onFinish = async (value: PatientSignupPayload) => {
+    console.log("Form Values", formValues);
     try {
-      setIsRegistering(true);
-      console.log(values)
-      const res = await fetch(`https://healthsync-backend-bfrv.onrender.com/api/register/patient`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials:"include",
-        body: values,
-      });
-
-      const data = await res.json();
-
-      if (res.ok) {
-        message.success("Registration successful.");
-        form.resetFields();
-        
-        router.push("/");
-      } else {
-        message.error(data.error);
-      }
-    } catch (error) {
-      message.error("An error occurred during registration.");
-    } finally {
-      setIsRegistering(false);
+      await registerPatient(formValues).unwrap();
+      message.success("Registration successful!");
+      setParentTab(0); 
+    } catch (error: any) {
+      message.error(error?.data?.error || "Registration failed, please try again");
     }
   };
 
-  const goToStep = (step: number) => setCurrentStep(step); // Navigation between steps
+  const goToStep = (step: number) => setCurrentStep(step); 
 
   const handleStepChange = (changedValues: any) => {
-    // Update formValues when fields change
     setFormValues((prevValues) => ({ ...prevValues, ...changedValues }));
   };
 
@@ -91,10 +68,10 @@ const PatientSignupForm = (
       onFinishFailed={() => {
         message.error("Please submit the form correctly");
       }}
-      onValuesChange={handleStepChange} // Listen for form value changes
+      onValuesChange={handleStepChange} 
       className="w-[100%] flex flex-col gap-4 mt-20"
     >
-      {currentStep === 0 && ( // Step 1: Personal Details
+      {currentStep === 0 && ( 
         <>
           <Divider orientation="left">Personal Details</Divider>
 
@@ -160,7 +137,7 @@ const PatientSignupForm = (
               className="w-[45%]"
               rules={[{ required: true, message: "Gender is required" }]}
             >
-              <Select
+              <AntdSelect
                 options={["male", "female"].map((value) => ({
                   label: value[0].toUpperCase() + value.slice(1),
                   value,
@@ -175,7 +152,7 @@ const PatientSignupForm = (
               className="w-[40%]"
               rules={[{ required: true, message: "Age is required" }]}
             >
-              <Select className="w-[100%]" options={generateOptions(0, 120)} />
+              <AntdSelect className="w-[100%]" options={generateOptions(0, 120)} />
             </Form.Item>
           </Row>
 
@@ -185,13 +162,27 @@ const PatientSignupForm = (
             name="nationality"
             rules={[{ required: true, message: "Nationality is required" }]}
           >
-            <Input />
+            <Select
+              onValueChange={(value) => handleStepChange({ nationality: value })}
+              value={formValues.nationality}
+            >
+              <SelectTrigger className="border-gray-300 bg-gray-100 focus:border-gray-400 p-5">
+                <SelectValue placeholder="Select your nationality" />
+              </SelectTrigger>
+              <SelectContent>
+                {countries.map((country) => (
+                  <SelectItem key={country} value={country}>
+                    {country}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </Form.Item>
 
           <Row className="w-[100%] mt-2">
             <Button
               className="primary-button primary-button-white-text"
-              onClick={() => goToStep(1)} // Go to step 2
+              onClick={() => goToStep(1)} 
             >
               Continue
             </Button>
@@ -199,7 +190,7 @@ const PatientSignupForm = (
         </>
       )}
 
-      {currentStep === 1 && ( // Step 2: Health Details
+      {currentStep === 1 && ( 
         <>
           <Divider orientation="left">Health Details</Divider>
 
@@ -209,7 +200,7 @@ const PatientSignupForm = (
             name="height"
             rules={[{ required: true, message: "Height is required" }]}
           >
-            <Select className="w-[100%]" options={generateOptions(100, 300)} />
+            <AntdSelect className="w-[100%]" options={generateOptions(100, 300)} />
           </Form.Item>
 
           <Form.Item
@@ -218,7 +209,7 @@ const PatientSignupForm = (
             name="weight"
             rules={[{ required: true, message: "Weight is required" }]}
           >
-            <Select className="w-[100%]" options={generateOptions(1, 300)} />
+            <AntdSelect className="w-[100%]" options={generateOptions(1, 300)} />
           </Form.Item>
 
           <Form.Item
@@ -227,7 +218,7 @@ const PatientSignupForm = (
             name="blood"
             rules={[{ required: true, message: "Blood type is required" }]}
           >
-            <Select
+            <AntdSelect
               options={["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"].map(
                 (value) => ({ label: value, value })
               )}
@@ -237,13 +228,13 @@ const PatientSignupForm = (
           <Row className="w-[100%] mt-2">
             <Button
               className="primary-button primary-button-white-text"
-              onClick={() => goToStep(0)} // Go back to step 1
+              onClick={() => goToStep(0)} 
             >
               Back
             </Button>
             <Button
               className="primary-button primary-button-white-text ml-2"
-              onClick={() => goToStep(2)} // Go to step 3 (Password)
+              onClick={() => goToStep(2)} 
             >
               Continue
             </Button>
@@ -251,7 +242,211 @@ const PatientSignupForm = (
         </>
       )}
 
-      {currentStep === 2 && ( // Step 3: Password
+      {currentStep === 2 && (
+        <>
+          <Divider orientation="left">
+            Additional Medical Information (Optional)
+          </Divider>
+
+          {/* Allergies */}
+          <div className="flex flex-col gap-3">
+            <Form.Item layout="vertical" label="Allergies">
+              <Select
+                onValueChange={(val) => {
+                  if (!formValues.allergies?.includes(val)) {
+                    handleStepChange({ allergies: [...(formValues.allergies || []), val] });
+                  }
+                }}
+                value=""
+              >
+                <SelectTrigger className="border-gray-300 bg-gray-100 focus:border-gray-400 p-5">
+                  <SelectValue placeholder="Select an Allergy" />
+                </SelectTrigger>
+                <SelectContent>
+                  {allergyOptions.map((opt) => (
+                    <SelectItem key={opt} value={opt}>
+                      {opt}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </Form.Item>
+            <div className="">
+              {formValues.allergies && formValues.allergies.length > 0 && (
+                <div className="flex flex-wrap gap-2 mt-3">
+                  {formValues.allergies?.map((item, idx) => (
+                    <div key={idx} className="flex items-center bg-gray-500 text-white px-2 py-1 rounded">
+                      <span>{item}</span>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          handleStepChange({ allergies: formValues.allergies?.filter((a) => a !== item) })
+                        }
+                        className="ml-1"
+                      >
+                        <X size={16} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Medical Conditions */}
+          <div className="flex flex-col gap-3">
+            <Form.Item layout="vertical" label="Medical Conditions">
+              <Select
+                onValueChange={(val) => {
+                  if (!formValues.medicalConditions?.includes(val)) {
+                    handleStepChange({ medicalConditions: [...(formValues.medicalConditions || []), val] });
+                  }
+                }}
+                value=""
+              >
+                <SelectTrigger className="border-gray-300 bg-gray-100 focus:border-gray-400 p-5">
+                  <SelectValue placeholder="Select a Condition" />
+                </SelectTrigger>
+                <SelectContent>
+                  {conditionOptions.map((opt) => (
+                    <SelectItem key={opt} value={opt}>
+                      {opt}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </Form.Item>
+            <div className="">
+              {formValues.medicalConditions && formValues.medicalConditions.length > 0 && (
+                <div className="flex flex-wrap gap-2 mt-3">
+                  {formValues.medicalConditions.map((item, idx) => (
+                    <div key={idx} className="flex items-center bg-gray-500 text-white px-2 py-1 rounded">
+                      <span>{item}</span>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          handleStepChange({ medicalConditions: formValues.medicalConditions?.filter((m) => m !== item) })
+                        }
+                        className="ml-1"
+                      >
+                        <X size={16} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Past Treatments */}
+          <div className="flex flex-col gap-3">
+            <Form.Item layout="vertical" label="Past Treatments">
+              <Select
+                onValueChange={(val) => {
+                  if (!formValues.pastTreatments?.includes(val)) {
+                    handleStepChange({ pastTreatments: [...(formValues.pastTreatments || []), val] });
+                  }
+                }}
+                value=""
+              >
+                <SelectTrigger className="border-gray-300 bg-gray-100 focus:border-gray-400 p-5">
+                  <SelectValue placeholder="Select a Past Treatment" />
+                </SelectTrigger>
+                <SelectContent>
+                  {pastTreatmentOptions.map((opt) => (
+                    <SelectItem key={opt} value={opt}>
+                      {opt}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </Form.Item>
+            <div className="">
+              {formValues.pastTreatments && formValues.pastTreatments.length > 0 && (
+                <div className="flex flex-wrap gap-2 mt-3">
+                  {formValues.pastTreatments.map((item, idx) => (
+                    <div key={idx} className="flex items-center bg-gray-500 text-white px-2 py-1 rounded">
+                      <span>{item}</span>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          handleStepChange({ pastTreatments: formValues.pastTreatments?.filter((t) => t !== item) })
+                        }
+                        className="ml-1"
+                      >
+                        <X size={16} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Major Accidents */}
+          <div className="flex flex-col gap-3">
+            <Form.Item layout="vertical" label="Major Accidents">
+              <Select
+                onValueChange={(val) => {
+                  if (!formValues.majorAccidents?.includes(val)) {
+                    handleStepChange({ majorAccidents: [...(formValues.majorAccidents || []), val] });
+                  }
+                }}
+                value=""
+              >
+                <SelectTrigger className="border-gray-300 bg-gray-100 focus:border-gray-400 p-5">
+                  <SelectValue placeholder="Select a Major Accident" />
+                </SelectTrigger>
+                <SelectContent>
+                  {majorAccidentOptions.map((opt) => (
+                    <SelectItem key={opt} value={opt}>
+                      {opt}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </Form.Item>
+            <div className="">
+              {formValues.majorAccidents && formValues.majorAccidents.length > 0 && (
+                <div className="flex flex-wrap gap-2 mt-3">
+                  {formValues.majorAccidents?.map((item, idx) => (
+                    <div key={idx} className="flex items-center bg-gray-500 text-white px-2 py-1 rounded">
+                      <span>{item}</span>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          handleStepChange({ majorAccidents: formValues.majorAccidents?.filter((m) => m !== item) })
+                        }
+                        className="ml-1"
+                      >
+                        <X size={16} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+          {/* --- End Additional Medical Information --- */}
+
+          <Row className="w-[100%] mt-2">
+            <Button
+              className="primary-button primary-button-white-text"
+              onClick={() => goToStep(1)} 
+            >
+              Back
+            </Button>
+            <Button
+              className="primary-button primary-button-white-text ml-2"
+              onClick={() => goToStep(3)} 
+            >
+              Continue
+            </Button>
+          </Row>
+        </>
+      )}
+
+      {currentStep === 3 && ( 
         <>
           <Divider orientation="left">Set Password</Divider>
 
@@ -268,14 +463,14 @@ const PatientSignupForm = (
           <Row className="w-[100%] mt-8">
             <Button
               className="primary-button primary-button-white-text"
-              onClick={() => goToStep(1)} // Go back to step 2
+              onClick={() => goToStep(2)} 
             >
               Back
             </Button>
             <Button
               className="primary-button primary-button-white-text ml-2"
               htmlType="submit"
-              loading={isRegistering}
+              loading={isLoading}
             >
               Register
             </Button>

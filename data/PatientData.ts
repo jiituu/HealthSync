@@ -263,3 +263,63 @@ export const conditionOptionsEnglish = [
   "Bronchitis",
   "Sinusitis",
 ];
+
+
+export const pastTreatmentOptions = [
+  "Chemotherapy (ኪሚዮተራፒ)",
+  "Radiation Therapy (የራዲዮሽን ሕክምና)",
+  "Surgery (ቀዶ ህክምና)",
+  "Dialysis (ዲያሊሲስ)",
+  "Physical Therapy (የአካል እንቅስቃሴ ሕክምና)",
+  "Occupational Therapy (የሥራ ችሎታ ሕክምና)",
+  "Psychotherapy (የስነ-ልቦና ሕክምና)",
+  "Antidepressant Medication (የድብርተኝነት መድሃኒት)",
+  "Antibiotic Treatment (የባክቴሪያ መከላከያ መድሃኒት)",
+  "Steroid Treatment (ስቴሮይድ ሕክምና)",
+  "Insulin Therapy (የኢንሱሊን ሕክምና)",
+  "Hormone Therapy (የሆርሞን ሕክምና)",
+  "Immunotherapy (ኢሚዩኖተራፒ)",
+  "Blood Transfusion (የደም መስማማት)",
+  "Organ Transplant (የኦርጋን ልውውጥ)",
+  "Pain Management Therapy (የህመም አስተዳደር ሕክምና)",
+  "Antiviral Therapy (የቫይረስ ሕክምና)",
+  "Respiratory Therapy (የእስትንፋስ ሕክምና)",
+  "Speech Therapy (የንግግር ሕክምና)",
+  "Chiropractic Treatment (የአካል ስርዓት ሕክምና)",
+  "Acupuncture (አኩፓንክቸር)",
+  "Homeopathy (ሆሜዮፓቲ)",
+  "Herbal Medicine Treatment (የምፅዋት ሕክምና)",
+  "Cognitive Behavioral Therapy (የሐሳብ እና ባህሪ ሕክምና)",
+  "Electroconvulsive Therapy (የኤሌክትሮን ድንጋጤ ሕክምና)",
+  "Laser Surgery (የሌዘር ቀዶ ሕክምና)",
+  "Cardiac Catheterization (የልብ ስርዓት ምርመራ)",
+  "Bypass Surgery (የልብ በይፓስ ቀዶ ሕክምና)",
+  "Joint Replacement Surgery (የጉልበት እና ጣፋጭ መቀየሪያ ቀዶ ሕክምና)"
+];
+
+
+export const majorAccidentOptions = [
+  "Car Accident (የመኪና አደጋ)",
+  "Motorcycle Accident (የሞተርሳይክል አደጋ)",
+  "Bicycle Accident (የብስክሌት አደጋ)",
+  "Pedestrian Accident (የታጠፉ ወንበዴዎች አደጋ)",
+  "Workplace Injury (የሥራ ቦታ ደረሰኝ)",
+  "Construction Site Accident (የህንፃ ስራ አደጋ)",
+  "Slip and Fall (የመንሸራተት እና መውደቅ አደጋ)",
+  "Sports Injury (የስፖርት ጉዳት)",
+  "Head Injury (የራስ ጉዳት)",
+  "Spinal Cord Injury (የአእምሮ አካል ጉዳት)",
+  "Fractured Bones (የአጥንት ስብራት)",
+  "Burn Injuries (የቃጠሎ ጉዳት)",
+  "Drowning Incident (የጠላልቅ አደጋ)",
+  "Electrocution (የኤሌክትሪክ ደረሰኝ)",
+  "Poisoning (መርዘኝነት)",
+  "Severe Allergic Reaction (አደገኛ የአለርጂ ምልክት)",
+  "Firearm Injury (የመሳሪያ ደረሰኝ)",
+  "Explosion Injury (የፍንዳታ ደረሰኝ)",
+  "Animal Attack (የእንስሳ ጥቃት)",
+  "Industrial Accident (የኢንዱስትሪ አደጋ)",
+  "Boating Accident (የመርከብ አደጋ)",
+  "Aviation Accident (የአየር መንገድ አደጋ)",
+  "Train Accident (የባቡር አደጋ)"
+];

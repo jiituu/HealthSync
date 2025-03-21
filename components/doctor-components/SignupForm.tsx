@@ -13,7 +13,8 @@ import {
 } from "antd";
 import { InboxOutlined } from "@ant-design/icons";
 import { qualifications, specializations } from "@/data/DoctorData";
-import { useAddDoctorMutation } from "@/redux/api/doctorApi";
+import { DoctorSignupPayload } from "@/types/doctor";
+import { useRegisterDoctorMutation } from "@/redux/api/doctorApi";
 
 const { Dragger } = Upload;
 
@@ -22,55 +23,41 @@ const formItemLayout = {
   wrapperCol: { span: 24 },
 };
 
-interface DoctorSignupFormValues {
-  firstname: string;
-  lastname: string;
-  email: string;
-  phonenumber: string;
-  gender: string;
-  age: number;
-  specializations: string;
-  qualifications: string;
-  licenses: File[];
-  password: string;
-}
 
 const DoctorSignupForm = (
   {setParentTab}
   :{setParentTab:any}
 ) => {
-  const [addDoctor] = useAddDoctorMutation();
-  const [current, setCurrent] = useState(0);
-  const [isRegistering, setIsRegistering] = useState(false);
+
   const [form] = Form.useForm();
+  const [current, setCurrent] = useState(0); 
+  const [formValues, setFormValues] = useState<DoctorSignupPayload>({
+    firstname: "",
+    lastname: "",
+    email: "",
+    phoneNumber: "",
+    gender: "male",
+    age: 0,
+    password: "",
+    role: "doctor",
+    specializations: [],
+    qualifications: [],
+    licenses: []
+  });
+
+  const [registerDoctor, {isLoading, isError, error}] = useRegisterDoctorMutation();
 
   const goToStep = (step: number) => setCurrent(step);
 
-  const onFinish = async (value: DoctorSignupFormValues) => {
-    const values = form.getFieldsValue(true);
-    try {
-      setIsRegistering(true);
-      // console.log("Form Submitted:",values );
-
-      const license = {
-        "url": "http://example.com/license3",
-        "type": "Medical License",
-        "isVerified": false
-      }
-
-      const response = await addDoctor({...values,licenses:[license]})
-
-      if (response.error) {
-        throw new Error("Failed to register doctor");
-      }
-
-      message.success("Registration successful!");
-      setParentTab(0);
-    } catch (error) {
-      message.error("Registration failed. Please try again.");
-    } finally {
-      setIsRegistering(false);
-    }
+  const onFinish = async (value: DoctorSignupPayload) => {
+      console.log("Form Values", formValues);
+        try {
+          await registerDoctor(formValues).unwrap();
+          message.success("Registration successful!");
+          setParentTab(0); 
+        } catch (error: any) {
+          message.error(error?.data?.error || "Registration failed, please try again");
+        }
   };
 
   const beforeUpload = (file: any) => {
@@ -80,6 +67,10 @@ const DoctorSignupForm = (
       return false;
     }
     return true;
+  };
+
+  const handleStepChange = (changedValues: any) => {
+    setFormValues((prevValues) => ({ ...prevValues, ...changedValues }));
   };
 
   const formList = [
@@ -234,7 +225,7 @@ const DoctorSignupForm = (
         <Button
           className="primary-button primary-button-white-text ml-2"
           htmlType="submit"
-          loading={isRegistering}
+          loading={isLoading}
         >
           Register
         </Button>
@@ -246,11 +237,13 @@ const DoctorSignupForm = (
     <Form
       form={form}
       onFinish={onFinish}
+      onValuesChange={handleStepChange}
       onFinishFailed={() => message.error("Please submit the form correctly")}
       className="w-full flex flex-col gap-4 mt-8"
     >
       {formList[current]}
     </Form>
+    
   );
 };
 

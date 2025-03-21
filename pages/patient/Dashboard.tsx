@@ -46,11 +46,13 @@ const Dashboard = () => {
           </div>
         </div>
       </div>
-      <div className="flex items-center gap-4 mt-8 h-[550px]">
+      {/* Responsive container: flex-col on small screens, flex-row on md and above */}
+      <div className="flex flex-col md:flex-row items-center gap-4 mt-8 h-auto md:h-[550px]">
         <Appointment/>
         <FromBlogs/>
       </div>
-      <div className="flex items-center gap-4 mt-8 mb-40">
+      {/* Responsive container for ActiveMedication & RecentVisits */}
+      <div className="flex flex-col md:flex-row items-center gap-4 mt-8 mb-40">
         <ActiveMedication/>
         <RecentVisits/>
       </div>

@@ -50,7 +50,7 @@ const PatientMedicalHistory = () => {
   const paginatedData = filteredData.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
 
   return (
-    <div className="mr-5">
+    <div className="mx-4 md:mr-5">
       {/* Profile Section */}
       <div className="flex justify-between items-center shadow-sm py-3 w-full">
         <div className="flex items-center">
@@ -66,55 +66,54 @@ const PatientMedicalHistory = () => {
       </div>
 
       {/* Medical History Table */}
-      <div className="mt-6 bg-white shadow rounded-lg p-4 w-full">
-        <div className="flex justify-between items-center mb-4">
-          <h3 className="text-xl font-semibold">Medical History</h3>
-          <div className="flex items-center space-x-4">
-            <Button className="md:hidden">
-              <HiMenu size={24} />
-            </Button>
+      <div className="mt-6 bg-white shadow rounded-lg w-full overflow-x-auto">
+        <div className="p-4">
+          {/* Updated Header Section */}
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 space-y-4 md:space-y-0">
+            <h3 className="text-xl font-semibold mb-2 md:mb-0">Medical History</h3>
+            <div className="flex flex-col sm:flex-row items-start md:items-center space-y-4 md:space-y-0 md:space-x-4">
+              {/* Integrating the SearchComponent */}
+              <SearchComponent
+                data={dummyData}
+                value="doctor"
+                onFilter={setFilteredData}
+              />
 
-            {/* Integrating the SearchComponent */}
-            <SearchComponent
-              data={dummyData}
-              value="doctor"
-              onFilter={setFilteredData}
-            />
-
-            <Select>
-              <SelectTrigger>Sort by: Newest</SelectTrigger>
-              <SelectContent>
-                <SelectItem value="newest">Newest</SelectItem>
-                <SelectItem value="oldest">Oldest</SelectItem>
-              </SelectContent>
-            </Select>
+              <Select>
+                <SelectTrigger>Sort by: Newest</SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="newest">Newest</SelectItem>
+                  <SelectItem value="oldest">Oldest</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
-        </div>
 
-        <table className="w-full text-left">
-          <thead>
-            <tr className="border-b">
-              <th className="p-2">Last Visit</th>
-              <th className="p-2">Doctor</th>
-              <th className="p-2">Rating</th>
-              <th className="p-2">Contact</th>
-              <th className="p-2">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {paginatedData.map((entry) => (
-              <tr key={entry.id} className="border-b">
-                <td className="p-2">{entry.date}</td>
-                <td className="p-2">{entry.doctor}</td>
-                <td className="p-2 text-blue-500">{entry.rating} / 5</td>
-                <td className="p-2">{entry.contact}</td>
-                <td className="p-2">
-                  <button className="px-4 py-1 text-sm text-white bg-secondaryColor rounded">More</button>
-                </td>
+          <table className="min-w-[600px] w-full text-left">
+            <thead>
+              <tr className="border-b">
+                <th className="p-2">Last Visit</th>
+                <th className="p-2">Doctor</th>
+                <th className="p-2">Rating</th>
+                <th className="p-2">Contact</th>
+                <th className="p-2">Actions</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {paginatedData.map((entry) => (
+                <tr key={entry.id} className="border-b">
+                  <td className="p-2">{entry.date}</td>
+                  <td className="p-2">{entry.doctor}</td>
+                  <td className="p-2 text-blue-500">{entry.rating} / 5</td>
+                  <td className="p-2">{entry.contact}</td>
+                  <td className="p-2">
+                    <button className="px-4 py-1 text-sm text-white bg-secondaryColor rounded">More</button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {/* Pagination */}

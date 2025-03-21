@@ -54,7 +54,6 @@ const AdminNavbar = ({ onMenuClick }: { onMenuClick: () => void }) => {
               A
             </div>
         </Link>
-
           <Popover>
             <PopoverTrigger asChild>
               <button>
