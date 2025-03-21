@@ -1,6 +1,7 @@
 import { PatientLoginPayload } from "@/types/patient";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { PatientSignupPayload } from "@/types/patient";
+import { use } from "react";
 
 export const patientApi = createApi({
   reducerPath: "patientApi",
@@ -30,10 +31,18 @@ export const patientApi = createApi({
       }),
     }),
 
+    deletePatient: builder.mutation<void, void>({
+      query: () => ({
+      url: '/patients/me',
+      method: 'DELETE',
+      }),
+    }),
+
   }),
 });
 
 export const {
   useLoginPatientMutation,
-  useRegisterPatientMutation
+  useRegisterPatientMutation,
+  useDeletePatientMutation
 } = patientApi;

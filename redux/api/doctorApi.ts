@@ -37,6 +37,13 @@ export const doctorApi = createApi({
           method: 'GET',
         }),
       }),
+
+    deleteDoctor: builder.mutation<void, void>({
+      query: () => ({
+      url: '/doctors/me',
+      method: 'DELETE',
+      }),
+    }),
   
   }),
 });
@@ -44,5 +51,6 @@ export const doctorApi = createApi({
 export const {
   useGetDoctorsQuery,
   useLoginDoctorMutation,
-  useRegisterDoctorMutation
+  useRegisterDoctorMutation,
+  useDeleteDoctorMutation
 } = doctorApi;
