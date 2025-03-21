@@ -15,6 +15,7 @@ export const doctorApi = createApi({
   tagTypes: ["Doctor"],
   endpoints: (builder) => ({
 
+    // to login a doctor
     loginDoctor: builder.mutation<any, DoctorLoginPayload>({
         query: (doctor) => ({
           url: '/login/doctor',
@@ -23,6 +24,7 @@ export const doctorApi = createApi({
         }),
     }),
 
+    // to register a doctor
     registerDoctor: builder.mutation<any, DoctorSignupPayload>({
       query: (doctor) => ({
       url: '/register/doctor',
@@ -31,6 +33,7 @@ export const doctorApi = createApi({
       }),
     }),
 
+    // to get all doctors
     getDoctors: builder.query<any, void>({
         query: () => ({
           url: '/doctors',
@@ -38,12 +41,22 @@ export const doctorApi = createApi({
         }),
       }),
 
+    // to delete a doctor
     deleteDoctor: builder.mutation<void, void>({
       query: () => ({
       url: '/doctors/me',
       method: 'DELETE',
       }),
     }),
+
+    // to get a doctor by id
+    getDoctorById: builder.query<any, string>({
+      query: (id) => ({
+        url: `/doctors/${id}`,
+        method: 'GET',
+      }),
+    }),
+    
   
   }),
 });
