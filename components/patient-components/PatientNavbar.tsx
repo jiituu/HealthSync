@@ -32,50 +32,50 @@ const notifications: NotificationModel[] = [
   },
 ];
 
-export const doctors: DoctorModel[] = [
-  {
-    id: "1",
-    firstname: "John",
-    lastname: "Doe",
-    email: "johndoe@example.com",
-    age: 45,
-    gender: "male",
-    phoneNumber: "1234567890",
-    specializations: ["Cardiology", "Neurology"],
-    qualifications: ["MBBS", "MD"],
-    licenses: [{ url: "license1.pdf", type: "Medical", isVerified: true }],
-    role: "doctor",
-    password: "hashedpassword1",
-  },
-  {
-    id: "2",
-    firstname: "Jane",
-    lastname: "Smith",
-    email: "janesmith@example.com",
-    age: 38,
-    gender: "female",
-    phoneNumber: "0987654321",
-    specializations: ["Neurology"],
-    qualifications: ["MBBS", "PhD"],
-    licenses: [{ url: "license2.pdf", type: "Medical", isVerified: true }],
-    role: "doctor",
-    password: "hashedpassword2",
-  },
-  {
-    id: "3",
-    firstname: "Robert",
-    lastname: "Brown",
-    email: "robertbrown@example.com",
-    age: 50,
-    gender: "male",
-    phoneNumber: "1122334455",
-    specializations: ["Orthopedics"],
-    qualifications: ["MBBS", "MS"],
-    licenses: [{ url: "license3.pdf", type: "Medical", isVerified: true }],
-    role: "doctor",
-    password: "hashedpassword3",
-  },
-];
+// export const doctors: DoctorModel[] = [
+//   {
+//     id: "1",
+//     firstname: "John",
+//     lastname: "Doe",
+//     email: "johndoe@example.com",
+//     age: 45,
+//     gender: "male",
+//     phoneNumber: "1234567890",
+//     specializations: ["Cardiology", "Neurology"],
+//     qualifications: ["MBBS", "MD"],
+//     licenses: [{ url: "license1.pdf", type: "Medical", isVerified: true }],
+//     role: "doctor",
+//     password: "hashedpassword1",
+//   },
+//   {
+//     id: "2",
+//     firstname: "Jane",
+//     lastname: "Smith",
+//     email: "janesmith@example.com",
+//     age: 38,
+//     gender: "female",
+//     phoneNumber: "0987654321",
+//     specializations: ["Neurology"],
+//     qualifications: ["MBBS", "PhD"],
+//     licenses: [{ url: "license2.pdf", type: "Medical", isVerified: true }],
+//     role: "doctor",
+//     password: "hashedpassword2",
+//   },
+//   {
+//     id: "3",
+//     firstname: "Robert",
+//     lastname: "Brown",
+//     email: "robertbrown@example.com",
+//     age: 50,
+//     gender: "male",
+//     phoneNumber: "1122334455",
+//     specializations: ["Orthopedics"],
+//     qualifications: ["MBBS", "MS"],
+//     licenses: [{ url: "license3.pdf", type: "Medical", isVerified: true }],
+//     role: "doctor",
+//     password: "hashedpassword3",
+//   },
+// ];
 
 const Navbar = ({ onMenuClick }: { onMenuClick: () => void }) => { 
   const router = useRouter();
@@ -84,7 +84,8 @@ const Navbar = ({ onMenuClick }: { onMenuClick: () => void }) => {
   const containerRef = useRef<any>(null);
 
   const { data, status, error, isLoading } = useGetVerifiedDoctorsQuery();
-  
+  const doctors:DoctorModel[] = data?.data?.doctors || [];
+
   // Close the modal if the user clicks outside the container
   useEffect(() => {
     const handleClickOutside = (event:MouseEvent) => {
@@ -148,7 +149,7 @@ const Navbar = ({ onMenuClick }: { onMenuClick: () => void }) => {
                       key={index}
                       className="p-2 hover:bg-gray-100 rounded cursor-pointer border-b-2"
                       onClick={()=>{
-                        router.push(`/patient/search?key=${doctor.id}`);
+                        router.push(`/patient/search?key=${doctor._id}`);
                         setIsOpen(false);
                       }}
                     >

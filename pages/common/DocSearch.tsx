@@ -4,7 +4,6 @@ import { IoMdCheckmarkCircle } from "react-icons/io";
 import Rating from "@/components/common-components/Rating";
 import { Button, Row, Spin } from "antd";
 import { useEffect, useState } from "react";
-import { doctors } from "@/components/patient-components/PatientNavbar";
 import { DoctorModel } from "@/components/models/doctor";
 import { LoadingOutlined } from '@ant-design/icons';
 import { useGetVerifiedDoctorsQuery } from "@/redux/api/doctorApi";
@@ -19,11 +18,13 @@ const DocSearch = ({doctorID}:prob)=>{
     const [openRequestVisit,setOpenRequestVisit] = useState(false);
 
     const { data, status, error, isLoading } = useGetVerifiedDoctorsQuery();
-
+    
+    
     useEffect(()=>{
-        const doctor = doctors.find(d=>d.id==doctorID);
+        const doctors: DoctorModel[] = data?.data?.doctors??[];
+        const doctor = doctors.find(d=>d._id==doctorID);
         if(doctor) setDoctor(doctor);
-    },[doctorID])
+    },[data?.data?.doctors, doctorID])
 
     return(
         <>

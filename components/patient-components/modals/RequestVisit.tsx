@@ -1,7 +1,7 @@
 import CustomModal from "@/components/common-components/CustomModal"
 import { DoctorModel } from "@/components/models/doctor";
-import { VisitRequestModel } from "@/components/models/visitRequest";
-import { useAddVisitRequestMutation } from "@/redux/api/commonApi";
+import { VisitModel } from "@/components/models/visitModel";
+import { useRequestVisitMutation } from "@/redux/api/patientApi";
 import { Box, useMediaQuery } from "@mui/material";
 import { Button, DatePicker, Divider, Form, Input, message, Row } from "antd";
 import dayjs from "dayjs";
@@ -13,29 +13,27 @@ interface props{
 
 export const RequestVisitModal = ({open,setOpen,doctor}:props)=>{
     const [form] = Form.useForm();
-    const [addVisitRequest,{isLoading}] = useAddVisitRequestMutation();
+    const [addVisitRequest,{isLoading}] = useRequestVisitMutation();
 
     const onFinish = ()=>{
-        form.validateFields().then((values)=>{
-            const visitRequest: VisitRequestModel = {
-                ...values,
-                doctor:doctor.id,
-                patient:'temporary',
-                preferredDate: dayjs(values.preferredDate).format('MMMM DD, YYYY hh:mm A')
-            }
-            console.log(visitRequest)
-            addVisitRequest(visitRequest)
-            .then((res)=>{
-                if(!res.error){
-                    message.success('Success')
-                }else{
-                    message.error('Something went wrong, please try again')
-                }
-            })
+        form.validateFields().then(async (values)=>{
+            const visitRequest: VisitModel = {
+                patient: "67dd28bccccc9e8b5881d9d3",
+                doctor: "67dd6f40ff757b2cfd262844",
+                preferredDate: values.preferredDate.toDate(),
+                reason: values.symptom,
+                status: "Scheduled",
+                approval: "Scheduled"
+            } as VisitModel;
 
-        }).catch((e)=>{
-            console.log(e)
-            message.warning('Something went wrong, please try again')
+            
+            try {
+                await addVisitRequest(visitRequest).unwrap();
+                message.success("Visit requested");
+                setOpen(false)
+            } catch (error: any) {
+                message.error(error?.data?.error || "Something went wrong, please try again");
+            }
         })
     }
 

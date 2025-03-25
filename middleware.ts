@@ -5,7 +5,6 @@ export const middleware = async (req: NextRequest): Promise<NextResponse> => {
     const { pathname } = req.nextUrl;
     const url = req.nextUrl.clone();
     const token = req.cookies.get("token")?.value;
-
     // auth middleware
     // if (!token) {
     //     url.pathname = "/";

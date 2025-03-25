@@ -51,7 +51,7 @@ export const doctorApi = createApi({
       }),
     }),
 
-    getVerifiedDoctors: builder.query<DoctorModel[], void>({
+    getVerifiedDoctors: builder.query<any, void>({
       query: () => ({
         url: '/doctors', // change the url to verified doctors and remove the comment
         method: 'GET',
@@ -74,5 +74,6 @@ export const {
   useGetDoctorsQuery,
   useLoginDoctorMutation,
   useRegisterDoctorMutation,
-  useGetVerifiedDoctorsQuery ,useDeleteDoctorMutation
+  useGetVerifiedDoctorsQuery,
+  useDeleteDoctorMutation
 } = doctorApi;
