@@ -132,7 +132,7 @@ const Navbar = ({ onMenuClick }: { onMenuClick: () => void }) => {
             </div>
 
             {
-              false?
+              error?
               <Row align='middle' justify='center'>
                 <p className="text-sm text-gray-500">Something went wrong</p>
               </Row>

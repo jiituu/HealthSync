@@ -30,7 +30,7 @@ const DocSearch = ({doctorID}:prob)=>{
         <>
             <div className="p-6">
                 {
-                    false?
+                    error?
                     <Row className="h-[60vh]"><p className="text-sm text-gray-500">Something went wrong</p></Row>
 
                     :isLoading?
