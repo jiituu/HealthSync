@@ -4,27 +4,23 @@ export const commonApi = createApi({
   reducerPath: "commonApi",
   baseQuery: fetchBaseQuery({
     baseUrl: "https://healthsync-backend-bfrv.onrender.com/api",
+    credentials: "include",
     prepareHeaders: (headers) => {
-      const token = localStorage.getItem("token");
-      if (token) {
-        headers.set("Authorization", `Bearer ${token}`);
-      }
       headers.set("Content-Type", `application/json`);
       return headers;
     },
-    credentials: "include",
   }),
-  tagTypes: ["Doctor"],
+  tagTypes: [],
   endpoints: (builder) => ({
-    //POST
-    addVisitRequest: builder.mutation<any, any>({
-      query: (visitRequest) => ({
-        url: '/doctors', //correct the url
-        method: 'POST',
-        body: visitRequest
+    logout: builder.mutation({
+      query: () => ({
+        url: "/logout",
+        method: "GET",
       }),
     }),
   }),
 });
 
-export const { useAddVisitRequestMutation } = commonApi;
+export const {
+  useLogoutMutation,
+} = commonApi;

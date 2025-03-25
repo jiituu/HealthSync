@@ -1,28 +1,54 @@
 import { DoctorModel } from "@/components/models/doctor";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { DoctorLoginPayload, DoctorSignupPayload } from "@/types/doctor";
+
 
 export const doctorApi = createApi({
   reducerPath: "doctorApi",
   baseQuery: fetchBaseQuery({
     baseUrl: "https://healthsync-backend-bfrv.onrender.com/api",
+    credentials: "include",
     prepareHeaders: (headers) => {
-      const token = localStorage.getItem("token");
-      if (token) {
-        headers.set("Authorization", `Bearer ${token}`);
-      }
       headers.set("Content-Type", `application/json`);
       return headers;
     },
-    credentials: "include",
   }),
   tagTypes: ["Doctor"],
   endpoints: (builder) => ({
-    //GET
-    getDoctors: builder.query<DoctorModel[], void>({
+
+    // to login a doctor
+    loginDoctor: builder.mutation<any, DoctorLoginPayload>({
+        query: (doctor) => ({
+          url: '/login/doctor',
+          method: 'POST',
+          body: doctor
+        }),
+    }),
+
+    // to register a doctor
+    registerDoctor: builder.mutation<any, DoctorSignupPayload>({
+      query: (doctor) => ({
+      url: '/register/doctor',
+      method: 'POST',
+      body: doctor
+      }),
+    }),
+
+
+    // to get all doctors
+    getDoctors: builder.query<any, void>({
         query: () => ({
           url: '/doctors',
           method: 'GET',
         }),
+      }),
+
+    // to delete a doctor
+    deleteDoctor: builder.mutation<void, void>({
+      query: () => ({
+      url: '/doctors/me',
+      method: 'DELETE',
+      }),
     }),
 
     getVerifiedDoctors: builder.query<DoctorModel[], void>({
@@ -31,16 +57,22 @@ export const doctorApi = createApi({
         method: 'GET',
       }),
     }),
-  
-    //POST
-    addDoctor: builder.mutation<any, any>({
-      query: (doctor) => ({
-        url: '/doctors',
-        method: 'POST',
-        body: doctor
+
+    // to get a doctor by id
+    getDoctorById: builder.query<any, string>({
+      query: (id) => ({
+        url: `/doctors/${id}`,
+        method: 'GET',
       }),
     }),
+    
+  
   }),
 });
 
-export const {useGetDoctorsQuery, useGetVerifiedDoctorsQuery ,useAddDoctorMutation} = doctorApi;
+export const {
+  useGetDoctorsQuery,
+  useLoginDoctorMutation,
+  useRegisterDoctorMutation,
+  useGetVerifiedDoctorsQuery ,useDeleteDoctorMutation
+} = doctorApi;

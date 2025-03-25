@@ -10,7 +10,7 @@ interface ErrorBoxProps {
   onRetry?: () => void;
 }
 
-const ErrorBox: React.FC<ErrorBoxProps> = ({ title = "Error", message, onRetry }) => {
+const ErrorMessage: React.FC<ErrorBoxProps> = ({ title = "Error", message, onRetry }) => {
   return (
     <Alert variant="destructive" className="flex flex-col gap-2 p-4">
       <div className="flex items-center gap-2">
@@ -27,12 +27,12 @@ const ErrorBox: React.FC<ErrorBoxProps> = ({ title = "Error", message, onRetry }
   );
 };
 
-export default ErrorBox;
+export default ErrorMessage;
 
 
 // ways to use the component
 
-{/* <ErrorBox 
+{/* <ErrorMessage 
   title="Network Error"
   message="Failed to load data. Please check your internet connection."
   onRetry={() => console.log("Retrying...")}
