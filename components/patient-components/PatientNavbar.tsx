@@ -6,9 +6,11 @@ import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover
 import Link from 'next/link';
 import Notification from '../common-components/Notification';
 import { NotificationModel } from '../models/notification';
-import { Row } from 'antd';
+import { Row, Spin } from 'antd';
 import { useRouter } from 'next/navigation';
-import { useGetDoctorsQuery } from '@/redux/api/doctorApi';
+import { useGetVerifiedDoctorsQuery } from '@/redux/api/doctorApi';
+import { LoadingOutlined } from '@ant-design/icons';
+import { DoctorModel } from '../models/doctor';
 
 
 const notifications: NotificationModel[] = [
@@ -30,118 +32,50 @@ const notifications: NotificationModel[] = [
   },
 ];
 
-export const doctors = [
-  {
-    id: '1',
-    name: 'Alice Rob',
-    email: 'alice@gmail.com',
-    specialty: 'Neurosurgeon',
-    hospital: 'Pawlos Hospital',
-    phoneNumber: '0942335678',
-    age: 27,
-    location: 'Addis Ababa, Bole',
-    gender:'Female'
-  },
-  {
-    id: '2',
-    name: 'John Doe',
-    email: 'johndoe@gmail.com',
-    specialty: 'Cardiologist',
-    hospital: 'Tikur Anbessa Hospital',
-    phoneNumber: '0933445566',
-    age: 35,
-    location: 'Addis Ababa, Yeka',
-    gender:'Male'
-  },
-  {
-    id: '3',
-    name: 'Sarah Lee',
-    email: 'sarahlee@gmail.com',
-    specialty: 'Dermatologist',
-    hospital: 'St. Paul Hospital',
-    phoneNumber: '0923442211',
-    age: 29,
-    location: 'Addis Ababa, Gullele',
-    gender:'Female'
-  },
-  {
-    id: '4',
-    name: 'Michael Brown',
-    email: 'michaelb@gmail.com',
-    specialty: 'Pediatrician',
-    hospital: 'Pawlos Hospital',
-    phoneNumber: '0911223344',
-    age: 40,
-    location: 'Addis Ababa, Arada',
-    gender:'Male'
-  },
-  {
-    id: '5',
-    name: 'Jane Smith',
-    email: 'janesmith@gmail.com',
-    specialty: 'Oncologist',
-    hospital: 'Zewditu Hospital',
-    phoneNumber: '0945678990',
-    age: 33,
-    location: 'Addis Ababa, Kirkos',
-    gender:'Female'
-  },
-  {
-    id: '6',
-    name: 'Samuel Yonas',
-    email: 'samuelyonas@gmail.com',
-    specialty: 'Orthopedic Surgeon',
-    hospital: 'St. Paul Hospital',
-    phoneNumber: '0911445567',
-    age: 36,
-    location: 'Addis Ababa, Lideta',
-    gender:'Male'
-  },
-  {
-    id: '7',
-    name: 'Linda Jones',
-    email: 'lindaj@gmail.com',
-    specialty: 'Gynecologist',
-    hospital: 'Pawlos Hospital',
-    phoneNumber: '0933221100',
-    age: 31,
-    location: 'Addis Ababa, Nifas Silk',
-    gender:'Female'
-  },
-  {
-    id: '8',
-    name: 'Daniel Tesfaye',
-    email: 'danieltesfaye@gmail.com',
-    specialty: 'General Practitioner',
-    hospital: 'Menelik II Hospital',
-    phoneNumber: '0925566778',
-    age: 28,
-    location: 'Addis Ababa, Bole',
-    gender:'Male'
-  },
-  {
-    id: '9',
-    name: 'Emily Adams',
-    email: 'emilyadams@gmail.com',
-    specialty: 'Neurologist',
-    hospital: 'Pawlos Hospital',
-    phoneNumber: '0947889900',
-    age: 34,
-    location: 'Addis Ababa, Kolfe Keranyo',
-    gender:'Female'
-  },
-  {
-    id: '10',
-    name: 'James Carter',
-    email: 'jamescarter@gmail.com',
-    specialty: 'Radiologist',
-    hospital: 'Tikur Anbessa Hospital',
-    phoneNumber: '0919887766',
-    age: 37,
-    location: 'Addis Ababa, Akaki Kality',
-    gender:'Male'
-  }
-];
+// export const doctors: DoctorModel[] = [
+//   {
+//     id: "1",
+//     firstname: "John",
+//     lastname: "Doe",
+//     email: "johndoe@example.com",
+//     age: 45,
+//     gender: "male",
+//     phoneNumber: "1234567890",
+//     specializations: ["Cardiology", "Neurology"],
+//     qualifications: ["MBBS", "MD"],
+//     licenses: [{ url: "license1.pdf", type: "Medical", isVerified: true }],
+//     role: "doctor",
+//     password: "hashedpassword1",
+//   },
+//   {
+//     id: "2",
+//     firstname: "Jane",
+//     lastname: "Smith",
+//     email: "janesmith@example.com",
+//     age: 38,
+//     gender: "female",
+//     phoneNumber: "0987654321",
+//     specializations: ["Neurology"],
+//     qualifications: ["MBBS", "PhD"],
+//     licenses: [{ url: "license2.pdf", type: "Medical", isVerified: true }],
+//     role: "doctor",
+//     password: "hashedpassword2",
+//   },
+//   {
+//     id: "3",
+//     firstname: "Robert",
+//     lastname: "Brown",
+//     email: "robertbrown@example.com",
+//     age: 50,
+//     gender: "male",
+//     phoneNumber: "1122334455",
+//     specializations: ["Orthopedics"],
+//     qualifications: ["MBBS", "MS"],
+//     licenses: [{ url: "license3.pdf", type: "Medical", isVerified: true }],
+//     role: "doctor",
+//     password: "hashedpassword3",
+//   },
+// ];
 
 const Navbar = ({ onMenuClick }: { onMenuClick: () => void }) => { 
   const router = useRouter();
@@ -149,9 +83,9 @@ const Navbar = ({ onMenuClick }: { onMenuClick: () => void }) => {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<any>(null);
 
-  const { data, status, error, isLoading } = useGetDoctorsQuery();
-  
-  console.log(data,"doctors");
+  const { data, status, error, isLoading } = useGetVerifiedDoctorsQuery();
+  const doctors:DoctorModel[] = data?.data?.doctors || [];
+
   // Close the modal if the user clicks outside the container
   useEffect(() => {
     const handleClickOutside = (event:MouseEvent) => {
@@ -169,9 +103,9 @@ const Navbar = ({ onMenuClick }: { onMenuClick: () => void }) => {
     };
   }, []);
 
-  const filteredResults = doctors.filter((doctor) =>
-    `Dr. ${doctor.name}`.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredResults = doctors?.filter((doctor) =>
+    `Dr. ${doctor.firstname} ${doctor.lastname}`.toLowerCase().includes(searchTerm.toLowerCase())
+  )??[];
 
   return (
     <nav ref={containerRef} className="sticky top-0 bg-white border-b-2 flex items-center justify-between px-6 py-3 z-20">
@@ -196,37 +130,51 @@ const Navbar = ({ onMenuClick }: { onMenuClick: () => void }) => {
             <div className="flex justify-between items-center mb-2">
               <span className="text-sm font-semibold">Search Results</span>
             </div>
-            {filteredResults.length > 0 ? (
-              <ul>
-                {filteredResults.map((doctor, index) => (
-                  <li
-                    key={index}
-                    className="p-2 hover:bg-gray-100 rounded cursor-pointer border-b-2"
-                    onClick={()=>{
-                      router.push(`/patient/search?key=${doctor.id}`);
-                      setIsOpen(false);
-                    }}
-                  >
-                    <Row className='gap-3 items-center'>
-                      <div className="w-8 h-8 bg-teal-400 rounded-full flex items-center justify-center text-white">
-                        {doctor.name.at(0)??'U'}
-                      </div>
-                      <Row className='flex-col'>
-                        <span className='font-semibold'>Dr. {doctor.name}</span>
-                        <span className='text-[13px] text-gray-500'>{doctor.email}</span>
+
+            {
+              error?
+              <Row align='middle' justify='center'>
+                <p className="text-sm text-gray-500">Something went wrong</p>
+              </Row>
+
+              :isLoading?
+              <Row align='middle' justify='center'>
+                <Spin indicator={<LoadingOutlined spin/>}/>
+              </Row>
+
+              :filteredResults.length > 0 ? (
+                <ul>
+                  {filteredResults.map((doctor, index) => (
+                    <li
+                      key={index}
+                      className="p-2 hover:bg-gray-100 rounded cursor-pointer border-b-2"
+                      onClick={()=>{
+                        router.push(`/patient/search?key=${doctor._id}`);
+                        setIsOpen(false);
+                      }}
+                    >
+                      <Row className='gap-3 items-center'>
+                        <div className="w-8 h-8 bg-teal-400 rounded-full flex items-center justify-center text-white">
+                          {doctor.firstname.at(0)??'U'}
+                        </div>
+                        <Row className='flex-col'>
+                          <span className='font-semibold'>Dr. {doctor.firstname} {doctor?.lastname?.at(0)?.toUpperCase()}.</span>
+                          <span className='text-[13px] text-gray-500'>{doctor.email}</span>
+                        </Row>
                       </Row>
-                    </Row>
-                    <Row className='gap-x-3 gap-y-2 justify-between mt-2'>
-                      <span className='text-sm text-gray-500'>🩺 {doctor.specialty}</span>
-                      <span className='text-sm text-gray-500'>📍 {doctor.location}</span>
-                      <span className='text-sm text-gray-500'>🏨 {doctor.hospital}</span>
-                    </Row>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p className="text-sm text-gray-500">No data</p>
-            )}
+                      <Row className='gap-x-3 gap-y-2 justify-between mt-2'>
+                        <span className='text-sm text-gray-500'>📍 {'Addis Ababa'}</span>
+                        <span className='text-sm text-gray-500'>🏨 {'Tikur Anbesa'}</span>
+                        <span className='text-sm text-gray-500'>🩺 {doctor.specializations.join(', ')}</span>
+                      </Row>
+                    </li>
+                  ))}
+                </ul>
+              ) 
+
+              : <Row><p className="text-sm text-gray-500">No data</p></Row>
+            }
+
           </div>
         )}
         <div className="absolute right-2 top-1/2 transform -translate-y-1/2">

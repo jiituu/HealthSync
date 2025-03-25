@@ -1,3 +1,4 @@
+import { DoctorModel } from "@/components/models/doctor";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { DoctorLoginPayload, DoctorSignupPayload } from "@/types/doctor";
 
@@ -33,6 +34,7 @@ export const doctorApi = createApi({
       }),
     }),
 
+
     // to get all doctors
     getDoctors: builder.query<any, void>({
         query: () => ({
@@ -46,6 +48,13 @@ export const doctorApi = createApi({
       query: () => ({
       url: '/doctors/me',
       method: 'DELETE',
+      }),
+    }),
+
+    getVerifiedDoctors: builder.query<any, void>({
+      query: () => ({
+        url: '/doctors', // change the url to verified doctors and remove the comment
+        method: 'GET',
       }),
     }),
 
@@ -65,5 +74,6 @@ export const {
   useGetDoctorsQuery,
   useLoginDoctorMutation,
   useRegisterDoctorMutation,
+  useGetVerifiedDoctorsQuery,
   useDeleteDoctorMutation
 } = doctorApi;
