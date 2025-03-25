@@ -1,36 +1,69 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { DoctorLoginPayload, DoctorSignupPayload } from "@/types/doctor";
+
 
 export const doctorApi = createApi({
   reducerPath: "doctorApi",
   baseQuery: fetchBaseQuery({
     baseUrl: "https://healthsync-backend-bfrv.onrender.com/api",
+    credentials: "include",
     prepareHeaders: (headers) => {
-      const token = localStorage.getItem("token");
-      if (token) {
-        headers.set("Authorization", `Bearer ${token}`);
-      }
       headers.set("Content-Type", `application/json`);
       return headers;
     },
-    credentials: "include",
   }),
   tagTypes: ["Doctor"],
   endpoints: (builder) => ({
+
+    // to login a doctor
+    loginDoctor: builder.mutation<any, DoctorLoginPayload>({
+        query: (doctor) => ({
+          url: '/login/doctor',
+          method: 'POST',
+          body: doctor
+        }),
+    }),
+
+    // to register a doctor
+    registerDoctor: builder.mutation<any, DoctorSignupPayload>({
+      query: (doctor) => ({
+      url: '/register/doctor',
+      method: 'POST',
+      body: doctor
+      }),
+    }),
+
+    // to get all doctors
     getDoctors: builder.query<any, void>({
         query: () => ({
           url: '/doctors',
           method: 'GET',
         }),
       }),
-  
-      addDoctor: builder.mutation<any, any>({
-        query: (doctor) => ({
-          url: '/doctors',
-          method: 'POST',
-          body: doctor
-        }),
+
+    // to delete a doctor
+    deleteDoctor: builder.mutation<void, void>({
+      query: () => ({
+      url: '/doctors/me',
+      method: 'DELETE',
       }),
+    }),
+
+    // to get a doctor by id
+    getDoctorById: builder.query<any, string>({
+      query: (id) => ({
+        url: `/doctors/${id}`,
+        method: 'GET',
+      }),
+    }),
+    
+  
   }),
 });
 
-export const {useGetDoctorsQuery, useAddDoctorMutation} = doctorApi;
+export const {
+  useGetDoctorsQuery,
+  useLoginDoctorMutation,
+  useRegisterDoctorMutation,
+  useDeleteDoctorMutation
+} = doctorApi;

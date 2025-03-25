@@ -6,7 +6,7 @@ import { IoChatbubbleSharp } from 'react-icons/io5'
 const page = () => {
   return (
 <div className="relative">
-    <div>
+    <div className='px-4'>
       <Dashboard />
     </div>
         <Link href='/patient/chat' className='absolute bottom-0 right-0 p-4 translate-y-20 flex items-center justify-center'>

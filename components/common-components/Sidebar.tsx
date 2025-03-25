@@ -1,5 +1,6 @@
+'use client';
 import { HiX } from "react-icons/hi";
-import { FiChevronsLeft } from "react-icons/fi";
+import { FiChevronsLeft, FiMoreVertical } from "react-icons/fi";
 import SidebarLink from "./SidebarLinks";
 import useNavigation from "@/hooks/useNavigation";
 import { useEffect, useState } from "react";
@@ -10,7 +11,14 @@ import { MdCastForEducation } from "react-icons/md";
 import { IoChatboxEllipses } from "react-icons/io5";
 import { MdAccountCircle } from "react-icons/md";
 import { IoMdHelpCircle } from "react-icons/io";
-
+import Logout from '../auth/Logout';
+import { useDeletePatientMutation } from "@/redux/api/patientApi";
+import { useDeleteDoctorMutation } from "@/redux/api/doctorApi";
+import { useRouter } from "next/navigation";
+import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from "@/components/ui/dialog";
+import { useToast } from "@/hooks/use-toast";
+import { Button } from "../ui/button";
+import { IoOptionsOutline } from "react-icons/io5";
 
 interface Props {
   type: 'Doctor'|'Patient'|'Admin'
@@ -48,21 +56,47 @@ const Sidebar: React.FC<Props> = ({ type, open, onClose, collapse, onCollapse })
     isPatientChatActive,
     isPatientAccountsActive,
     isPatientHelpActive,
-
-
   } = useNavigation();
 
   const [isSmallScreen, setIsSmallScreen] = useState<boolean>(false);
+  const [userType, setUserType] = useState<'Doctor' | 'Patient' | 'Admin'>(type);
+  const [showAccountOptions, setShowAccountOptions] = useState<boolean>(false);
+  const router = useRouter();
+  const [deletePatient, { isLoading: isDeletingPatient }] = useDeletePatientMutation();
+  const [deleteDoctor, { isLoading: isDeletingDoctor }] = useDeleteDoctorMutation();
+  const { toast } = useToast(); // new hook initialization
+
+  const handleDelete = async () => {
+    try {
+      if (userType === 'Patient') {
+        await deletePatient().unwrap();
+      } else if (userType === 'Doctor') {
+        await deleteDoctor().unwrap();
+      }
+      toast({ title: "Account deleted successfully" });
+      router.push("/");
+    } catch (error) {
+      console.error(error);
+      toast({ title: "Failed to delete account", variant: "destructive" });
+    }
+  };
+
+  const isDeleting = userType === 'Patient' ? isDeletingPatient : userType === 'Doctor' ? isDeletingDoctor : false;
 
   useEffect(() => {
+
     const checkScreenSize = () => {
       setIsSmallScreen(window.innerWidth < 768);
     };
 
     checkScreenSize();
     window.addEventListener("resize", checkScreenSize);
-    return () => window.removeEventListener("resize", checkScreenSize);
+    return () => window.removeEventListener("resize", checkScreenSize); 
   }, []);
+
+  useEffect(() => {
+    setUserType(type);
+  }, [type]);
 
   const docLinks: ILink[] = [
     {
@@ -175,8 +209,6 @@ const Sidebar: React.FC<Props> = ({ type, open, onClose, collapse, onCollapse })
     },
   ];
 
-
-
   // Admin Links Links and Other Links
   const adminLinks:ILink[] = [
     {
@@ -209,16 +241,13 @@ const Sidebar: React.FC<Props> = ({ type, open, onClose, collapse, onCollapse })
     },
   ];
 
-
-
- 
-  const getLinks = (type:'Doctor'|'Patient'|'Admin', link:'otherLinks'|'links')=>{
+  const getLinks = (link: 'otherLinks' | 'links') => {
     return (
-      type=='Doctor'?(link=='links'?docLinks:docOtherLinks):
-      type=='Patient'?(link=='links'?patientLinks:patientOtherLinks):
-      type=='Admin'?(link=='links'?adminLinks:[]):[]
-    )
-  }
+      userType === 'Doctor' ? (link === 'links' ? docLinks : docOtherLinks) :
+      userType === 'Patient' ? (link === 'links' ? patientLinks : patientOtherLinks) :
+      userType === 'Admin' ? (link === 'links' ? adminLinks : []) : []
+    );
+  };
 
   return (
     <div
@@ -245,7 +274,7 @@ const Sidebar: React.FC<Props> = ({ type, open, onClose, collapse, onCollapse })
         </div>
       </div>
 
-      {getLinks(type,'links').map((link: ILink, index: number) => {
+      {getLinks('links').map((link: ILink, index: number) => {
         return (
           <SidebarLink
             title={link.title}
@@ -260,8 +289,7 @@ const Sidebar: React.FC<Props> = ({ type, open, onClose, collapse, onCollapse })
 
       <hr className="my-5 mx-5" />
 
-
-    {getLinks(type,'otherLinks').map((link: ILink, index: number) => {
+      {getLinks('otherLinks').map((link: ILink, index: number) => {
         return (
           <SidebarLink
             title={link.title}
@@ -275,7 +303,6 @@ const Sidebar: React.FC<Props> = ({ type, open, onClose, collapse, onCollapse })
       })}
 
       <hr className="my-5 mx-5" />
-
       <span
         className="my-2 mx-auto cursor-pointer hidden md:block"
         onClick={onCollapse}
@@ -283,6 +310,54 @@ const Sidebar: React.FC<Props> = ({ type, open, onClose, collapse, onCollapse })
       >
         <FiChevronsLeft size={30} className={`${collapse ? "rotate-180" : ""}`} />
       </span>
+
+      {/* New Account Options Popover Trigger */}
+      <div className="relative flex justify-center items-center">
+        <span
+          className="cursor-pointer"
+          onClick={() => setShowAccountOptions((prev) => !prev)}
+          aria-label="Account-options-icon"
+        >
+          <IoOptionsOutline size={30} />
+        </span>
+        {showAccountOptions && (
+          <div className="absolute -bottom-32 flex flex-col items-center justify-center gap-3 p-2 rounded">
+            <div>
+              <Logout />
+            </div>
+            {userType !== 'Admin' && ( 
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button className="bg-red-500 text-white hover:bg-red-600">
+                    Delete Account
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Confirm Account Deletion</DialogTitle>
+                    <DialogDescription>
+                      Are you sure you want to delete your account? This action cannot be undone.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <DialogFooter>
+                    <DialogClose asChild>
+                      <button className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">Cancel</button>
+                    </DialogClose>
+                    <Button
+                      className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+                      onClick={handleDelete}
+                      disabled={isDeleting}
+                      isLoading={isDeleting}
+                    >
+                      {isDeleting ? "Deleting..." : "Continue"}
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 };

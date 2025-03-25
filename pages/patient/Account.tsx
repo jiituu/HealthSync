@@ -74,7 +74,7 @@ const PatientProfile = () => {
         <Card className="rounded-xl bg-white">
           <h2 className="text-2xl font-bold text-gray-800">Profile</h2>
           <CardHeader className="p-4 rounded-xl">
-            <div className="w-full flex items-center justify-between">
+            <div className="w-full flex flex-col md:flex-row md:items-center justify-between">
               <div className="flex items-center gap-4">
                 <Avatar className="w-20 h-20 md:w-40 md:h-40 bg-gray-300">
                   <AvatarImage src="/images/patient-placeholder.png" alt="Patient Yeabsira" />
@@ -83,9 +83,16 @@ const PatientProfile = () => {
                 <div>
                   <p className="text-lg text-gray-600 font-semibold">Patient Yeabsira</p>
                   <p className="text-md text-gray-500">yeabsira2000@gmail.com</p>
+                  {/* Logout for small screens */}
+                  <div className="mt-4 md:hidden">
+                    <Logout/>
+                  </div>
                 </div>
               </div>
-              <Logout/>
+              {/* Logout for medium and larger screens */}
+              <div className="hidden md:block">
+                <Logout/>
+              </div>
             </div>
           </CardHeader>
           
