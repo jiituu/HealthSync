@@ -12,11 +12,12 @@ const store = configureStore({
     [adminApi.reducerPath]: adminApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware()
-      .concat(commonApi.middleware)
-      .concat(doctorApi.middleware)
-      .concat(patientApi.middleware)
-      .concat(adminApi.middleware),
+    getDefaultMiddleware().concat(
+      commonApi.middleware,
+      doctorApi.middleware,
+      patientApi.middleware,
+      adminApi.middleware
+    ),
 });
 
 export default store;
