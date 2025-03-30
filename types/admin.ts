@@ -1,4 +1,4 @@
 export interface AdminLoginPayload {
-    email: string;
+    email?: string;
     password: string;
 }
