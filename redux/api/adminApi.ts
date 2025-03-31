@@ -12,26 +12,24 @@ export const adminApi = createApi({
       return headers;
     },
   }),
-  tagTypes: ["Admin"], 
+  tagTypes: ["Admin"],
   endpoints: (builder) => ({
 
-    // Admin login
+    // for admin to login
     loginAdmin: builder.mutation<any, AdminLoginPayload>({
-      query: (admin) => ({
-        url: '/login/admin',
-        method: 'POST',
-        body: admin,
-      }),
-      invalidatesTags: ["Admin"], 
+        query: (admin) => ({
+          url: '/login/admin',
+          method: 'POST',
+          body: admin
+        }),
     }),
 
-    // Get all patients (paginated)
-    getAllPatients: builder.query<any, { page: number; limit: number }>({
-      query: ({ page, limit }) => ({
+    // for admin to get all the patients. it is paginated
+    getAllPatients: builder.query<any, {page:number,limit:number}>({
+      query: ({page,limit}) => ({
         url: `/patients?page=${page}&limit=${limit}`,
-        method: 'GET',
-      }),
-      providesTags: ["Admin"], 
+        method: 'GET' 
+      }),     
     }),
 
     // for admin to get all the doctors. it is paginated
@@ -55,8 +53,7 @@ export const adminApi = createApi({
 
 export const {
   useLoginAdminMutation,
-  useGetAllPatientsQuery,
-  useGetAllDoctorsQuery,
+  useGetAllPatientsQuery
 } = adminApi;
 
 export const fetchAdmin = async (_id:string) => {

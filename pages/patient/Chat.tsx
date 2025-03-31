@@ -33,7 +33,7 @@ const ChatPatient = () => {
       <div className="mt-4">
         {index === 0 && (<div className="flex h-[80vh] bg-gray-100 ">
                           <Sidebar isDoctor={false} />
-                          // <ChatArea isDoctor={false} />
+                          <ChatArea isDoctor={false} />
                           {/* <ChatLayout/> */}
                         </div>)}
         {index === 1 && <ChatWithAI isDoctor={false} />}

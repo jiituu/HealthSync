@@ -7,7 +7,6 @@ import FromBlogs from '@/components/patient-components/FromBlogs';
 import RecentVisits from '@/components/patient-components/RecentVisits';
 import React, { useState, useEffect } from 'react';
 import { MdTipsAndUpdates } from "react-icons/md";
-import { useGetPatientDetailQuery } from '@/redux/api/patientApi';
 
 const messages = [
   "Remember to take your medications on time.",
@@ -17,10 +16,12 @@ const messages = [
   "Maintain a balanced diet for better health."
 ];
 
+// todo: here lets try to change the messages customed to patient tips
+
+
 const Dashboard = () => {
   const {user}:{user?:PatientModel} = useSessionUser();
   const [currentMessage, setCurrentMessage] = useState(messages[0]);
-  const { data: patientData } = useGetPatientDetailQuery();
   
   useEffect(() => {
     const interval = setInterval(() => {

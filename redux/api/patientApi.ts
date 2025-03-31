@@ -1,5 +1,6 @@
-import { PatientLoginPayload, PatientSignupPayload } from "@/types/patient";
+import { PatientLoginPayload } from "@/types/patient";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { PatientSignupPayload } from "@/types/patient";
 import { VisitModel } from "@/components/models/visitModel";
 
 export const patientApi = createApi({
@@ -12,27 +13,23 @@ export const patientApi = createApi({
       return headers;
     },
   }),
-  tagTypes: ["Patient"], 
+  tagTypes: ["Patient"],
   endpoints: (builder) => ({
-
-    // Patient login
+    // POST
     loginPatient: builder.mutation<any, PatientLoginPayload>({
       query: (patient) => ({
         url: '/login/patient',
         method: 'POST',
-        body: patient,
+        body: patient
       }),
-      invalidatesTags: ["Patient"], 
     }),
 
-    // Patient signup
     registerPatient: builder.mutation<any, PatientSignupPayload>({
       query: (patient) => ({
-        url: '/register/patient',
-        method: 'POST',
-        body: patient,
+      url: '/register/patient',
+      method: 'POST',
+      body: patient
       }),
-      invalidatesTags: ["Patient"], 
     }),
 
     requestVisit: builder.mutation<any,VisitModel>({
@@ -46,19 +43,9 @@ export const patientApi = createApi({
     // DELETE
     deletePatient: builder.mutation<void, void>({
       query: () => ({
-        url: '/patients/me',
-        method: 'DELETE',
+      url: '/patients/me',
+      method: 'DELETE',
       }),
-      invalidatesTags: ["Patient"], 
-    }),
-
-    // Get patient detail
-    getPatientDetail: builder.query<any, void>({
-      query: () => ({
-        url: '/patients/me',
-        method: 'GET',
-      }),
-      providesTags: ["Patient"], 
     }),
 
     // to get a patient by id
@@ -76,10 +63,7 @@ export const {
   useLoginPatientMutation,
   useRegisterPatientMutation,
   useDeletePatientMutation,
-  useGetPatientDetailQuery,
-  useRequestVisitMutation,
-  useGetPatientByIdQuery,
-
+  useRequestVisitMutation
 } = patientApi;
 
 export const fetchPatient = async (_id:string) => {

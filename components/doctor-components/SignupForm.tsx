@@ -21,7 +21,7 @@ const DoctorSignupForm = ({ setParentTab }: { setParentTab: any }) => {
     lastname: "",
     email: "",
     phoneNumber: "",
-    gender: "",
+    gender: "male",
     age: 0,
     password: "",
     role: "doctor",
