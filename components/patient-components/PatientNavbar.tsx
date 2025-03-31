@@ -34,51 +34,6 @@ const notifications: NotificationModel[] = [
   },
 ];
 
-// export const doctors: DoctorModel[] = [
-//   {
-//     id: "1",
-//     firstname: "John",
-//     lastname: "Doe",
-//     email: "johndoe@example.com",
-//     age: 45,
-//     gender: "male",
-//     phoneNumber: "1234567890",
-//     specializations: ["Cardiology", "Neurology"],
-//     qualifications: ["MBBS", "MD"],
-//     licenses: [{ url: "license1.pdf", type: "Medical", isVerified: true }],
-//     role: "doctor",
-//     password: "hashedpassword1",
-//   },
-//   {
-//     id: "2",
-//     firstname: "Jane",
-//     lastname: "Smith",
-//     email: "janesmith@example.com",
-//     age: 38,
-//     gender: "female",
-//     phoneNumber: "0987654321",
-//     specializations: ["Neurology"],
-//     qualifications: ["MBBS", "PhD"],
-//     licenses: [{ url: "license2.pdf", type: "Medical", isVerified: true }],
-//     role: "doctor",
-//     password: "hashedpassword2",
-//   },
-//   {
-//     id: "3",
-//     firstname: "Robert",
-//     lastname: "Brown",
-//     email: "robertbrown@example.com",
-//     age: 50,
-//     gender: "male",
-//     phoneNumber: "1122334455",
-//     specializations: ["Orthopedics"],
-//     qualifications: ["MBBS", "MS"],
-//     licenses: [{ url: "license3.pdf", type: "Medical", isVerified: true }],
-//     role: "doctor",
-//     password: "hashedpassword3",
-//   },
-// ];
-
 const Navbar = ({ onMenuClick }: { onMenuClick: () => void }) => { 
   const {user}:{user?:PatientModel} = useSessionUser();
   const router = useRouter();
