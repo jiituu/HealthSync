@@ -2,6 +2,7 @@
 
 import ChatArea from '@/components/common-components/chatFiles/ChatArea';
 import Sidebar from '@/components/common-components/chatFiles/Sidebar';
+// import ChatLayout from '@/components/common-components/chatFiles2/chat-layout';
 import ChatWithAI from '@/components/common-components/ChatWithAI';
 import React, { useState } from 'react';
 
@@ -30,9 +31,10 @@ const ChatPatient = () => {
       </div>
 
       <div className="mt-4">
-        {index === 0 && (<div className="flex h-[80vh] bg-gray-100 fixed">
+        {index === 0 && (<div className="flex h-[80vh] bg-gray-100 ">
                           <Sidebar isDoctor={false} />
                           <ChatArea isDoctor={false} />
+                          {/* <ChatLayout/> */}
                         </div>)}
         {index === 1 && <ChatWithAI isDoctor={false} />}
       </div>

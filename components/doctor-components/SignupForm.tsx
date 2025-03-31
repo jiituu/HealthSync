@@ -1,30 +1,21 @@
-import { useState } from "react";
-import {
-  Form,
-  Input,
-  Select,
-  Row,
-  Button,
-  message,
-  InputNumber,
-  Col,
-  Divider,
-} from "antd";
-import { qualifications, specializations } from "@/data/DoctorData";
-import { DoctorSignupPayload } from "@/types/doctor";
-import { useRegisterDoctorMutation } from "@/redux/api/doctorApi";
-import CloudinaryUploader from "./CloudinaryUploader";
+"use client"
 
+import { useState, useEffect } from "react"
+import { Form, Input, Select, Row, Button, message, InputNumber, Col, Divider, Modal, Tag } from "antd"
+import { qualifications, specializations } from "@/data/DoctorData"
+import type { DoctorSignupPayload } from "@/types/doctor"
+import { useRegisterDoctorMutation } from "@/redux/api/doctorApi"
+import { useGetAllHospitalsQuery, usePostHospitalMutation } from "@/redux/api/hospitalApi"
+import CloudinaryUploader from "./CloudinaryUploader"
 
 const formItemLayout = {
   labelCol: { span: 24 },
   wrapperCol: { span: 24 },
-};
-
+}
 
 const DoctorSignupForm = ({ setParentTab }: { setParentTab: any }) => {
-  const [form] = Form.useForm();
-  const [current, setCurrent] = useState(0); 
+  const [form] = Form.useForm()
+  const [current, setCurrent] = useState(0)
   const [formValues, setFormValues] = useState<DoctorSignupPayload>({
     firstname: "",
     lastname: "",
@@ -36,34 +27,83 @@ const DoctorSignupForm = ({ setParentTab }: { setParentTab: any }) => {
     role: "doctor",
     specializations: [],
     qualifications: [],
-    licenses: []
-  });
+    licenses: [],
+    hospital: undefined,
+  })
 
-  const [registerDoctor, { isLoading }] = useRegisterDoctorMutation();
+  const [isHospitalModalVisible, setIsHospitalModalVisible] = useState(false)
+  const [hospitalForm] = Form.useForm()
+  const [selectedHospitalName, setSelectedHospitalName] = useState<string | null>(null)
+  const [uploadedLicenses, setUploadedLicenses] = useState<Array<{ url: string; type: string; isVerified: boolean }>>(
+    [],
+  )
 
-  const goToStep = (step: number) => setCurrent(step);
+  const { data: hospitals, isLoading: isLoadingHospitals } = useGetAllHospitalsQuery()
+  const [postHospital, { isLoading: isAddingHospital }] = usePostHospitalMutation()
 
-  const onFinish = async (value: DoctorSignupPayload) => {
-    console.log("Form values", formValues);
-    try {
-      await registerDoctor(formValues).unwrap();
-      message.success("Registration successful!");
-      setParentTab(0); 
-    } catch (error: any) {
-      message.error(error?.data?.error || "Registration failed, please try again");
+  const [registerDoctor, { isLoading }] = useRegisterDoctorMutation()
+
+  useEffect(() => {
+    form.setFieldsValue(formValues)
+  }, [current, form, formValues])
+
+  useEffect(() => {
+    if (formValues.hospital && hospitals?.data?.hospitals) {
+      const hospital = hospitals.data.hospitals.find((h: any) => h._id === formValues.hospital)
+      if (hospital) {
+        setSelectedHospitalName(hospital.name)
+      }
     }
-  };
+  }, [formValues.hospital, hospitals])
+
+  const goToStep = (step: number) => setCurrent(step)
+
+  const onFinish = async (values: DoctorSignupPayload) => {
+    const finalValues = {
+      ...formValues,
+      ...values,
+      licenses: uploadedLicenses, 
+    }
+    console.log("Final form values", finalValues)
+
+    try {
+      await registerDoctor(finalValues).unwrap()
+      message.success("Registration successful!")
+      setParentTab(0)
+    } catch (error: any) {
+      message.error(error?.data?.error || "Registration failed, please try again")
+    }
+  }
 
   const handleStepChange = (changedValues: any) => {
-    setFormValues((prevValues) => ({ ...prevValues, ...changedValues }));
-  };
+    setFormValues((prevValues) => ({ ...prevValues, ...changedValues }))
+  }
 
   const handleLicenseUpload = (url: string) => {
-    setFormValues(prev => ({
+    const newLicense = { url, type: "pdf", isVerified: false }
+    setUploadedLicenses((prev) => [...prev, newLicense])
+
+    setFormValues((prev) => ({
       ...prev,
-      licenses: [...prev.licenses, { url, type: "pdf", isVerified: false }]
-    }));
-  };
+      licenses: [...uploadedLicenses, newLicense],
+    }))
+  }
+
+  const handleAddHospital = async (values: any) => {
+    try {
+      const result = await postHospital(values).unwrap()
+      message.success("Hospital added successfully!")
+      setFormValues((prev) => ({
+        ...prev,
+        hospital: result._id, 
+      }))
+      setSelectedHospitalName(values.name)
+      setIsHospitalModalVisible(false)
+      hospitalForm.resetFields()
+    } catch (error: any) {
+      message.error(error?.data?.error || "Failed to add hospital")
+    }
+  }
 
   const formList = [
     // Step 1: Personal Details
@@ -108,7 +148,7 @@ const DoctorSignupForm = ({ setParentTab }: { setParentTab: any }) => {
         <Button
           type="primary"
           onClick={() => goToStep(current + 1)}
-          className="primary-button primary-button-white-text" 
+          className="primary-button primary-button-white-text"
         >
           Continue
         </Button>
@@ -119,6 +159,54 @@ const DoctorSignupForm = ({ setParentTab }: { setParentTab: any }) => {
     <Row key="step-2" gutter={[16, 8]} justify="center">
       <Col span={24}>
         <Divider orientation="left">Professional Details</Divider>
+      </Col>
+      <Col span={24}>
+        <Form.Item
+          {...formItemLayout}
+          label="Hospital"
+          name="hospital"
+          rules={[{ required: false, message: "Hospital is required" }]}
+        >
+          <div className="space-y-2">
+            <div className="flex flex-row gap-2">
+              <Select
+                showSearch
+                placeholder="Select a hospital"
+                loading={isLoadingHospitals}
+                className="w-full"
+                optionFilterProp="children"
+                value={formValues.hospital}
+                onChange={(value, option: any) => {
+                  setFormValues((prev) => ({
+                    ...prev,
+                    hospital: value,
+                  }))
+                  setSelectedHospitalName(option?.label || null)
+                }}
+                filterOption={(input, option) =>
+                  (option?.label?.toString().toLowerCase() ?? "").includes(input.toLowerCase())
+                }
+                options={
+                  hospitals?.data?.hospitals?.map((hospital: any) => ({
+                    label: hospital.name,
+                    value: hospital._id,
+                  })) || []
+                }
+              />
+              <Button onClick={() => setIsHospitalModalVisible(true)} className="bg-secondaryColor">
+                Add New
+              </Button>
+            </div>
+            {selectedHospitalName && (
+              <div className="mt-2">
+                <Tag color="blue">Selected: {selectedHospitalName}</Tag>
+              </div>
+            )}
+            <p className="text-sm text-gray-500">
+              Please make sure your hospital is not already in the list before adding a new one.
+            </p>
+          </div>
+        </Form.Item>
       </Col>
       {["Specializations", "Qualifications"].map((label) => (
         <Col span={24} key={label}>
@@ -131,9 +219,9 @@ const DoctorSignupForm = ({ setParentTab }: { setParentTab: any }) => {
             <Select
               mode="multiple"
               showSearch
-              options={(label === "Specializations" ? specializations : qualifications).map(value => ({
+              options={(label === "Specializations" ? specializations : qualifications).map((value) => ({
                 label: value,
-                value
+                value,
               }))}
             />
           </Form.Item>
@@ -146,20 +234,31 @@ const DoctorSignupForm = ({ setParentTab }: { setParentTab: any }) => {
           name="licenses"
           rules={[{ required: true, message: "Please upload your licenses" }]}
         >
-          <CloudinaryUploader onUploadSuccess={handleLicenseUpload} />
+          <div>
+            <CloudinaryUploader onUploadSuccess={handleLicenseUpload} />
+            {uploadedLicenses.length > 0 && (
+              <div className="mt-2">
+                <p className="text-sm font-medium mb-1">Uploaded Licenses:</p>
+                <div className="flex flex-wrap gap-2">
+                  {uploadedLicenses.map((license, index) => (
+                    <Tag key={index} color="green">
+                      License {index + 1}
+                    </Tag>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
         </Form.Item>
       </Col>
       <Col span={24}>
-        <Button
-          onClick={() => goToStep(current - 1)}
-          className="primary-button primary-button-white-text"
-        >
+        <Button onClick={() => goToStep(current - 1)} className="primary-button primary-button-white-text">
           Back
         </Button>
         <Button
           type="primary"
           onClick={() => goToStep(current + 1)}
-          className="primary-button primary-button-white-text" 
+          className="primary-button primary-button-white-text"
           style={{ marginLeft: 8 }}
         >
           Continue
@@ -183,36 +282,121 @@ const DoctorSignupForm = ({ setParentTab }: { setParentTab: any }) => {
         </Form.Item>
       </Col>
       <Col span={24}>
-        <Button
-          onClick={() => goToStep(current - 1)}
-          className="primary-button primary-button-white-text"
-        >
+        <Button onClick={() => goToStep(current - 1)} className="primary-button primary-button-white-text">
           Back
         </Button>
         <Button
           type="primary"
           htmlType="submit"
           loading={isLoading}
-          className="primary-button primary-button-white-text" 
+          className="primary-button primary-button-white-text"
           style={{ marginLeft: 8 }}
         >
           Register
         </Button>
       </Col>
-    </Row>
-  ];
+    </Row>,
+  ]
+
+  const hospitalModal = (
+    <Modal
+      title="Add New Hospital"
+      open={isHospitalModalVisible}
+      onCancel={() => setIsHospitalModalVisible(false)}
+      footer={null}
+      centered
+      style={{ top: 0 }}
+    >
+      <div className="mb-4">
+        <p className="text-red-500 font-medium">
+          Please ensure your hospital is not already in the dropdown list before adding a new one.
+        </p>
+      </div>
+      <Form form={hospitalForm} layout="vertical" onFinish={handleAddHospital}>
+        <Form.Item label="Hospital Name" name="name" rules={[{ required: true, message: "Hospital name is required" }]}>
+          <Input />
+        </Form.Item>
+        <Form.Item
+          label="Branch Number"
+          name="branch"
+          rules={[{ required: true, message: "Branch number is required" }]}
+        >
+          <InputNumber min={1} className="w-full" />
+        </Form.Item>
+        <Form.Item label="Address">
+          <Row gutter={[16, 0]}>
+            <Col span={24}>
+              <Form.Item
+                name={["address", "street"]}
+                label="Street"
+                rules={[{ required: true, message: "Street is required" }]}
+              >
+                <Input />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                name={["address", "city"]}
+                label="City"
+                rules={[{ required: true, message: "City is required" }]}
+              >
+                <Input />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                name={["address", "region"]}
+                label="Region"
+                rules={[{ required: true, message: "Region is required" }]}
+              >
+                <Input />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                name={["address", "country"]}
+                label="Country"
+                rules={[{ required: true, message: "Country is required" }]}
+              >
+                <Input />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item
+                name={["address", "postalCode"]}
+                label="Postal Code"
+                rules={[{ required: true, message: "Postal code is required" }]}
+              >
+                <Input />
+              </Form.Item>
+            </Col>
+          </Row>
+        </Form.Item>
+        <Form.Item>
+          <Button htmlType="submit" loading={isAddingHospital} className="w-full bg-secondaryColor">
+            Add Hospital
+          </Button>
+        </Form.Item>
+      </Form>
+    </Modal>
+  )
 
   return (
-    <Form
-      form={form}
-      onFinish={onFinish}
-      onValuesChange={handleStepChange}
-      onFinishFailed={() => message.error("Please fill all required fields")}
-      layout="vertical"
-    >
-      {formList[current]}
-    </Form>
-  );
-};
+    <>
+      <Form
+        form={form}
+        onFinish={onFinish}
+        onValuesChange={handleStepChange}
+        onFinishFailed={() => message.error("Please fill all required fields")}
+        layout="vertical"
+        initialValues={formValues}
+      >
+        {formList[current]}
+      </Form>
+      {hospitalModal}
+    </>
+  )
+}
 
-export default DoctorSignupForm;
+export default DoctorSignupForm
+

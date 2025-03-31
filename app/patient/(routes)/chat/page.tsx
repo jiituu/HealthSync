@@ -1,10 +1,12 @@
+import ChatLayout from '@/components/common-components/chatFiles2/chat-layout'
 import ChatPatient from '@/pages/patient/Chat'
 import React from 'react'
 
 const page = () => {
   return (
     <div className=''>
-      <ChatPatient/>
+      {/* <ChatPatient/> */}
+      <ChatLayout/>
     </div>
   )
 }

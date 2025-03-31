@@ -10,19 +10,22 @@ interface CloudinaryUploaderProps {
 }
 
 const CloudinaryUploader = ({ onUploadSuccess }: CloudinaryUploaderProps) => {
+  const allowedTypes = ['application/pdf', 'image/png', 'image/jpeg'];
+  const allowedExtensions = ['.pdf', '.png', '.jpg', '.jpeg'];
+
   const beforeUpload: UploadProps['beforeUpload'] = (file) => {
-    const isPdf = file.type === 'application/pdf';
-    if (!isPdf) {
-      message.error('You can only upload PDF files!');
+    const isValidType = allowedTypes.includes(file.type);
+    if (!isValidType) {
+      message.error(`You can only upload ${allowedExtensions.join(', ')} files!`);
       return false;
     }
-    
+
     const isLt20M = file.size / 1024 / 1024 <= 20;
     if (!isLt20M) {
       message.error('File must be smaller than 20MB!');
       return false;
     }
-    
+
     return true;
   };
 
@@ -31,6 +34,8 @@ const CloudinaryUploader = ({ onUploadSuccess }: CloudinaryUploaderProps) => {
     formData.append('file', file);
     formData.append('upload_preset', process.env.NEXT_PUBLIC_UPLOAD_PRESET!);
     formData.append('api_key', process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY!);
+    
+    formData.append('resource_type', 'auto');
 
     try {
       const response = await fetch(
@@ -52,17 +57,19 @@ const CloudinaryUploader = ({ onUploadSuccess }: CloudinaryUploaderProps) => {
 
   return (
     <Dragger
-      accept="application/pdf"
+      accept={allowedTypes.join(',')}
       beforeUpload={beforeUpload}
       customRequest={customRequest}
-      multiple
+      multiple={false}
       listType="picture-card"
     >
       <p className="ant-upload-drag-icon">
         <InboxOutlined style={{ fontSize: "25px" }} />
       </p>
-      <p className="ant-upload-text">Click or drag PDF files to this area to upload</p>
-      <p className="ant-upload-hint">Maximum file size: 20MB</p>
+      <p className="ant-upload-text">Click or drag files to this area to upload (if you have multiple files, put them in a single pdf file)</p>
+      <p className="ant-upload-hint">
+        Supported formats: PDF, PNG, JPG (Max size: 20MB)
+      </p>
     </Dragger>
   );
 };
