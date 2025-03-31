@@ -1,5 +1,6 @@
 export interface DoctorLoginPayload {
-    phone: string;
+    phone?: string;
+    email?: string;
     password: string;
 }
 

@@ -1,4 +1,6 @@
 'use client';
+import { useSessionUser } from '@/components/context/Session';
+import { PatientModel } from '@/components/models/patient';
 import ActiveMedication from '@/components/patient-components/ActiveMedication';
 import Appointment from '@/components/patient-components/Appointment';
 import FromBlogs from '@/components/patient-components/FromBlogs';
@@ -16,26 +18,26 @@ const messages = [
 ];
 
 const Dashboard = () => {
-
+  const {user}:{user?:PatientModel} = useSessionUser();
   const [currentMessage, setCurrentMessage] = useState(messages[0]);
   const { data: patientData } = useGetPatientDetailQuery();
   
-    useEffect(() => {
-      const interval = setInterval(() => {
-        setCurrentMessage(prevMessage => {
-          const currentIndex = messages.indexOf(prevMessage);
-          const nextIndex = (currentIndex + 1) % messages.length;
-          return messages[nextIndex];
-        });
-      }, 10000);
-  
-      return () => clearInterval(interval);
-    }, []);
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentMessage(prevMessage => {
+        const currentIndex = messages.indexOf(prevMessage);
+        const nextIndex = (currentIndex + 1) % messages.length;
+        return messages[nextIndex];
+      });
+    }, 10000);
+
+    return () => clearInterval(interval);
+  }, []);
 
 
   return (
     <div>
-      <h1 className='text-xl mb-7'>Welcome back<span className='font-bold'> {patientData?.data?.firstname}</span>!</h1>
+      <h1 className='text-xl mb-7'>Welcome back <span className='font-bold'>{user?.firstname}</span>!</h1>
       <div className="bg-[#FFA07A] text-white p-4 flex justify-between items-center rounded-3xl mr-4">
         <div className="flex items-center gap-2">
           <MdTipsAndUpdates className='text-primaryColor' size={40}/>
