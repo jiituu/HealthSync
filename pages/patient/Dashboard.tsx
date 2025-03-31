@@ -5,6 +5,7 @@ import FromBlogs from '@/components/patient-components/FromBlogs';
 import RecentVisits from '@/components/patient-components/RecentVisits';
 import React, { useState, useEffect } from 'react';
 import { MdTipsAndUpdates } from "react-icons/md";
+import { useGetPatientDetailQuery } from '@/redux/api/patientApi';
 
 const messages = [
   "Remember to take your medications on time.",
@@ -14,12 +15,10 @@ const messages = [
   "Maintain a balanced diet for better health."
 ];
 
-// todo: here lets try to change the messages customed to patient tips
-
-
 const Dashboard = () => {
 
   const [currentMessage, setCurrentMessage] = useState(messages[0]);
+  const { data: patientData } = useGetPatientDetailQuery();
   
     useEffect(() => {
       const interval = setInterval(() => {
@@ -36,7 +35,7 @@ const Dashboard = () => {
 
   return (
     <div>
-      <h1 className='text-xl mb-7'>Welcome back <span className='font-bold'>Yeabsira</span>!</h1>
+      <h1 className='text-xl mb-7'>Welcome back<span className='font-bold'> {patientData?.data?.firstname}</span>!</h1>
       <div className="bg-[#FFA07A] text-white p-4 flex justify-between items-center rounded-3xl mr-4">
         <div className="flex items-center gap-2">
           <MdTipsAndUpdates className='text-primaryColor' size={40}/>

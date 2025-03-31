@@ -1,105 +1,163 @@
-import { Box, Link, Typography } from "@mui/material";
-import { Button, Drawer, Row } from "antd";
-import InstagramIcon from '@mui/icons-material/Instagram';
-import YouTubeIcon from '@mui/icons-material/YouTube';
-import FacebookIcon from '@mui/icons-material/Facebook';
-import { motion } from 'framer-motion';
-import MenuIcon from '@mui/icons-material/Menu';
-import { useState } from "react";
-import About from "./About";
-import { ContactUs } from "./ContactUs";
+"use client"
 
+import { useState } from "react"
+import { motion } from "framer-motion"
+import Link from "next/link"
+import { Facebook, Instagram, Menu, Youtube } from "lucide-react"
 
-type SlideUpAnimationProb = {
-    initial:any,
-    animate:any,
-    exit:any,
-    transition:any
+import { Button } from "@/components/ui/button"
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
+import About from "./About"
+import { ContactUs } from "./ContactUs"
+
+import { VariantLabels, TargetAndTransition } from "framer-motion"
+
+type SlideUpAnimationProps = {
+  initial: Record<string, unknown>
+  animate: Record<string, unknown>
+  exit: VariantLabels | TargetAndTransition
+  transition: Record<string, unknown>
 }
 
-const Home = ({slideUpAnimation,setShowSecondPage}:{slideUpAnimation:SlideUpAnimationProb,setShowSecondPage:any})=>{
-    const [page,setPage] = useState<'home'|'about'|'contact'>('home');
-    const [visible, setVisible] = useState(false);
+type PageType = "home" | "about" | "contact"
 
-    return (
-        <motion.div
-            key="firstPage"
-            className="absolute inset-0 bg-white"
-            initial={{ y: '0%' }}
-            animate={{ y: '0%' }}
-            exit={slideUpAnimation.exit}
-            transition={slideUpAnimation.transition}
-        >
-            <Box className='bg-[url("../public/images/landing-bg.png")] bg-cover bg-center h-screen'>
-                {/* Header */}
-                <Row className="w-full justify-around items-center pt-10">
-                    <MenuIcon className="text-white text-2xl hover:text-accent sm:hidden" onClick={()=>setVisible(true)} />
-                    <Typography className="text-primary text-3xl font-bold max-sm:text-xl max-sm:flex-[0.6]">Health<span className="text-accent">Sync</span></Typography>
+export default function Home({
+  slideUpAnimation,
+  setShowSecondPage,
+}: {
+  slideUpAnimation: SlideUpAnimationProps
+  setShowSecondPage: (show: boolean) => void
+}) {
+  const [page, setPage] = useState<PageType>("home")
 
-                    <Row className="flex-[0.6] justify-around max-sm:hidden">
-                        <Link onClick={()=>setPage('home')} className={`text-xl ${page=='home'?'text-accent underline-offset-4 decoration-accent':'text-neutral-100 no-underline'} hover:text-accent`}>Home</Link>
-                        <Link onClick={()=>setPage('about')} className={`text-xl ${page=='about'?'text-accent underline-offset-4 decoration-accent':'text-neutral-100 no-underline'} hover:text-accent`}>About</Link>
-                        <Link onClick={()=>setPage('contact')} className={`text-xl ${page=='contact'?'text-accent underline-offset-4 decoration-accent':'text-neutral-100 no-underline'} hover:text-accent`}>Contact</Link>
-                    </Row>
+  return (
+    <motion.div
+      key="firstPage"
+      className="absolute inset-0 bg-white"
+      initial={{ y: "0%" }}
+      animate={{ y: "0%" }}
+      exit={slideUpAnimation.exit}
+      transition={slideUpAnimation.transition}
+    >
+      <div className="h-screen bg-[url('/images/landing-bg.png')] bg-cover bg-center">
+        {/* Header */}
+        <div className="flex w-full items-center justify-between px-6 pt-10 md:justify-around">
+          <div className="flex items-center md:hidden">
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="icon" className="text-white hover:bg-white/10 hover:text-accent">
+                  <Menu className="h-6 w-6" />
+                  <span className="sr-only">Toggle menu</span>
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="left" className="w-[250px] p-0">
+                <div className="flex flex-col space-y-4 p-6">
+                  <h2 className="border-b border-gray-200 pb-2 text-xl font-bold">Menu</h2>
+                  <nav className="flex flex-col space-y-4">
+                    <button
+                      onClick={() => setPage("home")}
+                      className={`text-left font-semibold ${page === "home" ? "text-accent" : "text-foreground"}`}
+                    >
+                      Home
+                    </button>
+                    <button
+                      onClick={() => setPage("about")}
+                      className={`text-left font-semibold ${page === "about" ? "text-accent" : "text-foreground"}`}
+                    >
+                      About
+                    </button>
+                    <button
+                      onClick={() => setPage("contact")}
+                      className={`text-left font-semibold ${page === "contact" ? "text-accent" : "text-foreground"}`}
+                    >
+                      Contact
+                    </button>
+                  </nav>
+                </div>
+              </SheetContent>
+            </Sheet>
+          </div>
 
-                    <Row className="gap-3">
-                        <Link>
-                            <FacebookIcon className="text-white text-2xl hover:text-accent max-sm:text-lg"/>
-                        </Link>
-                        <Link>
-                            <YouTubeIcon className="text-white text-2xl hover:text-accent max-sm:text-lg"/>
-                        </Link>
-                        <Link>
-                            <InstagramIcon className="text-white text-2xl hover:text-accent max-sm:text-lg"/>
-                        </Link>
-                    </Row>
-                </Row>
+          <h1 className="text-2xl font-bold text-primary md:text-3xl">
+            Health<span className="text-accent">Sync</span>
+          </h1>
 
-                {
-                    page=='home'?
-                    <Row className='w-full h-[87vh] flex justify-center items-center px-4'>
-                        <Row className="flex flex-col justify-center items-center gap-16">
-                            <Typography className="text-primary text-6xl font-bold max-sm:text-4xl">Health<span className="text-accent">Sync</span></Typography>
-                            <Typography className="text-neutral-100 max-w-lg text-center break-words">
-                                An AI-powered platform that connects patients with verified doctors, enabling virtual consultations, prescriptions, and healthcare management
-                            </Typography>
-                            <Button
-                                className="primary-button"
-                                onClick={() => setShowSecondPage(true)}
-                            >
-                                Get Started
-                            </Button>
-                        </Row>
-                    </Row>
-                    :page == 'about'?
-                    <About/>
-                    :page == 'contact'?
-                    <ContactUs/>
-                    :<></>
-                }
-            </Box>
-
-            {/* Sliding Menu */}
-            <Drawer
-                placement="left"
-                closable={false} // Remove default close button
-                onClose={()=>setVisible(false)}
-                open={visible}
-                width={250}
-                bodyStyle={{ backgroundColor: "#f5f5f5", color: "#333333", padding: "20px" }}
+          <nav className="hidden md:flex md:flex-1 md:justify-center md:space-x-12">
+            <button
+              onClick={() => setPage("home")}
+              className={`text-xl transition-colors hover:text-accent ${
+                page === "home"
+                  ? "text-accent underline decoration-accent underline-offset-4"
+                  : "text-neutral-100 no-underline"
+              }`}
             >
-                <div className="flex justify-between items-center mb-5 border-b border-gray-400 pb-3">
-                    <h2 className="text-xl font-bold text-primary-foreground">Menu</h2>
-                </div>
+              Home
+            </button>
+            <button
+              onClick={() => setPage("about")}
+              className={`text-xl transition-colors hover:text-accent ${
+                page === "about"
+                  ? "text-accent underline decoration-accent underline-offset-4"
+                  : "text-neutral-100 no-underline"
+              }`}
+            >
+              About
+            </button>
+            <button
+              onClick={() => setPage("contact")}
+              className={`text-xl transition-colors hover:text-accent ${
+                page === "contact"
+                  ? "text-accent underline decoration-accent underline-offset-4"
+                  : "text-neutral-100 no-underline"
+              }`}
+            >
+              Contact
+            </button>
+          </nav>
 
-                <div className="space-y-3 text-[16px]">
-                    <Box onClick={()=>setPage('home')} className={`font-semibold cursor-pointer ${page=='home'?'text-accent':''}`}>Home</Box>
-                    <Box onClick={()=>setPage('about')} className={`font-semibold cursor-pointer ${page=='about'?'text-accent':''}`}>About</Box>
-                    <Box onClick={()=>setPage('contact')} className={`font-semibold cursor-pointer ${page=='contact'?'text-accent':''}`}>Contact</Box>
-                </div>
-            </Drawer>
-        </motion.div>
-    )
+          <div className="flex space-x-3">
+            <Link href="#" className="transition-colors hover:text-accent">
+              <Facebook className="h-5 w-5 text-white md:h-6 md:w-6" />
+              <span className="sr-only">Facebook</span>
+            </Link>
+            <Link href="#" className="transition-colors hover:text-accent">
+              <Youtube className="h-5 w-5 text-white md:h-6 md:w-6" />
+              <span className="sr-only">YouTube</span>
+            </Link>
+            <Link href="#" className="transition-colors hover:text-accent">
+              <Instagram className="h-5 w-5 text-white md:h-6 md:w-6" />
+              <span className="sr-only">Instagram</span>
+            </Link>
+          </div>
+        </div>
+
+        {/* Page Content */}
+        {page === "home" ? (
+          <div className="flex h-[calc(100vh-120px)] items-center justify-center px-4">
+            <div className="flex flex-col items-center justify-center gap-8 md:gap-16">
+              <h2 className="text-4xl font-bold text-primary md:text-6xl">
+                Health<span className="text-accent">Sync</span>
+              </h2>
+              <p className="max-w-lg text-center text-neutral-100">
+                An AI-powered platform that connects patients with verified doctors, enabling virtual consultations,
+                prescriptions, and healthcare management
+              </p>
+              <Button
+                className="bg-accent text-white hover:bg-accent/90"
+                size="lg"
+                onClick={() => setShowSecondPage(true)}
+              >
+                Get Started
+              </Button>
+            </div>
+          </div>
+        ) : page === "about" ? (
+          <About />
+        ) : (
+          <ContactUs />
+        )}
+      </div>
+    </motion.div>
+  )
 }
 
-export default Home;

@@ -1,7 +1,5 @@
-import { PatientLoginPayload } from "@/types/patient";
+import { PatientLoginPayload, PatientSignupPayload } from "@/types/patient";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { PatientSignupPayload } from "@/types/patient";
-import { use } from "react";
 
 export const patientApi = createApi({
   reducerPath: "patientApi",
@@ -13,29 +11,45 @@ export const patientApi = createApi({
       return headers;
     },
   }),
-  tagTypes: ["Patient"],
+  tagTypes: ["Patient"], 
   endpoints: (builder) => ({
+
+    // Patient login
     loginPatient: builder.mutation<any, PatientLoginPayload>({
       query: (patient) => ({
         url: '/login/patient',
         method: 'POST',
-        body: patient
+        body: patient,
       }),
+      invalidatesTags: ["Patient"], 
     }),
 
+    // Patient signup
     registerPatient: builder.mutation<any, PatientSignupPayload>({
       query: (patient) => ({
-      url: '/register/patient',
-      method: 'POST',
-      body: patient
+        url: '/register/patient',
+        method: 'POST',
+        body: patient,
       }),
+      invalidatesTags: ["Patient"], 
     }),
 
+    // Patient delete
     deletePatient: builder.mutation<void, void>({
       query: () => ({
-      url: '/patients/me',
-      method: 'DELETE',
+        url: '/patients/me',
+        method: 'DELETE',
       }),
+      invalidatesTags: ["Patient"], 
+    }),
+
+    // Get patient detail
+    getPatientDetail: builder.query<any, void>({
+      query: () => ({
+        url: '/patients/me',
+        method: 'GET',
+      }),
+      providesTags: ["Patient"], 
     }),
 
   }),
@@ -44,5 +58,6 @@ export const patientApi = createApi({
 export const {
   useLoginPatientMutation,
   useRegisterPatientMutation,
-  useDeletePatientMutation
+  useDeletePatientMutation,
+  useGetPatientDetailQuery,
 } = patientApi;

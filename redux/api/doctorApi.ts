@@ -1,7 +1,6 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { DoctorLoginPayload, DoctorSignupPayload } from "@/types/doctor";
 
-
 export const doctorApi = createApi({
   reducerPath: "doctorApi",
   baseQuery: fetchBaseQuery({
@@ -12,52 +11,65 @@ export const doctorApi = createApi({
       return headers;
     },
   }),
-  tagTypes: ["Doctor"],
+  tagTypes: ["Doctor"], 
   endpoints: (builder) => ({
 
-    // to login a doctor
+    // Doctor login
     loginDoctor: builder.mutation<any, DoctorLoginPayload>({
-        query: (doctor) => ({
-          url: '/login/doctor',
-          method: 'POST',
-          body: doctor
-        }),
+      query: (doctor) => ({
+        url: '/login/doctor',
+        method: 'POST',
+        body: doctor,
+      }),
+      invalidatesTags: ["Doctor"], 
     }),
 
-    // to register a doctor
+    // Doctor registration
     registerDoctor: builder.mutation<any, DoctorSignupPayload>({
       query: (doctor) => ({
-      url: '/register/doctor',
-      method: 'POST',
-      body: doctor
+        url: '/register/doctor',
+        method: 'POST',
+        body: doctor,
       }),
+      invalidatesTags: ["Doctor"], 
     }),
 
-    // to get all doctors
+    // Get all doctors
     getDoctors: builder.query<any, void>({
-        query: () => ({
-          url: '/doctors',
-          method: 'GET',
-        }),
+      query: () => ({
+        url: '/doctors',
+        method: 'GET',
       }),
+      providesTags: ["Doctor"], 
+    }),
 
-    // to delete a doctor
+    // Delete a doctor
     deleteDoctor: builder.mutation<void, void>({
       query: () => ({
-      url: '/doctors/me',
-      method: 'DELETE',
+        url: '/doctors/me',
+        method: 'DELETE',
       }),
+      invalidatesTags: ["Doctor"],
     }),
 
-    // to get a doctor by id
+    // Get doctor by ID
     getDoctorById: builder.query<any, string>({
       query: (id) => ({
         url: `/doctors/${id}`,
         method: 'GET',
       }),
+      providesTags: ["Doctor"], 
+    }),
+
+    // Get doctor detail
+    getDoctorDetail: builder.query<any, void>({
+      query: () => ({
+        url: '/doctors/me',
+        method: 'GET',
+      }),
+      providesTags: ["Doctor"], 
     }),
     
-  
   }),
 });
 
@@ -65,5 +77,7 @@ export const {
   useGetDoctorsQuery,
   useLoginDoctorMutation,
   useRegisterDoctorMutation,
-  useDeleteDoctorMutation
+  useDeleteDoctorMutation,
+  useGetDoctorByIdQuery,
+  useGetDoctorDetailQuery,
 } = doctorApi;

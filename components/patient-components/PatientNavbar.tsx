@@ -9,6 +9,7 @@ import { NotificationModel } from '../models/notification';
 import { Row } from 'antd';
 import { useRouter } from 'next/navigation';
 import { useGetDoctorsQuery } from '@/redux/api/doctorApi';
+import { useGetPatientDetailQuery } from '@/redux/api/patientApi';
 
 
 const notifications: NotificationModel[] = [
@@ -150,8 +151,9 @@ const Navbar = ({ onMenuClick }: { onMenuClick: () => void }) => {
   const containerRef = useRef<any>(null);
 
   const { data, status, error, isLoading } = useGetDoctorsQuery();
+  const { data: patientData, status: patientStatus, error: patientError, isLoading: patientLoading } = useGetPatientDetailQuery();
   
-  console.log(data,"doctors");
+  console.log(patientData, "doctors");
   // Close the modal if the user clicks outside the container
   useEffect(() => {
     const handleClickOutside = (event:MouseEvent) => {
@@ -238,9 +240,10 @@ const Navbar = ({ onMenuClick }: { onMenuClick: () => void }) => {
         <div className="relative">
           <Link href='/patient/accounts' className="flex items-center space-x-2 text-sm text-gray-700 focus:outline-none">
             <div className="w-8 h-8 bg-teal-400 rounded-full flex items-center justify-center text-white">
-              P
+              {patientData?.data?.firstname?.charAt(0).toUpperCase()}
             </div>
-            <span className="hidden sm:inline">Mr. Aweke</span> 
+            <span className="hidden sm:inline">{patientData?.data?.firstname}</span> 
+            {/* <span className="hidden sm:inline">patient</span>  */}
           </Link>
         </div>
 

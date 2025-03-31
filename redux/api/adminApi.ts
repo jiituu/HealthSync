@@ -11,40 +11,42 @@ export const adminApi = createApi({
       return headers;
     },
   }),
-  tagTypes: ["Admin"],
+  tagTypes: ["Admin"], 
   endpoints: (builder) => ({
 
-    // for admin to login
+    // Admin login
     loginAdmin: builder.mutation<any, AdminLoginPayload>({
       query: (admin) => ({
         url: '/login/admin',
         method: 'POST',
-        body: admin
+        body: admin,
       }),
-  }),
+      invalidatesTags: ["Admin"], 
+    }),
 
-  // for admin to get all the patients. it is paginated
-  getAllPatients: builder.query<any, {page:number,limit:number}>({
-    query: ({page,limit}) => ({
-      url: `/patients?page=${page}&limit=${limit}`,
-      method: 'GET' 
-    }),     
-  }),
+    // Get all patients (paginated)
+    getAllPatients: builder.query<any, { page: number; limit: number }>({
+      query: ({ page, limit }) => ({
+        url: `/patients?page=${page}&limit=${limit}`,
+        method: 'GET',
+      }),
+      providesTags: ["Admin"], 
+    }),
 
-  // for admin to get all the doctors. it is paginated
-  getAllDoctors: builder.query<any, {page:number,limit:number}>({
-    query: ({page,limit}) => ({
-      url: `/doctors?page=${page}&limit=${limit}`,
-      method: 'GET' 
-    })      
-  })
-
-
+    // Get all doctors (paginated)
+    getAllDoctors: builder.query<any, { page: number; limit: number }>({
+      query: ({ page, limit }) => ({
+        url: `/doctors?page=${page}&limit=${limit}`,
+        method: 'GET',
+      }),
+      providesTags: ["Admin"], 
+    }),
 
   }),
 });
 
 export const {
   useLoginAdminMutation,
-  useGetAllPatientsQuery
+  useGetAllPatientsQuery,
+  useGetAllDoctorsQuery,
 } = adminApi;

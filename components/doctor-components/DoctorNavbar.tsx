@@ -6,6 +6,7 @@ import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover
 import Link from 'next/link';
 import Notification from '../common-components/Notification';
 import { NotificationModel } from '../models/notification';
+import { useGetDoctorDetailQuery } from '@/redux/api/doctorApi';
 
 const notifications: NotificationModel[] = [
   {
@@ -27,6 +28,9 @@ const notifications: NotificationModel[] = [
 ];
 
 const Navbar = ({ onMenuClick }: { onMenuClick: () => void }) => { 
+
+  const { data: doctorData } = useGetDoctorDetailQuery();
+  const doctorName = doctorData?.data?.firstname + " " + doctorData?.data?.lastname;
   
   return (
     <nav className="sticky top-0 bg-white border-b-2 flex items-center justify-between px-6 py-3 z-20">
@@ -52,9 +56,9 @@ const Navbar = ({ onMenuClick }: { onMenuClick: () => void }) => {
         <div className="relative">
           <Link href='/doctor/accounts' className="flex items-center space-x-2 text-sm text-gray-700 focus:outline-none">
             <div className="w-8 h-8 bg-teal-400 rounded-full flex items-center justify-center text-white">
-              D
+              {doctorData?.data?.firstname.charAt(0).toUpperCase()}
             </div>
-            <span className="hidden sm:inline">Dr Belete Abebe</span> 
+            <span className="hidden sm:inline">Dr {doctorName}</span> 
           </Link>
         </div>
 
