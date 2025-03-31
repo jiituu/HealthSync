@@ -1,16 +1,14 @@
-export interface DoctorModel {
-    _id:string;
+import { UserModel } from "./user";
+
+export interface DoctorModel extends Omit<UserModel,'role'> {
     firstname: string;
     lastname: string;
-    email: string;
     age: number;
     gender: "male" | "female";
-    phoneNumber: string;
     specializations: string[];
     qualifications: string[];
     licenses: LicenseModel[];
-    role?: string;
-    password: string;
+    role: string;
 }
 
 export interface LicenseModel {

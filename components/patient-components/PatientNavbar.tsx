@@ -11,6 +11,8 @@ import { useRouter } from 'next/navigation';
 import { useGetVerifiedDoctorsQuery } from '@/redux/api/doctorApi';
 import { LoadingOutlined } from '@ant-design/icons';
 import { DoctorModel } from '../models/doctor';
+import { useSessionUser } from '../context/Session';
+import { PatientModel } from '../models/patient';
 
 
 const notifications: NotificationModel[] = [
@@ -78,6 +80,7 @@ const notifications: NotificationModel[] = [
 // ];
 
 const Navbar = ({ onMenuClick }: { onMenuClick: () => void }) => { 
+  const {user}:{user?:PatientModel} = useSessionUser();
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
   const [isOpen, setIsOpen] = useState(false);
@@ -188,7 +191,7 @@ const Navbar = ({ onMenuClick }: { onMenuClick: () => void }) => {
             <div className="w-8 h-8 bg-teal-400 rounded-full flex items-center justify-center text-white">
               P
             </div>
-            <span className="hidden sm:inline">Mr. Aweke</span> 
+            <span className="hidden sm:inline">{user?.firstname}</span> 
           </Link>
         </div>
 
