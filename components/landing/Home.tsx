@@ -34,7 +34,7 @@ const Home = ({slideUpAnimation,setShowSecondPage}:{slideUpAnimation:SlideUpAnim
                 {/* Header */}
                 <Row className="w-full justify-around items-center pt-10">
                     <MenuIcon className="text-white text-2xl hover:text-accent sm:hidden" onClick={()=>setVisible(true)} />
-                    <Typography className="text-primary text-3xl font-bold max-sm:text-xl max-sm:flex-[0.6]">Health<span className="text-accent">Sync</span></Typography>
+                    <Typography className="text-primary text-3xl font-bold max-sm:text-xl max-sm:flex-[0.6] cursor-pointer hover:opacity-80 transition-opacity">Health<span className="text-accent">Sync</span></Typography>
 
                     <Row className="flex-[0.6] justify-around max-sm:hidden">
                         <Link onClick={()=>setPage('home')} className={`text-xl ${page=='home'?'text-accent underline-offset-4 decoration-accent':'text-neutral-100 no-underline'} hover:text-accent`}>Home</Link>
@@ -59,7 +59,7 @@ const Home = ({slideUpAnimation,setShowSecondPage}:{slideUpAnimation:SlideUpAnim
                     page=='home'?
                     <Row className='w-full h-[87vh] flex justify-center items-center px-4'>
                         <Row className="flex flex-col justify-center items-center gap-16">
-                            <Typography className="text-primary text-6xl font-bold max-sm:text-4xl">Health<span className="text-accent">Sync</span></Typography>
+                            <Typography className="text-primary text-6xl font-bold max-sm:text-4xl cursor-pointer hover:opacity-80 transition-opacity">Health<span className="text-accent">Sync</span></Typography>
                             <Typography className="text-neutral-100 max-w-lg text-center break-words">
                                 An AI-powered platform that connects patients with verified doctors, enabling virtual consultations, prescriptions, and healthcare management
                             </Typography>

@@ -3,6 +3,8 @@ import { doctorApi } from "./api/doctorApi";
 import { patientApi } from "./api/patientApi";
 import { adminApi } from "./api/adminApi";
 import { commonApi } from "./api/commonApi";
+import { blogApi } from "./api/blogApi"; // 
+
 
 const store = configureStore({
   reducer: {
@@ -10,13 +12,16 @@ const store = configureStore({
     [doctorApi.reducerPath]: doctorApi.reducer,
     [patientApi.reducerPath]: patientApi.reducer,
     [adminApi.reducerPath]: adminApi.reducer,
+    [blogApi.reducerPath]: blogApi.reducer, 
+
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(
       commonApi.middleware,
       doctorApi.middleware,
       patientApi.middleware,
-      adminApi.middleware
+      adminApi.middleware,
+      blogApi.middleware,
     ),
 });
 
