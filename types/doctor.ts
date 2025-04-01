@@ -13,6 +13,7 @@ export interface DoctorSignupPayload {
     password: string;
     phoneNumber: string;
     age: number
+    hospital?: string
     gender: 'male' | 'female';
     role: string;
     specializations: string[];
