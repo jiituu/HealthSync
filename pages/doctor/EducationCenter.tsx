@@ -14,7 +14,8 @@ import type { BlogPost } from '@/types/blog';
 
 const EducationCenter = () => {
   const { data: doctorData } = useGetCurrentDoctorQuery();
-  const doctorId = doctorData?.data?._id || "DR Abiy"; 
+  // const doctorId = "doctorData?.data?._id || "DR Abiy"; 
+  const doctorId= "67eb16337db753f356e1174d"
 
   // Fetch blogs data
   const { data: response, isLoading, error, refetch } = useGetBlogsQuery({});
