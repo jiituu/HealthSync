@@ -35,7 +35,28 @@ export const blogApi = createApi({
         result?.data?.blogs 
           ? [...result.data.blogs.map(({ _id }) => ({ type: 'BlogPost' as const, id: _id }))]
           : ['BlogPost'],    }),
+// Fetch bookmarked blogs for current user
+getBookmarkedBlogs: builder.query<BlogResponse, void>({
+  query: () => "/blogs/bookmarks/me",
+  providesTags: ['BlogPost'],
+}),
 
+// Bookmark a blog
+bookmarkBlog: builder.mutation<void, { blogId: string }>({
+  query: ({ blogId }) => ({
+    url: `/blogs/${blogId}/bookmark`,
+    method: 'POST',
+  }),
+  invalidatesTags: ['BlogPost'],
+}),
+// Remove bookmark from a blog
+removeBookmark: builder.mutation<void, { blogId: string }>({
+  query: ({ blogId }) => ({
+    url: `/blogs/${blogId}/bookmark`,
+    method: 'DELETE',
+  }),
+  invalidatesTags: ['BlogPost'],
+}),
     // Create a blog post
     createBlogPost: builder.mutation<BlogPost, CreateBlogPostPayload>({
         query: (newPost) => {
@@ -84,4 +105,7 @@ export const {
   useGetBlogsQuery,
   useCreateBlogPostMutation,
   useDeleteBlogPostMutation,
+  useGetBookmarkedBlogsQuery,
+  useBookmarkBlogMutation,
+  useRemoveBookmarkMutation,
 } = blogApi;

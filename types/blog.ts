@@ -9,14 +9,14 @@ export interface BlogPost {
       name: string;
       specialty?: string;
     };
+    isBookmarked: boolean;
   }
   
   export interface BlogResponse {
+    success: boolean;
     data: {
       blogs: BlogPost[];
-      totalCount: number;
     };
-    success: boolean;
   }
   export interface CreateBlogPostPayload {
     author: string;
@@ -27,4 +27,6 @@ export interface BlogPost {
     published?: boolean;
     publishedAt?: string;
   }
-  
+  // types/blog.ts
+
+
