@@ -5,7 +5,7 @@ import { NextAuthOptions, User } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 
 
-async function authenticateUser( password: string,role:'admin'|'patient'|'doctor',phone?: string,email?:string,): Promise<User | null> {
+export async function authenticateUser( password: string,role:'admin'|'patient'|'doctor',phone?: string,email?:string,): Promise<User | null> {
 
     let result:any = null;
 

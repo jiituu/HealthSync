@@ -8,6 +8,7 @@ import { useLoginDoctorMutation } from "@/redux/api/doctorApi";
 import { useLoginPatientMutation } from "@/redux/api/patientApi";
 import { signIn } from 'next-auth/react';
 import { useLoginAdminMutation } from "@/redux/api/adminApi";
+import { authenticateUser } from "../../app/api/auth/authOptions";
                                     
 type LoginProb = {
   setTab: any;
@@ -41,14 +42,16 @@ const Login = ({ setTab }: LoginProb) => {
 
     try {
       setIsLoggingIn(true);
-      const result = await signIn('credentials', {
-          redirect: false,
-          ...credential,
-          role,
-          password
-      })
+      // const result = await signIn('credentials', {
+      //     redirect: false,
+      //     ...credential,
+      //     role,
+      //     password
+      // })
 
-      if (result?.error) {
+      const result = await authenticateUser(password,role,credential.phone,credential.email)
+
+      if (!result) {
           message.error("Incorrect credential")
       } else {
           message.success("Login successful.")

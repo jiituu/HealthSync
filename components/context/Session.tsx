@@ -27,16 +27,20 @@ export default function NextAuthSessionProvider({ children }: sessionProps) {
     useEffect(() => {
         {
             (async () => {
-                const session = await getSession();
+                const session = null;
                 setSessionData(session);
 
+                const res = await fetch("/api/me", { credentials: "include" });
+                const data = await res.json();
+                console.log('token',data.token);
+
                 if (session === null && pathName!=='/sign-up' ) {
-                    router.push("/");
+                    // router.push("/");
                 }
                 else {
                     // set user data to session user
-                    const user= session?.user;
-                    setUser(user??null);
+                    // const user= session?.user;
+                    setUser(null);
 
                     if (window.location.pathname === "/") {
                         router.push(
@@ -58,11 +62,11 @@ export default function NextAuthSessionProvider({ children }: sessionProps) {
     }, []);
 
     return (
-        <SessionProvider session={sessionData}>
+        // <SessionProvider session={sessionData}>
             <AppContext.Provider value={{ user, setUser }}>
                 {loading ? <Row className="w-full h-[100vh]" justify='center' align='middle'><Spin indicator={<LoadingOutlined spin />} size="large"/></Row> : children}
             </AppContext.Provider>
-        </SessionProvider>
+        // </SessionProvider>
 
     );
 }
