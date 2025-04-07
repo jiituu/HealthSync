@@ -12,6 +12,8 @@ export const commonApi = createApi({
   }),
   tagTypes: [],
   endpoints: (builder) => ({
+
+    // Logout the current user
     logout: builder.mutation({
       query: () => ({
         url: "/logout",
