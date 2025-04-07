@@ -25,7 +25,7 @@ export interface DoctorSignupPayload {
 interface DoctorLicense {
     url: string;
     type: string;
-    isVerified: boolean;
+    isVerified: boolean; 
 }
     export interface Doctor {
     _id: string;
@@ -47,6 +47,51 @@ interface DoctorLicense {
   
   export interface DoctorApiResponse {
     success: boolean;
-    data: Doctor;
+    data: DoctorResponse;
     message?: string;
   }
+
+interface License {
+    url: string;
+    type: string;
+    isVerified: boolean;
+    _id: string;
+  }
+  
+  interface Address {
+    street: string;
+    city: string;
+    region: string;
+    country: string;
+    postalCode: string;
+  }
+  
+  interface Hospital {
+    address: Address;
+    _id: string;
+    name: string;
+    branch: number;
+    __v: number;
+  }
+  
+export interface DoctorResponse {
+    bookmarks: any[]; 
+    status: "pending" | "approved" | "rejected"; 
+    banned: boolean;
+    _id: string;
+    firstname: string;
+    lastname: string;
+    email: string;
+    age: number;
+    gender: "male" | "female"
+    role: string;
+    phoneNumber: string;
+    specializations: string[];
+    qualifications: string[];
+    licenses: License[];
+    hospital: Hospital;
+    createdAt: string; 
+    updatedAt: string;
+    __v: number;
+  }
+  
