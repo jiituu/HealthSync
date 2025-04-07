@@ -4,9 +4,9 @@ import { Button, Divider, Form, Input, message, Row } from "antd";
 import { GoogleCircleFilled } from "@ant-design/icons";
 import FacebookRoundedIcon from "@mui/icons-material/FacebookRounded";
 import { useRouter } from "next/navigation";
-import { loginDoctor, useLoginDoctorMutation } from "@/redux/api/doctorApi";
-import { loginPatient, useLoginPatientMutation } from "@/redux/api/patientApi";
-import { loginAdmin, useLoginAdminMutation } from "@/redux/api/adminApi";
+import { loginDoctor } from "@/redux/api/doctorApi";
+import { loginPatient } from "@/redux/api/patientApi";
+import { loginAdmin } from "@/redux/api/adminApi";
 import { useSessionUser } from "../context/Session";
 import { fetchMe } from "@/redux/api/commonApi";
                                     
@@ -70,17 +70,12 @@ const Login = ({ setTab }: LoginProb) => {
 
     try {
       setIsLoggingIn(true);
-      // const result = await signIn('credentials', {
-      //     redirect: false,
-      //     ...credential,
-      //     role,
-      //     password
-      // })
 
       const result = await authenticateUser(password,role,credential.phone,credential.email)
 
       if (!result) {
           message.error("Incorrect credential")
+          setIsLoggingIn(false);
       } else {
           message.success("Login successful.")
 
@@ -98,12 +93,12 @@ const Login = ({ setTab }: LoginProb) => {
             );
           }else{
             message.error('Something went wrong, please try again')
+            setIsLoggingIn(false);
           }
       }
 
     } catch (error: any) {
       message.error(error?.data?.error || "An error occurred.");
-    } finally {
       setIsLoggingIn(false);
     }
   };

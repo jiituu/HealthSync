@@ -28,18 +28,15 @@ export default function NextAuthSessionProvider({ children }: sessionProps) {
             (async () => {
                 const role = localStorage.getItem('role') as any
                 let res;
+                const request = pathName?.split('/').at(1)
 
-                if(['admin','patients','doctors'].includes(role)){
+                if(['admin','patients','doctors'].includes(role) && (pathName == '/' || (request=="admin"?request:request+'s')== role)){
                     res = await fetchMe(role)
                 }
 
-                console.log('me',res?.data);
-
-
                 if (!res?.data && pathName!=='/sign-up') {
                     router.push("/");
-                }
-                else {
+                }else {
                     setUser(res.data);
 
                     if (window.location.pathname === "/") {
