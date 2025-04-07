@@ -1,6 +1,5 @@
 "use client";
 
-import { getSession, SessionProvider } from "next-auth/react";
 import React, { useContext, useEffect, useState } from "react";
 import { Session } from "next-auth";
 import AppContext from "./AppContext";
@@ -10,6 +9,7 @@ import { PatientModel } from "../models/patient";
 import { AdminModel } from "../models/admin";
 import { Row, Spin } from "antd";
 import {LoadingOutlined} from "@ant-design/icons";
+import { fetchMe } from "@/redux/api/commonApi";
 
 
 type sessionProps = {
@@ -20,54 +20,54 @@ export default function NextAuthSessionProvider({ children }: sessionProps) {
     const [loading, setLoading] = useState<boolean>(true);
     const router = useRouter();
     const pathName = usePathname();
-
     const [sessionData, setSessionData] = useState<Session | null>(null);
     const [user, setUser] = useState<DoctorModel & PatientModel & AdminModel| null>(null);
 
     useEffect(() => {
         {
             (async () => {
-                const session = null;
-                setSessionData(session);
+                const role = localStorage.getItem('role') as any
+                let res;
 
-                const res = await fetch("/api/me", { credentials: "include" });
-                const data = await res.json();
-                console.log('token',data.token);
+                if(['admin','patients','doctors'].includes(role)){
+                    res = await fetchMe(role)
+                }
 
-                if (session === null && pathName!=='/sign-up' ) {
-                    // router.push("/");
+                console.log('me',res?.data);
+
+
+                if (!res?.data && pathName!=='/sign-up') {
+                    router.push("/");
                 }
                 else {
-                    // set user data to session user
-                    // const user= session?.user;
-                    setUser(null);
+                    setUser(res.data);
 
                     if (window.location.pathname === "/") {
                         router.push(
-                            user?.role=='doctor'?
+                            role=='doctors'?
                             "/doctor/dashboard"
-                            :user?.role=='patient'?
+                            :role=='patients'?
                             "/patient/dashboard"
-                            :"/admin/dashboard"
+                            :role=='admin'?
+                            "/admin/dashboard"
+                            :"/"
                         );
                     }
                 }
 
-                setTimeout(() => {
+                setTimeout(()=>{
                     setLoading(false);
-                }, 500);
+                },500)
             })()
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    return (
-        // <SessionProvider session={sessionData}>
-            <AppContext.Provider value={{ user, setUser }}>
-                {loading ? <Row className="w-full h-[100vh]" justify='center' align='middle'><Spin indicator={<LoadingOutlined spin />} size="large"/></Row> : children}
-            </AppContext.Provider>
-        // </SessionProvider>
 
+    return (
+        <AppContext.Provider value={{ user, setUser }}>
+            {loading ? <Row className="w-full h-[100vh]" justify='center' align='middle'><Spin indicator={<LoadingOutlined spin />} size="large"/></Row> : children}
+        </AppContext.Provider>
     );
 }
 
@@ -75,3 +75,4 @@ export const useSessionUser = () => {
     const context:any = useContext(AppContext)
     return {user:context.user,setUser:context.setUser }
 }
+
