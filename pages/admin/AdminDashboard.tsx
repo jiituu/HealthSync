@@ -1,3 +1,5 @@
+'use client';
+
 import DashGraph from "@/components/admin-components/DashGraph";
 import StatCard from "@/components/admin-components/StatCard";
 import totalUsers from "@/public/images/Icon.svg";
