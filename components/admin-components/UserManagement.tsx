@@ -48,7 +48,7 @@ interface PatientResponse {
   allergies: string[]
   __v: number
   createdAt: string
-  nationality?: string 
+  nationality?: string
 }
 
 interface DoctorResponse {
@@ -130,8 +130,6 @@ type User = (PatientResponse | DoctorResponse) & {
   nationality?: string
 }
 
-
-
 const mergeUsersData = (patients: PatientResponse[], doctors: DoctorResponse[]): User[] => {
   const patientsWithRole = patients?.map((patient) => ({
     ...patient,
@@ -177,8 +175,8 @@ const filterByDate = (joined: string | undefined, filter: string): boolean => {
 }
 
 const UserManagement = () => {
-  const { data: getAllPatientsQuery } = useGetAllPatientsQuery({ page: 1, limit: 1000 })
-  const { data: getAllDoctorsQuery } = useGetAllDoctorsQuery({ page: 1, limit: 1000 })
+  const { data: getAllPatientsQuery, isLoading: isPatientsLoading } = useGetAllPatientsQuery({ page: 1, limit: 1000 })
+  const { data: getAllDoctorsQuery, isLoading: isDoctorsLoading } = useGetAllDoctorsQuery({ page: 1, limit: 1000 })
 
   // console.log("patients bbom", getAllPatientsQuery?.data?.patients)
   // console.log("doctors boom", getAllDoctorsQuery?.data?.doctors)
@@ -187,7 +185,6 @@ const UserManagement = () => {
   //   patients: getAllPatientsQuery?.data?.patients || [],
   //   doctors: getAllDoctorsQuery?.data?.doctors || [],
   // }
-
 
   const [users, setUsers] = useState<User[]>([])
   const [search, setSearch] = useState("")
@@ -199,6 +196,7 @@ const UserManagement = () => {
   const [selectedLicense, setSelectedLicense] = useState("")
   const [banDialogOpen, setBanDialogOpen] = useState(false)
   const itemsPerPage = 6
+  const isLoading = isPatientsLoading || isDoctorsLoading
 
   useEffect(() => {
     const mergedUsers = mergeUsersData(getAllPatientsQuery?.data?.patients, getAllDoctorsQuery?.data?.doctors)
@@ -304,7 +302,33 @@ const UserManagement = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {paginatedUsers.length > 0 ? (
+            {isLoading ? (
+              Array.from({ length: 6 }).map((_, index) => (
+                <TableRow key={`loading-${index}`}>
+                  <TableCell>
+                    <div className="h-5 w-32 bg-gray-200 animate-pulse rounded"></div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="h-5 w-40 bg-gray-200 animate-pulse rounded"></div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="h-5 w-28 bg-gray-200 animate-pulse rounded"></div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="h-5 w-24 bg-gray-200 animate-pulse rounded"></div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="h-5 w-16 bg-gray-200 animate-pulse rounded"></div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="h-5 w-16 bg-gray-200 animate-pulse rounded"></div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="h-8 w-16 bg-gray-200 animate-pulse rounded"></div>
+                  </TableCell>
+                </TableRow>
+              ))
+            ) : paginatedUsers.length > 0 ? (
               paginatedUsers?.map((user) => (
                 <TableRow key={user._id}>
                   <TableCell>{user.fullname}</TableCell>
@@ -340,7 +364,7 @@ const UserManagement = () => {
           </TableBody>
         </Table>
 
-        {totalPages > 1 && (
+        {!isLoading && totalPages > 1 && (
           <Pagination className="mt-4">
             <PaginationContent>
               <PaginationPrevious onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))} />
@@ -561,4 +585,3 @@ const UserManagement = () => {
 }
 
 export default UserManagement
-
