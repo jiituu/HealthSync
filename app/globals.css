@@ -120,20 +120,38 @@
 /* Ant D Button */
 
 .primary-button{
-  background-color: var(--accent);
+  background-color: var(--accent) !important;
   border: none;
   border-radius: 30px;
-  padding: 1.25rem 1.5rem;
+  padding: 1rem 1.5rem;
   font-weight: bolder;
-  color: var(--primary-foreground);
+  color: var(--primary-foreground) !important;
+}
+
+.secondary-button{
+  background-color: #D1D5DB !important;
+  border: none;
+  border-radius: 30px;
+  padding: 1rem 1.5rem;
+  font-weight: bolder;
+  color: var(--primary-foreground) !important;
 }
 
 .primary-button.squared-button{
   border-radius: 10px;
 }
 
+.secondary-button.squared-button{
+  border-radius: 10px;
+}
+
 .primary-button:hover{
   background-color: var(--accent) !important;
+  color:var(--neutral) !important;
+}
+
+.secondary-button:hover{
+  background-color: #D1D5DB !important;
   color:var(--neutral) !important;
 }
 

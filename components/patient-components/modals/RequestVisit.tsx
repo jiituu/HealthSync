@@ -1,5 +1,7 @@
 import CustomModal from "@/components/common-components/CustomModal"
+import { useSessionUser } from "@/components/context/Session";
 import { DoctorModel } from "@/components/models/doctor";
+import { PatientModel } from "@/components/models/patient";
 import { VisitModel } from "@/components/models/visitModel";
 import { useRequestVisitMutation } from "@/redux/api/patientApi";
 import { Box, useMediaQuery } from "@mui/material";
@@ -12,14 +14,16 @@ interface props{
 }
 
 export const RequestVisitModal = ({open,setOpen,doctor}:props)=>{
+    const {user}:{user?:PatientModel} = useSessionUser();
+ 
     const [form] = Form.useForm();
     const [addVisitRequest,{isLoading}] = useRequestVisitMutation();
 
     const onFinish = ()=>{
         form.validateFields().then(async (values)=>{
             const visitRequest: VisitModel = {
-                patient: "67dd28bccccc9e8b5881d9d3",
-                doctor: "67dd6f40ff757b2cfd262844",
+                patient: user?._id,
+                doctor: doctor?._id,
                 preferredDate: values.preferredDate.toDate(),
                 reason: values.symptom,
                 status: "Scheduled",
