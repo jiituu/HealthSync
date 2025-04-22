@@ -1,129 +1,116 @@
 "use client"
 
-import { useState, useCallback } from "react"
+import { useState, useCallback, useEffect } from "react"
 import ContactsList from "./contacts-list"
 import ChatArea from "./chat-area"
 import AIChatArea from "./ai-chat-area"
 import ChatModeSelector from "./chat-mode-selector"
 import { SidebarProvider, useSidebar } from "./context/sidebar-context"
 import { useIsMobile } from "@/hooks/use-mobile"
-
-const contacts = [
-  {
-    id: 1,
-    name: "Dr. Hailu Tesfaye",
-    role: "Cardiologist",
-    avatar:
-      "https://static.vecteezy.com/system/resources/thumbnails/026/375/249/small_2x/ai-generative-portrait-of-confident-male-doctor-in-white-coat-and-stethoscope-standing-with-arms-crossed-and-looking-at-camera-photo.jpg",
-    status: "online",
-    lastMessage: "Your heart rate looks normal in the latest readings.",
-    time: "10:30 AM",
-  },
-  {
-    id: 2,
-    name: "Dr. Abebe Bekele",
-    role: "Neurologist",
-    avatar:
-      "https://static.vecteezy.com/system/resources/thumbnails/026/375/249/small_2x/ai-generative-portrait-of-confident-male-doctor-in-white-coat-and-stethoscope-standing-with-arms-crossed-and-looking-at-camera-photo.jpg",
-    status: "offline",
-    lastMessage: "Let's schedule a follow-up appointment next week.",
-    time: "Yesterday",
-  },
-  {
-    id: 3,
-    name: "Nurse Amanuel Gebreslassie",
-    role: "Registered Nurse",
-    avatar:
-      "https://static.vecteezy.com/system/resources/thumbnails/026/375/249/small_2x/ai-generative-portrait-of-confident-male-doctor-in-white-coat-and-stethoscope-standing-with-arms-crossed-and-looking-at-camera-photo.jpg",
-    status: "online",
-    lastMessage: "Remember to take your medication with food.",
-    time: "Yesterday",
-  },
-  {
-    id: 4,
-    name: "Dr. Tsegaye Mekonnen",
-    role: "Nutritionist",
-    avatar:
-      "https://static.vecteezy.com/system/resources/thumbnails/026/375/249/small_2x/ai-generative-portrait-of-confident-male-doctor-in-white-coat-and-stethoscope-standing-with-arms-crossed-and-looking-at-camera-photo.jpg",
-    status: "away",
-    lastMessage: "Your new diet plan is ready for review.",
-    time: "Monday",
-  },
-  {
-    id: 5,
-    name: "Dr. Kebede Tadesse",
-    role: "Physical Therapist",
-    avatar:
-      "https://static.vecteezy.com/system/resources/thumbnails/026/375/249/small_2x/ai-generative-portrait-of-confident-male-doctor-in-white-coat-and-stethoscope-standing-with-arms-crossed-and-looking-at-camera-photo.jpg",
-    status: "online",
-    lastMessage: "Try the exercises we discussed daily.",
-    time: "Sunday",
-  },
-  {
-    id: 6,
-    name: "Dr. Mulu Worku",
-    role: "General Practitioner",
-    avatar:
-      "https://static.vecteezy.com/system/resources/thumbnails/026/375/249/small_2x/ai-generative-portrait-of-confident-male-doctor-in-white-coat-and-stethoscope-standing-with-arms-crossed-and-looking-at-camera-photo.jpg",
-    status: "online",
-    lastMessage: "Your overall health is improving steadily.",
-    time: "8:15 AM",
-  },
-  {
-    id: 7,
-    name: "Nurse Selamawit Fikadu",
-    role: "Pediatric Nurse",
-    avatar:
-      "https://static.vecteezy.com/system/resources/thumbnails/026/375/249/small_2x/ai-generative-portrait-of-confident-male-doctor-in-white-coat-and-stethoscope-standing-with-arms-crossed-and-looking-at-camera-photo.jpg",
-    status: "offline",
-    lastMessage: "Please update the child’s medication schedule.",
-    time: "Yesterday",
-  },
-  {
-    id: 8,
-    name: "Dr. Dawit Yohannes",
-    role: "Oncologist",
-    avatar:
-      "https://static.vecteezy.com/system/resources/thumbnails/026/375/249/small_2x/ai-generative-portrait-of-confident-male-doctor-in-white-coat-and-stethoscope-standing-with-arms-crossed-and-looking-at-camera-photo.jpg",
-    status: "online",
-    lastMessage: "Your test results are in; let's discuss them soon.",
-    time: "11:00 AM",
-  },
-  {
-    id: 9,
-    name: "Dr. Fitsum Alemu",
-    role: "Dermatologist",
-    avatar:
-      "https://static.vecteezy.com/system/resources/thumbnails/026/375/249/small_2x/ai-generative-portrait-of-confident-male-doctor-in-white-coat-and-stethoscope-standing-with-arms-crossed-and-looking-at-camera-photo.jpg",
-    status: "away",
-    lastMessage: "Don't forget your sunscreen for the weekend.",
-    time: "Saturday",
-  },
-  {
-    id: 10,
-    name: "Nurse Tena Asfaw",
-    role: "Emergency Nurse",
-    avatar:
-      "https://static.vecteezy.com/system/resources/thumbnails/026/375/249/small_2x/ai-generative-portrait-of-confident-male-doctor-in-white-coat-and-stethoscope-standing-with-arms-crossed-and-looking-at-camera-photo.jpg",
-    status: "online",
-    lastMessage: "Make sure you get plenty of rest tonight.",
-    time: "2:45 PM",
-  },
-]
+import { useSessionUser } from "../../context/Session"
+import { useGetDoctorPatientsQuery, useGetPatientDoctorsQuery } from "@/redux/api/chatApi"
+import { Spin } from "antd"
+import { LoadingOutlined } from "@ant-design/icons"
+import { WebSocketProvider } from "../../context/WebSocketContext"
 
 export type ChatMode = "ai" | "contacts"
 
+interface Contact {
+  _id: string
+  firstname: string
+  lastname: string
+  gender: string
+  hospital?: {
+    _id: string
+    name: string
+  }
+  blood?: string
+  role?: string
+  avatar?: string
+  status?: string
+  lastMessage?: string
+  time?: string
+}
+
 function ChatLayoutContent() {
-  const [selectedContact, setSelectedContact] = useState(contacts[0])
+  const { user } = useSessionUser()
+  const [contacts, setContacts] = useState<Contact[]>([])
+  const [selectedContact, setSelectedContact] = useState<Contact | null>(null)
   const [chatMode, setChatMode] = useState<ChatMode>("contacts")
   const { isOpen, close } = useSidebar()
   const isMobile = useIsMobile()
+
+  const userRole = localStorage.getItem('role')
+  const isDoctor = userRole === 'doctors'
+  const isPatient = userRole === 'patients'
+
+  // Fetch contacts based on user role
+  const { data: doctorPatients, isLoading: isLoadingPatients } = useGetDoctorPatientsQuery(
+    user?._id || '',
+    { skip: !isDoctor || !user?._id }
+  )
+
+  const { data: patientDoctors, isLoading: isLoadingDoctors } = useGetPatientDoctorsQuery(
+    user?._id || '',
+    { skip: !isPatient || !user?._id }
+  )
+
+  const isLoading = isLoadingPatients || isLoadingDoctors
+
+  // Update contacts when data changes
+  useEffect(() => {
+    if (isDoctor && doctorPatients?.data) {
+      const formattedContacts = doctorPatients.data.map((patient: any) => ({
+        _id: patient._id,
+        firstname: patient.firstname,
+        lastname: patient.lastname,
+        gender: patient.gender,
+        blood: patient.blood,
+        avatar: "https://static.vecteezy.com/system/resources/thumbnails/026/375/249/small_2x/ai-generative-portrait-of-confident-male-doctor-in-white-coat-and-stethoscope-standing-with-arms-crossed-and-looking-at-camera-photo.jpg",
+        status: "online",
+        lastMessage: "Tap to start conversation",
+        time: "Now",
+        role: "Patient"
+      }))
+
+      setContacts(formattedContacts)
+      if (formattedContacts.length > 0 && !selectedContact) {
+        setSelectedContact(formattedContacts[0])
+      }
+    } else if (isPatient && patientDoctors?.data) {
+      const formattedContacts = patientDoctors.data.map((doctor: any) => ({
+        _id: doctor._id,
+        firstname: doctor.firstname,
+        lastname: doctor.lastname,
+        gender: doctor.gender,
+        hospital: doctor.hospital,
+        avatar: "https://static.vecteezy.com/system/resources/thumbnails/026/375/249/small_2x/ai-generative-portrait-of-confident-male-doctor-in-white-coat-and-stethoscope-standing-with-arms-crossed-and-looking-at-camera-photo.jpg",
+        status: "online",
+        lastMessage: "Tap to start conversation",
+        time: "Now",
+        role: "Doctor"
+      }))
+
+      setContacts(formattedContacts)
+      if (formattedContacts.length > 0 && !selectedContact) {
+        setSelectedContact(formattedContacts[0])
+      }
+    }
+  }, [doctorPatients, patientDoctors, isDoctor, isPatient, selectedContact])
 
   const handleMainClick = useCallback(() => {
     if (isMobile && isOpen) {
       close()
     }
   }, [isMobile, isOpen, close])
+
+  if (!user?._id) {
+    return (
+      <div className="h-[85vh] flex items-center justify-center">
+        <p>Please log in to access chat</p>
+      </div>
+    );
+  }
 
   return (
     <div className="h-[85vh] flex overflow-hidden bg-background">
@@ -138,7 +125,17 @@ function ChatLayoutContent() {
         <div className="h-full flex flex-col overflow-y-auto">
           <ChatModeSelector mode={chatMode} onChange={setChatMode} />
           {chatMode === "contacts" && (
-            <ContactsList contacts={contacts} selectedContact={selectedContact} onSelectContact={setSelectedContact} />
+            isLoading ? (
+              <div className="flex-1 flex items-center justify-center">
+                <Spin indicator={<LoadingOutlined spin />} />
+              </div>
+            ) : (
+              <ContactsList
+                contacts={contacts}
+                selectedContact={selectedContact}
+                onSelectContact={setSelectedContact}
+              />
+            )
           )}
           {chatMode === "ai" && (
             <div className="p-4">
@@ -165,9 +162,11 @@ function ChatLayoutContent() {
 
 export default function ChatLayout() {
   return (
-    <SidebarProvider>
-      <ChatLayoutContent />
-    </SidebarProvider>
+    <WebSocketProvider>
+      <SidebarProvider>
+        <ChatLayoutContent />
+      </SidebarProvider>
+    </WebSocketProvider>
   )
 }
 

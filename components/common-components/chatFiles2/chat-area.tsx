@@ -1,73 +1,132 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import ChatHeader from "./chat-header"
 import ChatMessages from "./chat-messages"
 import MessageInput from "./message-input"
+import { useSessionUser } from "../../context/Session"
+import { useWebSocket } from "../../context/WebSocketContext"
+import {
+  useGetChatByParticipantsQuery,
+  useSendMessageMutation,
+  useMarkMessageAsSeenMutation
+} from "@/redux/api/chatApi"
+import { Spin } from "antd"
+import { LoadingOutlined } from "@ant-design/icons"
+import webSocketService from "@/utils/websocketService"
 
 interface Message {
-  id: number
-  sender: "me" | "them" | "ai"
-  content: string
-  time: string
+  _id: string
+  sender: string
+  receiver: string
+  message: string
+  timestamp: string
+  seen: boolean
 }
 
-const initialMessages: Message[] = [
-  { id: 1, sender: "them", content: "Selam! How have you been feeling since our last appointment at Menelik Hospital?", time: "10:30 AM" },
-  {
-    id: 2,
-    sender: "me",
-    content: "I've been feeling somewhat better. The new medication is helping to control my blood pressure, thank God.",
-    time: "10:32 AM",
-  },
-  { id: 3, sender: "them", content: "That's promising news! Have you experienced any side effects?", time: "10:33 AM" },
-  {
-    id: 4,
-    sender: "me",
-    content: "I get a little dizziness in the mornings, especially after enjoying my injera breakfast.",
-    time: "10:35 AM",
-  },
-  {
-    id: 5,
-    sender: "them",
-    content:
-      "That can be a common side effect with this medication. If it continues or worsens, please let me know immediately. Your recent readings are good overall.",
-    time: "10:36 AM",
-  },
-  { id: 6, sender: "me", content: "When should I schedule my next check-up?", time: "10:38 AM" },
-  {
-    id: 7,
-    sender: "them",
-    content:
-      "Let's plan for a follow-up in three weeks. I'll have my assistant contact you with available times. Meanwhile, continue keeping an eye on your health.",
-    time: "10:40 AM",
-  },
-]
+interface Contact {
+  _id: string
+  firstname: string
+  lastname: string
+  role?: string
+  gender: string
+  hospital?: {
+    _id: string
+    name: string
+  }
+  status?: string
+  avatar?: string
+}
 
 interface ChatAreaProps {
-  selectedContact: {
-    id: number
-    name: string
-    role: string
-    avatar: string
-    status: string
-  } | null
+  selectedContact: Contact | null
 }
 
 export default function ChatArea({ selectedContact }: ChatAreaProps) {
-  const [messages, setMessages] = useState(initialMessages)
+  const { user } = useSessionUser()
+  const { sendMessage: sendWebSocketMessage } = useWebSocket()
+  const [messages, setMessages] = useState<Message[]>([])
 
-  const handleSendMessage = (content: string) => {
-    if (!content.trim()) return
 
-    const newMessage: Message = {
-      id: messages.length + 1,
-      sender: "me",
-      content,
-      time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+
+  // Set up the patient and doctor IDs based on user role
+  const patientId = localStorage.getItem('role') === 'patients' ? user?._id : selectedContact?._id
+  const doctorId = localStorage.getItem('role') === 'doctors' ? user?._id : selectedContact?._id
+
+  // Get chat data from API
+  const { data: chatData, isLoading, refetch } = useGetChatByParticipantsQuery(
+    { patientId: patientId || '', doctorId: doctorId || '' },
+    { skip: !patientId || !doctorId }
+  )
+
+  // Mutations
+  const [sendMessageApi] = useSendMessageMutation()
+  const [markMessageAsSeen] = useMarkMessageAsSeenMutation()
+
+  // Update messages when chat data changes
+  useEffect(() => {
+    if (chatData?.data?.messages) {
+      setMessages(chatData.data.messages)
+
+      // Mark unread messages as seen
+      chatData.data.messages.forEach((msg: Message) => {
+        if (msg.receiver === user?._id && !msg.seen) {
+          markMessageAsSeen({
+            chatId: chatData.data._id,
+            messageId: msg._id
+          })
+        }
+      })
+    }
+  }, [chatData, user?._id, markMessageAsSeen])
+
+  // Set up WebSocket listener for new messages
+  useEffect(() => {
+    const handleNewMessage = (data: any) => {
+      if (data.chatId === chatData?.data?._id) {
+        refetch()
+      }
     }
 
-    setMessages([...messages, newMessage])
+    webSocketService.on('newMessage', handleNewMessage)
+
+    return () => {
+      webSocketService.off('newMessage', handleNewMessage)
+    }
+  }, [chatData?.data?._id, refetch])
+
+  const handleSendMessage = async (content: string) => {
+    if (!content.trim() || !user?._id || !selectedContact?._id || !chatData?.data?._id) return
+
+    try {
+      // Send message through API
+      const response = await sendMessageApi({
+        chatId: chatData.data._id,
+        sender: user._id,
+        receiver: selectedContact._id,
+        message: content
+      }).unwrap()
+
+      // Also send through WebSocket for real-time updates
+      sendWebSocketMessage(
+        chatData.data._id,
+        selectedContact._id,
+        content
+      )
+
+      // Optimistically update UI with the new message
+      setMessages([...messages, {
+        _id: response.data._id || Date.now().toString(),
+        sender: user._id,
+        receiver: selectedContact._id,
+        message: content,
+        timestamp: new Date().toISOString(),
+        seen: false
+      }])
+
+    } catch (error) {
+      console.error("Failed to send message:", error)
+    }
   }
 
   if (!selectedContact) {
@@ -78,10 +137,32 @@ export default function ChatArea({ selectedContact }: ChatAreaProps) {
     )
   }
 
+  if (isLoading) {
+    return (
+      <div className="flex-1 flex items-center justify-center">
+        <Spin indicator={<LoadingOutlined spin />} size="large" />
+      </div>
+    )
+  }
+
+  // Format messages for the ChatMessages component
+  const formattedMessages = messages.map((msg) => ({
+    id: msg._id,
+    sender: (msg.sender === user?._id ? "me" : "them") as "me" | "them" | "ai",
+    content: msg.message,
+    time: new Date(msg.timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+    seen: msg.seen
+  }))
+
   return (
     <>
-      <ChatHeader contact={selectedContact} />
-      <ChatMessages messages={messages} />
+      <ChatHeader contact={{
+        name: `${selectedContact.firstname} ${selectedContact.lastname}`,
+        role: selectedContact.hospital ? `Doctor at ${selectedContact.hospital.name}` : "Patient",
+        avatar: selectedContact.avatar || "https://static.vecteezy.com/system/resources/thumbnails/026/375/249/small_2x/ai-generative-portrait-of-confident-male-doctor-in-white-coat-and-stethoscope-standing-with-arms-crossed-and-looking-at-camera-photo.jpg",
+        status: selectedContact.status || "online"
+      }} />
+      <ChatMessages messages={formattedMessages} />
       <MessageInput onSendMessage={handleSendMessage} />
     </>
   )
