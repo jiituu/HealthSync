@@ -16,8 +16,8 @@ import webSocketService from "@/utils/websocketService";
 
 interface Message {
   _id: string;
-  sender: string;
-  receiver: string;
+  sender: string | null | undefined;
+  receiver: string | null | undefined;
   message: string;
   timestamp: string;
   seen: boolean;
@@ -171,6 +171,10 @@ export default function ChatArea({ selectedContact }: ChatAreaProps) {
       const response = await sendMessageApi({
         chatId: chatData.data._id,
         sender: user._id,
+        senderType:
+          localStorage.getItem("role") === "patients" ? "Patient" : "Doctor",
+        receiverType:
+          localStorage.getItem("role") === "patients" ? "Doctor" : "Patient",
         receiver: selectedContact._id,
         message: content,
       }).unwrap();
@@ -188,8 +192,8 @@ export default function ChatArea({ selectedContact }: ChatAreaProps) {
         ...messages,
         {
           _id: response.data._id || Date.now().toString(),
-          sender: user._id,
-          receiver: selectedContact._id,
+          sender: user._id, // Optimistic update sender as object
+          receiver: selectedContact._id, // Optimistic update receiver as object
           message: content,
           timestamp: new Date().toISOString(),
           seen: false,
