@@ -1,4 +1,4 @@
-import ChatLayout from '@/components/common-components/chatFiles2/chat-layout'
+import ChatLayout from '@/components/common-components/chatFiles/chat-layout'
 import ChatPatient from '@/appPages/patient/Chat'
 import React from 'react'
 
