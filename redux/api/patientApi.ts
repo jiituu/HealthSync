@@ -56,6 +56,8 @@ export const patientApi = createApi({
       }),
     }),
 
+
+
   }),
 });
 
@@ -63,7 +65,8 @@ export const {
   useLoginPatientMutation,
   useRegisterPatientMutation,
   useDeletePatientMutation,
-  useRequestVisitMutation
+  useRequestVisitMutation,
+  useGetPatientByIdQuery,
 } = patientApi;
 
 export const fetchPatient = async (_id:string) => {

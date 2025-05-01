@@ -11,7 +11,7 @@ export const adminApi = createApi({
       return headers;
     },
   }),
-  tagTypes: ["Admin"],
+  tagTypes: ["Admin", "Patient", "Doctor"],
   endpoints: (builder) => ({
     // for admin to login
     loginAdmin: builder.mutation<any, AdminLoginPayload>({
@@ -28,6 +28,7 @@ export const adminApi = createApi({
         url: `/patients?page=${page}&limit=${limit}`,
         method: "GET",
       }),
+      providesTags: ["Patient"],
     }),
 
     // for admin to get all the doctors. it is paginated
@@ -36,6 +37,7 @@ export const adminApi = createApi({
         url: `/doctors?page=${page}&limit=${limit}`,
         method: "GET",
       }),
+      providesTags: ["Doctor"],
     }),
 
     // to get a patient by id
@@ -61,6 +63,55 @@ export const adminApi = createApi({
         method: "GET",
       }),
     }),
+
+    banPatient: builder.mutation<any, { patientId: string; banned: boolean }>({
+      async queryFn(
+        { patientId, banned },
+        _queryApi,
+        _extraOptions,
+        baseQuery
+      ) {
+        const patientResponse = await baseQuery({
+          url: `/patients/${patientId}`,
+          method: "GET",
+        });
+        if (patientResponse.error) {
+          return { error: patientResponse.error };
+        }
+        const banResponse = await baseQuery({
+          url: `/patients/${patientId}`,
+          method: "PATCH",
+          body: { banned },
+        });
+        if (banResponse.error) {
+          return { error: banResponse.error };
+        }
+        return { data: banResponse.data };
+      },
+      invalidatesTags: [{ type: "Patient", id: "LIST" }],
+    }),
+
+    banDoctor: builder.mutation<any, { doctorId: string; banned: boolean }>({
+      async queryFn({ doctorId, banned }, _queryApi, _extraOptions, baseQuery) {
+        const doctorResponse = await baseQuery({
+          url: `/doctors/${doctorId}`,
+          method: "GET",
+        });
+        if (doctorResponse.error) {
+          return { error: doctorResponse.error };
+        }
+        const banResponse = await baseQuery({
+          url: `/doctors/${doctorId}`,
+          method: "PATCH",
+          body: { banned },
+        });
+        if (banResponse.error) {
+          return { error: banResponse.error };
+        }
+        return { data: banResponse.data };
+      },
+      invalidatesTags: ["Doctor"],
+    }),
   }),
 });
 
@@ -71,6 +122,8 @@ export const {
   useGetAdminByIdQuery,
   useGetStatInfoQuery,
   useGetUsersStatQuery,
+  useBanPatientMutation,
+  useBanDoctorMutation,
 } = adminApi;
 
 export const fetchAdmin = async (_id: string) => {
