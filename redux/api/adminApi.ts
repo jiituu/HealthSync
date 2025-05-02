@@ -88,7 +88,7 @@ export const adminApi = createApi({
         }
         return { data: banResponse.data };
       },
-      invalidatesTags: [{ type: "Patient", id: "LIST" }],
+      invalidatesTags: ["Patient"],
     }),
 
     banDoctor: builder.mutation<any, { doctorId: string; banned: boolean }>({

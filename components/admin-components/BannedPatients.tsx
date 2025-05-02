@@ -13,8 +13,18 @@ import {
   PaginationPrevious,
   PaginationNext,
 } from "@/components/ui/pagination"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 import { Phone, Mail, Calendar, Droplets, Ruler, Weight, User } from "lucide-react"
-import { useGetAllPatientsQuery } from "@/redux/api/adminApi"
+import { useGetAllPatientsQuery, useBanPatientMutation } from "@/redux/api/adminApi"
 import { FaBan } from "react-icons/fa";
 
 interface Patient {
@@ -40,24 +50,58 @@ interface Patient {
   __v: number
 }
 
-
 const BannedPatients = () => {
   const ITEMS_PER_PAGE = 3
   const [currentPage, setCurrentPage] = useState(1)
   const [bannedPatients, setBannedPatients] = useState<Patient[]>([])
+  const [processingPatientId, setProcessingPatientId] = useState<string | null>(null);
+  const [restoreDialogOpen, setRestoreDialogOpen] = useState(false);
+  const [patientToRestoreId, setPatientToRestoreId] = useState<string | null>(null);
 
   const { data: allfetchedPatients, isLoading, isError } = useGetAllPatientsQuery({ page: 1, limit: 1000 })
+  const [unbanPatient] = useBanPatientMutation();
 
   useEffect(() => {
-    if (allfetchedPatients) {
-      const filtered = allfetchedPatients?.data?.patients.filter((patient: Patient) => patient.banned)
+    if (allfetchedPatients?.data?.patients) {
+      const filtered = allfetchedPatients.data.patients.filter((patient: Patient) => patient.banned)
       setBannedPatients(filtered)
+    } else {
+       setBannedPatients([])
     }
   }, [allfetchedPatients])
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page)
   }
+
+  const openRestoreConfirmation = (patientId: string) => {
+    setPatientToRestoreId(patientId);
+    setRestoreDialogOpen(true);
+  };
+
+  const confirmRestoreAccess = async () => {
+    if (!patientToRestoreId) return;
+
+    setProcessingPatientId(patientToRestoreId);
+    try {
+      await unbanPatient({ patientId: patientToRestoreId, banned: false }).unwrap();
+      // Adjust pagination if the last item on the current page was removed
+      const updatedBannedCount = bannedPatients.length - 1;
+      const totalPages = Math.ceil(updatedBannedCount / ITEMS_PER_PAGE);
+      if (currentPage > totalPages && totalPages > 0) {
+         setCurrentPage(totalPages);
+      } else if (updatedBannedCount === 0) {
+         setCurrentPage(1); // Reset to page 1 if no banned patients left
+      }
+      setRestoreDialogOpen(false); // Close dialog on success
+    } catch (error) {
+      console.error("Failed to restore access:", error);
+      // Optionally: show an error message to the user
+    } finally {
+      setProcessingPatientId(null);
+      setPatientToRestoreId(null); // Clear the ID regardless of success/failure
+    }
+  };
 
   const paginatedData = bannedPatients.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE)
 
@@ -80,7 +124,11 @@ const BannedPatients = () => {
 
   return (
     <div className="container mx-auto p-6">
-      {bannedPatients.length === 0 ? (
+      {isLoading ? (
+         <div className="text-center py-12">Loading banned patients...</div>
+      ) : isError ? (
+         <div className="text-center py-12 text-red-500">Error loading patients. Please try again later.</div>
+      ) : bannedPatients.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-12 text-center">
           <div className="w-24 h-24 mb-6 rounded-full bg-purple-50 flex items-center justify-center">
             <FaBan className="text-purple-500" size={40}/>
@@ -160,8 +208,13 @@ const BannedPatients = () => {
               </CardContent>
 
               <CardFooter className="bg-gray-50 border-t p-4 flex justify-end">
-                <Button variant="secondary" className="bg-purple-500 text-white hover:bg-purple-600">
-                  Restore Access
+                <Button
+                  variant="secondary"
+                  className="bg-purple-500 text-white hover:bg-purple-600"
+                  onClick={() => openRestoreConfirmation(patient._id)}
+                  disabled={processingPatientId === patient._id}
+                >
+                  {processingPatientId === patient._id ? "Restoring..." : "Restore Access"}
                 </Button>
               </CardFooter>
             </Card>
@@ -208,6 +261,24 @@ const BannedPatients = () => {
           </Pagination>
         </div>
       )}
+
+      <AlertDialog open={restoreDialogOpen} onOpenChange={setRestoreDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirm Restore Access</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to restore access for this doctor? They will be able to use the platform again.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setPatientToRestoreId(null)} disabled={!!processingPatientId}>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmRestoreAccess} disabled={!!processingPatientId}>
+              {processingPatientId === patientToRestoreId ? "Restoring..." : "Confirm Restore"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog> 
+      
     </div>
   )
 }
