@@ -27,17 +27,6 @@ export interface VisitCard extends VisitModel {
   image?: string
 }
 
-// const visitsData: VisitCard[] = [
-//   { id: 1, name: "Alemayehu T", contact: "0908818109", status: "active", days: "In 10 days", image: "" },
-//   { id: 2, name: "Bekele M", contact: "0908818110", status: "active", days: "In 8 days", image: "" },
-//   { id: 3, name: "Chaltu A", contact: "0908818111", status: "active", days: "In 5 days", image: "" },
-//   { id: 4, name: "Desta K", contact: "0908818112", status: "active", days: "In 12 days", image: "" },
-//   { id: 5, name: "Eleni G", contact: "0908818113", status: "active", days: "In 7 days", image: "" },
-//   { id: 6, name: "Fikru L", contact: "0908818114", status: "active", days: "In 3 days", image: "" },
-//   { id: 7, name: "Genet S", contact: "0908818115", status: "ended", days: "2 days ago", image: "" },
-//   { id: 8, name: "Haile T", contact: "0908818116", status: "ended", days: "5 days ago", image: "" },
-//   { id: 9, name: "Ibrahim B", contact: "0908818117", status: "ended", days: "1 week ago", image: "" },
-// ]
 export const handleDaysCalculation = (date:Date)=>{
   const diff = dayjs(date).diff(dayjs(),'days');
   let days = '';
@@ -178,7 +167,7 @@ const ActiveVisits: React.FC = () => {
                   key={visit._id}
                   className="embla__slide min-w-0 sm:min-w-[320px] flex-grow-0 flex-shrink-0 basis-[85%] sm:basis-[320px] pr-4"
                 >
-                  <Card onClick={()=>{setOpenViewVisit(true); console.log(visit,'visit');setSelectedCard(visit);}} className="h-full overflow-hidden transition-all duration-200 hover:shadow-md cursor-pointer">
+                  <Card onClick={()=>{setOpenViewVisit(true); setSelectedCard(visit);}} className="h-full overflow-hidden transition-all duration-200 hover:shadow-md cursor-pointer">
                     <div className={`h-1.5 w-full ${getUrgencyColor(visit.days)}`} />
                     <CardContent className="p-5">
                       <div className="flex items-center justify-between mb-4">
