@@ -26,7 +26,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
-import { useGetAllDoctorsQuery } from "@/redux/api/adminApi"
+import { useGetAllDoctorsQuery, useBanPatientMutation, useBanDoctorMutation } from "@/redux/api/adminApi"
 import { useGetAllPatientsQuery } from "@/redux/api/adminApi"
 
 interface PatientResponse {
@@ -177,6 +177,8 @@ const filterByDate = (joined: string | undefined, filter: string): boolean => {
 const UserManagement = () => {
   const { data: getAllPatientsQuery, isLoading: isPatientsLoading } = useGetAllPatientsQuery({ page: 1, limit: 1000 })
   const { data: getAllDoctorsQuery, isLoading: isDoctorsLoading } = useGetAllDoctorsQuery({ page: 1, limit: 1000 })
+  const [banPatient] = useBanPatientMutation()
+  const [banDoctor] = useBanDoctorMutation()
 
   // console.log("patients bbom", getAllPatientsQuery?.data?.patients)
   // console.log("doctors boom", getAllDoctorsQuery?.data?.doctors)
@@ -195,6 +197,7 @@ const UserManagement = () => {
   const [pdfDialogOpen, setPdfDialogOpen] = useState(false)
   const [selectedLicense, setSelectedLicense] = useState("")
   const [banDialogOpen, setBanDialogOpen] = useState(false)
+  const [banLoading, setBanLoading] = useState(false) 
   const itemsPerPage = 6
   const isLoading = isPatientsLoading || isDoctorsLoading
 
@@ -213,14 +216,28 @@ const UserManagement = () => {
   const totalPages = Math.ceil(filteredUsers.length / itemsPerPage)
   const paginatedUsers = filteredUsers.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
 
-  const handleBanUser = (): void => {
+  const handleBanUser = async (): Promise<void> => {
     if (selectedUser) {
-      const updatedUsers = users?.map((user) =>
-        user._id === selectedUser._id ? { ...user, banned: !user.banned } : user,
-      )
-      setUsers(updatedUsers)
-      setSelectedUser({ ...selectedUser, banned: !selectedUser.banned })
-      setBanDialogOpen(false)
+      const newBanned = !selectedUser.banned
+      setBanLoading(true) // set pending state
+      try {
+        if (selectedUser.role === "doctor") {
+          await banDoctor({ doctorId: selectedUser._id, banned: newBanned }).unwrap()
+        } else {
+          await banPatient({ patientId: selectedUser._id, banned: newBanned }).unwrap()
+        }
+        // update local state on success
+        const updatedUsers = users.map((user) =>
+          user._id === selectedUser._id ? { ...user, banned: newBanned } : user
+        )
+        setUsers(updatedUsers)
+        setSelectedUser({ ...selectedUser, banned: newBanned })
+        setBanDialogOpen(false)
+      } catch (error) {
+        console.error("Ban action failed:", error)
+      } finally {
+        setBanLoading(false) // clear pending state
+      }
     }
   }
 
@@ -576,7 +593,9 @@ const UserManagement = () => {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleBanUser}>{selectedUser?.banned ? "Unban" : "Ban"}</AlertDialogAction>
+            <AlertDialogAction onClick={handleBanUser} disabled={banLoading}>
+              {banLoading ? "Processing..." : (selectedUser?.banned ? "Unban" : "Ban")}
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
