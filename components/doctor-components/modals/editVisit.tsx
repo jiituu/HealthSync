@@ -65,7 +65,6 @@ export const EditVisitModal = ({open,visit,setOpen,setScheduledVisits}:props)=>{
                 patient: visit.patient,
                 doctor:visit.doctor,
                 preferredDate: visit.preferredDate,
-                reason:'Reason one'
             } as VisitModel;
 
             
