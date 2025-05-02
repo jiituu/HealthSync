@@ -162,6 +162,7 @@ const ActiveVisits: React.FC = () => {
               <Row className="h-[20vh] w-full" align='middle' justify='center'>
                   <Spin indicator={<LoadingOutlined  spin/>} size='large'/>
               </Row>
+              
               :scheduledVisits.map((visit) => (
                 <div
                   key={visit._id}
