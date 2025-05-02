@@ -2,8 +2,8 @@ import * as React from "react"
 
 import { cn } from "@/lib/utils"
 
-export const Card = ({ children, className = "" }: { children: React.ReactNode; className?: string }) => {
-  return <div className={`card ${className}`}>{children}</div>;
+export const Card = ({ children, onClick, className = "" }: { children: React.ReactNode; onClick?: React.MouseEventHandler<HTMLDivElement>,className?: string }) => {
+  return <div onClick={onClick} className={`card ${className}`}>{children}</div>;
 };
 
 const CardHeader = React.forwardRef<

@@ -86,6 +86,14 @@ export const doctorApi = createApi({
         body:{approval:visitPayload.approval}
       }),
     }),
+
+    updateVisit: builder.mutation<void, {visitID:string,body:any}>({
+      query: (visitPayload) => ({
+        url: `/visits/${visitPayload.visitID}`,
+        method: 'PATCH',
+        body:visitPayload.body
+      }),
+    })
   
   }),
 });
@@ -99,7 +107,8 @@ export const {
   useGetCurrentDoctorQuery,
 
   useGetVisitsByDoctorIdQuery,
-  useApproveRefuseVisitMutation
+  useApproveRefuseVisitMutation,
+  useUpdateVisitMutation
 } = doctorApi;
 
 export const fetchDoctor = async (_id:string) => {
