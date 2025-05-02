@@ -1,6 +1,5 @@
 export interface VisitModel{
-    id:string,
-    timestamp:Date,
+    _id:string,
     patient:string,
     doctor:string,
     preferredDate:Date,
@@ -11,6 +10,7 @@ export interface VisitModel{
     labResults?: LabResultsModel[],
     status: "Scheduled"|"Completed"|"Cancelled",
     approval: "Approved"|"Denied"|"Scheduled",
+    createdAt:string
 }
 
 export interface PrescriptionModel{
