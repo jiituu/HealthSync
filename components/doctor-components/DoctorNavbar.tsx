@@ -28,6 +28,8 @@ const Navbar = ({ onMenuClick }: { onMenuClick: () => void }) => {
   const [notifications,setNotifications] = useState<NotificationModel[]>([]);
   const {data,isLoading,error} = useGetVisitsByDoctorIdQuery(user?._id??'');
 
+  console.log('user',user);
+
   useEffect(()=>{
 
     const visitRequests:VisitModel[] = data?.data?.visits??[];
@@ -77,7 +79,7 @@ const Navbar = ({ onMenuClick }: { onMenuClick: () => void }) => {
             <div className="w-8 h-8 bg-teal-400 rounded-full flex items-center justify-center text-white">
               D
             </div>
-            <span className="hidden sm:inline">Dr Belete Abebe</span> 
+            <span className="hidden sm:inline">Dr {user?.firstname}</span> 
           </Link>
         </div>
 
