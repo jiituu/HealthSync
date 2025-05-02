@@ -1,4 +1,4 @@
-type notificationType = 'visitRequest'|'noAction'
+export type notificationType = 'visitRequest'|'noAction'
 
 export interface NotificationModel {
     id: string;

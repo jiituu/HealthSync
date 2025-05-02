@@ -65,11 +65,35 @@ export const doctorApi = createApi({
         method: 'GET',
       }),
     }),
+
     getCurrentDoctor: builder.query<DoctorApiResponse, void>({
-  query: () => '/doctors/me',
-  providesTags: ['Doctor'],
-}),
-    
+      query: () => '/doctors/me',
+      providesTags: ['Doctor'],
+    }),
+
+    // Visits
+    getVisitsByDoctorId: builder.query<any, string>({
+      query: (id) => ({
+        url: `/visits?doctor=${id}`,
+        method: 'GET',
+      }),
+    }), 
+
+    approveRefuseVisit: builder.mutation<void, {visitID:string,approval:'Approved'|'Denied'}>({
+      query: (visitPayload) => ({
+        url: `/visits/${visitPayload.visitID}/approval`,
+        method: 'PATCH',
+        body:{approval:visitPayload.approval}
+      }),
+    }),
+
+    updateVisit: builder.mutation<void, {visitID:string,body:any}>({
+      query: (visitPayload) => ({
+        url: `/visits/${visitPayload.visitID}`,
+        method: 'PATCH',
+        body:visitPayload.body
+      }),
+    })
   
   }),
 });
@@ -81,6 +105,10 @@ export const {
   useGetVerifiedDoctorsQuery,
   useDeleteDoctorMutation,
   useGetCurrentDoctorQuery,
+
+  useGetVisitsByDoctorIdQuery,
+  useApproveRefuseVisitMutation,
+  useUpdateVisitMutation
 } = doctorApi;
 
 export const fetchDoctor = async (_id:string) => {

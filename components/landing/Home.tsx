@@ -143,7 +143,7 @@ export default function Home({
                 prescriptions, and healthcare management
               </p>
               <Button
-                className="bg-accent text-white hover:bg-accent/90"
+                className="bg-accent rounded-3xl text-gray-900 font-bold hover:bg-accent/90 hover:text-white"
                 size="lg"
                 onClick={() => setShowSecondPage(true)}
               >
