@@ -1,12 +1,9 @@
 import CustomModal from "@/components/common-components/CustomModal"
 import { useSessionUser } from "@/components/context/Session";
-import { DoctorModel } from "@/components/models/doctor";
 import { PatientModel } from "@/components/models/patient";
 import { LabResultsModel, VisitModel } from "@/components/models/visitModel";
-import { useRequestVisitMutation } from "@/redux/api/patientApi";
 import { Box, useMediaQuery } from "@mui/material";
-import { Button, DatePicker, Divider, Form, Input, message, Row, Space, Upload, UploadProps } from "antd";
-import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
+import { Button, DatePicker, Divider, Form, Input, message, Row, Upload, UploadProps } from "antd";
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
 import { handleDaysCalculation, VisitCard } from "@/appPages/doctor/ActiveVisits";
 import {MinusCircleOutlined, UploadOutlined} from '@ant-design/icons';
@@ -15,6 +12,7 @@ import { useEffect, useState } from "react";
 import { cloudinaryPresents } from "@/data/constants";
 import { useUpdateVisitMutation } from "@/redux/api/doctorApi";
 import dayjs from "dayjs";
+import { string } from "zod";
 
 
 interface props{
@@ -74,9 +72,9 @@ export const EditVisitModal = ({open,visit,setOpen,setScheduledVisits}:props)=>{
                 const formattedVisit:VisitCard = {
                     ...visitData,
                     _id:visit._id,
-                    name: 'Not Specified',
-                    contact: "Not specified",
-                    days: handleDaysCalculation(visitData.preferredDate)
+                    name: visit.name??'',
+                    contact: visit.contact??'',
+                    days: handleDaysCalculation(visitData.startDate)
                 }
                 // updating the current state.
                 setScheduledVisits((prev:VisitCard[])=>{
@@ -121,6 +119,8 @@ export const EditVisitModal = ({open,visit,setOpen,setScheduledVisits}:props)=>{
     useEffect(()=>{
         if(visit && open){
             form.setFieldValue('preferredDate', dayjs(visit.preferredDate).format('MMMM DD, YYYY hh:mm A'))
+            form.setFieldValue('startDate', typeof visit.startDate == 'string'? dayjs(visit.startDate):visit.startDate)
+            form.setFieldValue('endDate', typeof visit.endDate == 'string'? dayjs(visit.endDate):visit.endDate)
             form.setFieldValue('reason', visit.reason);
             form.setFieldValue('diagnosis', visit.diagnosis);
             form.setFieldValue('prescription', visit.prescription?.map(({_id,...pres}:any)=>pres));
@@ -148,6 +148,30 @@ export const EditVisitModal = ({open,visit,setOpen,setScheduledVisits}:props)=>{
                         rules= {[{required:true,message:'Preferred Date is required'}]}
                     >
                         <Input readOnly/>
+                    </Form.Item>
+
+                    <Form.Item
+                        label = 'Start Date'
+                        name = 'startDate'
+                        rules= {[{required:true,message:'Start Date is required'}]}
+                    >
+                        <DatePicker
+                            className="w-full"
+                            format='MMMM DD, YYYY hh:mm A'
+                            showTime
+                        />
+                    </Form.Item>
+
+                    <Form.Item
+                        label = 'End Date'
+                        name = 'endDate'
+                        rules= {[{required:true,message:'End Date is required'}]}
+                    >
+                        <DatePicker
+                            className="w-full"
+                            format='MMMM DD, YYYY hh:mm A'
+                            showTime
+                        />
                     </Form.Item>
 
                     <Form.Item

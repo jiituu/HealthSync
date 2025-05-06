@@ -56,7 +56,13 @@ export const patientApi = createApi({
       }),
     }),
 
-
+    // Visits
+    getVisitsByDoctorIdPatientId: builder.query<any, {doctor_id:string,patient_id:string }>({
+      query: ({doctor_id,patient_id}) => ({
+        url: `/visits?doctor_id=${doctor_id}&patient_id=${patient_id}`,
+        method: 'GET',
+      }),
+    }), 
 
   }),
 });
@@ -67,6 +73,7 @@ export const {
   useDeletePatientMutation,
   useRequestVisitMutation,
   useGetPatientByIdQuery,
+  useGetVisitsByDoctorIdPatientIdQuery
 } = patientApi;
 
 export const fetchPatient = async (_id:string) => {

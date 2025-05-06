@@ -2,29 +2,49 @@ import Image from "next/image";
 import ppimage from "@/public/images/doctor.png";
 import { IoMdCheckmarkCircle } from "react-icons/io";
 import Rating from "@/components/common-components/Rating";
-import { Button, Row, Spin } from "antd";
+import { Button, message, Row, Spin } from "antd";
 import { useEffect, useState } from "react";
 import { DoctorModel } from "@/components/models/doctor";
 import { LoadingOutlined } from '@ant-design/icons';
 import { useGetVerifiedDoctorsQuery } from "@/redux/api/doctorApi";
 import { RequestVisitModal } from "@/components/patient-components/modals/RequestVisit";
+import { useGetVisitsByDoctorIdPatientIdQuery } from "@/redux/api/patientApi";
+import { useSessionUser } from "@/components/context/Session";
+import { PatientModel } from "@/components/models/patient";
 
 interface prob{
     doctorID:string
 }
 
 const DocSearch = ({doctorID}:prob)=>{
+    const {user}:{user?:PatientModel} = useSessionUser();
     const [doctor,setDoctor] = useState<DoctorModel>();
     const [openRequestVisit,setOpenRequestVisit] = useState(false);
 
     const { data, status, error, isLoading } = useGetVerifiedDoctorsQuery();
-    
+    const {data: visitData, status: statusData} = useGetVisitsByDoctorIdPatientIdQuery({doctor_id:doctorID,patient_id:user?._id??''});
     
     useEffect(()=>{
         const doctors: DoctorModel[] = data?.data?.doctors??[];
         const doctor = doctors.find(d=>d._id==doctorID);
         if(doctor) setDoctor(doctor);
     },[data?.data?.doctors, doctorID])
+
+    const getStatus = (approval:"Approved"|"Denied"|"Scheduled")=>{
+        return (
+            <span 
+                className={
+                    `flex align-middle text-[16px] border-[3px] rounded-xl px-3 py-[2px]
+                    ${approval=='Scheduled'?'bg-[#ccc15c88] border-[#ddcc34] text-[#6e6418]'
+                    :approval=='Approved'?'bg-[#62eb62a1] border-[#4cff70] text-[#144b11]'
+                    :'bg-[#cc5c5c88] border-[#dd3434] text-[#6e1818]'}  
+                    `
+                }
+            >
+                {approval}
+            </span>
+        )
+    }
 
     return(
         <>
@@ -94,12 +114,18 @@ const DocSearch = ({doctorID}:prob)=>{
                             </div>
                             <Row className="h-[10rem] flex justify-center items-center gap-3 bg-[#72bbb7] rounded-xl sm:justify-between sm:px-10">
                                 <Rating isView={true} value={3}/>
-                                <Button 
-                                    className="primary-button squared-button"
-                                    onClick={()=>setOpenRequestVisit(true)}
-                                >
-                                    Request Visit
-                                </Button>
+                                {
+                                    visitData?.data?.visits?.length&&visitData?.data?.visits?.at(0).approval=='Scheduled'?
+                                    <div className="flex gap-2 items-center font-semibold text-lg"><span>Status: </span> {getStatus(visitData?.data?.visits?.at(0).approval)}</div>
+                                    :<Button 
+                                        className="primary-button squared-button"
+                                        onClick={()=>{
+                                            setOpenRequestVisit(true)
+                                        }}
+                                    >
+                                        Request Visit
+                                    </Button>
+                                }
                             </Row>
                         </div>
                     </>

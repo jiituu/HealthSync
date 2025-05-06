@@ -25,6 +25,8 @@ export const RequestVisitModal = ({open,setOpen,doctor}:props)=>{
                 patient: user?._id,
                 doctor: doctor?._id,
                 preferredDate: values.preferredDate.toDate(),
+                startDate: values.preferredDate.toDate(),
+                endDate: values.preferredDate.toDate(),
                 reason: values.symptom,
                 status: "Scheduled",
                 approval: "Scheduled"

@@ -72,9 +72,9 @@ export const doctorApi = createApi({
     }),
 
     // Visits
-    getVisitsByDoctorId: builder.query<any, string>({
-      query: (id) => ({
-        url: `/visits?doctor=${id}`,
+    getVisitsByDoctorIdApproval: builder.query<any, {id:string,approval:"Approved"|"Denied"|"Scheduled"}>({
+      query: ({id,approval}) => ({
+        url: `/visits?doctor_id=${id}&approval=${approval}`,
         method: 'GET',
       }),
     }), 
@@ -93,7 +93,15 @@ export const doctorApi = createApi({
         method: 'PATCH',
         body:visitPayload.body
       }),
-    })
+    }),
+
+    // Patients
+    getAppointedPatients: builder.query<any, string>({
+      query: (id) => ({
+        url: `/doctors/${id}/patients`,
+        method: 'GET',
+      }),
+    }),
   
   }),
 });
@@ -105,10 +113,12 @@ export const {
   useGetVerifiedDoctorsQuery,
   useDeleteDoctorMutation,
   useGetCurrentDoctorQuery,
-
-  useGetVisitsByDoctorIdQuery,
+  
+  useGetVisitsByDoctorIdApprovalQuery,
   useApproveRefuseVisitMutation,
-  useUpdateVisitMutation
+  useUpdateVisitMutation,
+
+  useGetAppointedPatientsQuery,
 } = doctorApi;
 
 export const fetchDoctor = async (_id:string) => {
