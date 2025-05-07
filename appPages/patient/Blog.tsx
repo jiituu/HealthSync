@@ -3,7 +3,7 @@ import React from 'react';
 import imgg from '@/public/images/doctor.png';
 import { FaBookmark, FaRegBookmark } from "react-icons/fa";
 import { useGetBlogsQuery, useBookmarkBlogMutation, useRemoveBookmarkMutation } from '@/redux/api/blogApi';
-import { BlogPost, SingleBlogObject } from '@/types/blog';
+import { SingleBlogObject } from '@/types/blog';
 import { toast } from 'react-toastify';
 
 const Blog: React.FC = () => {
