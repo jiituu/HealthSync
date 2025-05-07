@@ -1,10 +1,10 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Eye, Ban, AlertCircle} from "lucide-react"
+import { Eye, AlertCircle} from "lucide-react"
 import {
   Pagination,
   PaginationContent,
@@ -16,169 +16,23 @@ import {
 import { Badge } from "@/components/ui/badge"
 import { format } from "date-fns"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-
-interface Address {
-  street: string
-  city: string
-  region: string
-  country: string
-  postalCode: string
-}
-
-interface Hospital {
-  address: Address
-  _id: string
-  name: string
-  branch: number
-}
-
-interface License {
-  url: string
-  type: string
-  isVerified: boolean
-  _id: string
-}
-
-interface Doctor {
-  bookmarks: any[]
-  status: string
-  banned: boolean
-  _id: string
-  firstname: string
-  lastname: string
-  email: string
-  age: number
-  gender: string
-  phoneNumber: string
-  specializations: string[]
-  qualifications: string[]
-  licenses: License[]
-  hospital: Hospital
-  createdAt: string
-  updatedAt: string
-  __v: number
-}
-
-interface DoctorsResponse {
-  doctors: Doctor[]
-}
+import { useGetDoctorsQuery, useUpdateDoctorStatusMutation } from "@/redux/api/doctorApi"
 
 const ITEMS_PER_PAGE = 6
 
 const DeniedLicenses = () => {
-  const [doctors, setDoctors] = useState<Doctor[]>([])
-  const [loading, setLoading] = useState(true)
+  const { data: doctorsData, isLoading, isError } = useGetDoctorsQuery({ status: "denied" })
+  const [updateDoctorStatus] = useUpdateDoctorStatusMutation()
+  
+  const doctors = doctorsData?.data?.doctors || []
+  
   const [currentPage, setCurrentPage] = useState(1)
-  const [totalPages, setTotalPages] = useState(1)
+  const totalPages = Math.ceil(doctors.length / ITEMS_PER_PAGE)
+
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [currentLicenseUrl, setCurrentLicenseUrl] = useState("")
-
-  useEffect(() => {
-    const fetchDoctors = async () => {
-      try {
-        setLoading(true)
-        const mockResponse: DoctorsResponse = {
-          doctors: [
-            {
-              bookmarks: [],
-              status: "pending",
-              banned: false,
-              _id: "67eb15297db753f356e1173e",
-              firstname: "daniel",
-              lastname: "teka",
-              email: "dani@gmail.com",
-              age: 34,
-              gender: "male",
-              phoneNumber: "251987654321",
-              specializations: ["Orthopedics"],
-              qualifications: ["MCh"],
-              licenses: [
-                {
-                  url: "https://res.cloudinary.com/drz9aa55k/image/upload/v1743459612/yzs7uqn5gmhxlldpaeje.pdf",
-                  type: "pdf",
-                  isVerified: false,
-                  _id: "67eb15297db753f356e1173f",
-                },
-              ],
-              hospital: {
-                address: {
-                  street: "Bethel PO BOX 127",
-                  city: "Addis Ababa",
-                  region: "Addis Ababa",
-                  country: "Ethiopia",
-                  postalCode: "35324",
-                },
-                _id: "67e83e268439394e7ff2ee53",
-                name: "Bethel General Hospital",
-                branch: 2,
-              },
-              createdAt: "2025-03-31T22:20:25.702Z",
-              updatedAt: "2025-03-31T22:20:25.702Z",
-              __v: 0,
-            },
-            {
-              bookmarks: [],
-              status: "pending",
-              banned: false,
-              _id: "67eb16337db753f356e1174d",
-              firstname: "melakeselam",
-              lastname: "yitbarek",
-              email: "melakeselamyitbarek2012@gmail.com",
-              age: 23,
-              gender: "male",
-              phoneNumber: "251962212818",
-              specializations: ["Neurology", "Cardiology"],
-              qualifications: ["DO"],
-              licenses: [
-                {
-                  url: "https://res.cloudinary.com/drz9aa55k/image/upload/v1743459877/bm2cfkhvy3uomivtzqzg.pdf",
-                  type: "pdf",
-                  isVerified: false,
-                  _id: "67eb16337db753f356e1174e",
-                },
-              ],
-              hospital: {
-                address: {
-                  street: "Addis Ababa",
-                  city: "Addis Ababa",
-                  region: "Addis Ababa",
-                  country: "Ethiopia",
-                  postalCode: "1000",
-                },
-                _id: "67e83e148439394e7ff2ee51",
-                name: "Teklehaymanot General Hospital",
-                branch: 2,
-              },
-              createdAt: "2025-03-31T22:24:51.806Z",
-              updatedAt: "2025-03-31T22:24:51.806Z",
-              __v: 0,
-            },
-          ],
-        }
-
-        const additionalDoctors = Array(10)
-          .fill(0)
-          .map((_, index) => ({
-            ...mockResponse.doctors[index % 2],
-            _id: `mock-id-${index}`,
-            firstname: `Doctor${index}`,
-            lastname: `Smith${index}`,
-            email: `doctor${index}@example.com`,
-            createdAt: new Date(Date.now() - index * 86400000).toISOString(), 
-          }))
-
-        const allDoctors = [...mockResponse.doctors, ...additionalDoctors]
-        setDoctors(allDoctors)
-        setTotalPages(Math.ceil(allDoctors.length / ITEMS_PER_PAGE))
-      } catch (error) {
-        console.error("Error fetching doctors:", error)
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    fetchDoctors()
-  }, [])
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false)
+  const [selectedDoctorId, setSelectedDoctorId] = useState<string | null>(null)
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page)
@@ -192,7 +46,7 @@ const DeniedLicenses = () => {
         return <Badge className="bg-green-500">Accepted</Badge>
       case "pending":
         return <Badge className="bg-yellow-500">Pending</Badge>
-      case "rejected":
+      case "denied":
         return <Badge className="bg-red-500">Rejected</Badge>
       default:
         return <Badge className="bg-gray-500">{status}</Badge>
@@ -204,8 +58,11 @@ const DeniedLicenses = () => {
     setIsDialogOpen(true)
   }
 
-  if (loading) {
+  if (isLoading) {
     return <div className="flex justify-center items-center h-64">Loading doctors data...</div>
+  }
+  if (isError) {
+    return <div>Error loading doctors data.</div>
   }
 
   return (
@@ -272,10 +129,12 @@ const DeniedLicenses = () => {
                         size="sm"
                         variant="ghost"
                         className="text-green-600 hover:text-green-700 hover:bg-green-50"
-                        onClick={() => {}}
-                        title="Reject License"
+                        onClick={() => {
+                          setSelectedDoctorId(doctor._id)
+                          setIsConfirmOpen(true)
+                        }}
+                        title="Accept License"
                       >
-                        {/* <Ban className="w-4 h-4 mr-1" /> */}
                         Accept
                       </Button>
                     </TableCell>
@@ -336,6 +195,29 @@ const DeniedLicenses = () => {
             {currentLicenseUrl && (
               <iframe src={currentLicenseUrl} className="w-full h-full border-0" title="License Document" />
             )}
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={isConfirmOpen} onOpenChange={setIsConfirmOpen}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Confirm Accept</DialogTitle>
+          </DialogHeader>
+          <p>Are you sure you want to accept this doctor?</p>
+          <div className="flex justify-end gap-2 mt-4">
+            <Button variant="outline" onClick={() => setIsConfirmOpen(false)}>
+              Cancel
+            </Button>
+            <Button
+              onClick={() => {
+                selectedDoctorId &&
+                  updateDoctorStatus({ doctorId: selectedDoctorId, status: "approved" })
+                setIsConfirmOpen(false)
+              }}
+            >
+              Confirm
+            </Button>
           </div>
         </DialogContent>
       </Dialog>

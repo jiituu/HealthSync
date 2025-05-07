@@ -31,7 +31,10 @@ import { useGetAllPatientsQuery } from "@/redux/api/adminApi"
 
 interface PatientResponse {
   bookmarks: any[]
-  banned: boolean
+  banned: {
+    status: boolean
+    reason: string
+  }
   _id: string
   firstname: string
   lastname: string
@@ -54,7 +57,10 @@ interface PatientResponse {
 interface DoctorResponse {
   bookmarks: any[]
   status: string
-  banned: boolean
+  banned: {
+    status: boolean
+    reason: string
+  }
   _id: string
   firstname: string
   lastname: string
@@ -91,7 +97,10 @@ interface DoctorResponse {
 type User = (PatientResponse | DoctorResponse) & {
   fullname: string
   role?: string
-  banned?: boolean
+  banned?: {
+    status: boolean
+    reason: string
+  }
   createdAt?: string
   email: string
   phoneNumber: string
@@ -197,6 +206,9 @@ const UserManagement = () => {
   const [pdfDialogOpen, setPdfDialogOpen] = useState(false)
   const [selectedLicense, setSelectedLicense] = useState("")
   const [banDialogOpen, setBanDialogOpen] = useState(false)
+  // New state variables for reason dialog and text
+  const [reasonDialogOpen, setReasonDialogOpen] = useState(false)
+  const [banReason, setBanReason] = useState("")
   const [banLoading, setBanLoading] = useState(false) 
   const itemsPerPage = 6
   const isLoading = isPatientsLoading || isDoctorsLoading
@@ -216,27 +228,33 @@ const UserManagement = () => {
   const totalPages = Math.ceil(filteredUsers.length / itemsPerPage)
   const paginatedUsers = filteredUsers.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
 
-  const handleBanUser = async (): Promise<void> => {
+  // Updated handleReasonSubmit for explicit ban/unban logic
+  const handleReasonSubmit = async (): Promise<void> => {
     if (selectedUser) {
-      const newBanned = !selectedUser.banned
-      setBanLoading(true) // set pending state
+      // Use explicit logic: if currently banned then unban, else ban.
+      console.log("selected user$$$$$$$$$$$$$$$", selectedUser)
+      const newBanned = selectedUser.banned && selectedUser.banned.status === true ? false : true;
+      setBanLoading(true)
       try {
         if (selectedUser.role === "doctor") {
-          await banDoctor({ doctorId: selectedUser._id, banned: newBanned }).unwrap()
+          await banDoctor({ doctorId: selectedUser._id, banned: { status: newBanned, reason: banReason } }).unwrap()
         } else {
-          await banPatient({ patientId: selectedUser._id, banned: newBanned }).unwrap()
+          await banPatient({ patientId: selectedUser._id, banned: { status: newBanned, reason: banReason } }).unwrap()
         }
         // update local state on success
         const updatedUsers = users.map((user) =>
-          user._id === selectedUser._id ? { ...user, banned: newBanned } : user
+          user._id === selectedUser._id
+            ? { ...user, banned: { status: newBanned, reason: banReason } }
+            : user
         )
         setUsers(updatedUsers)
-        setSelectedUser({ ...selectedUser, banned: newBanned })
-        setBanDialogOpen(false)
+        setSelectedUser({ ...selectedUser, banned: { status: newBanned, reason: banReason } })
+        setReasonDialogOpen(false)
+        setBanReason("")
       } catch (error) {
         console.error("Ban action failed:", error)
       } finally {
-        setBanLoading(false) // clear pending state
+        setBanLoading(false)
       }
     }
   }
@@ -358,7 +376,7 @@ const UserManagement = () => {
                     </Badge>
                   </TableCell>
                   <TableCell>
-                    <Badge variant={user.banned ? "destructive" : "outline"}>{user.banned ? "Banned" : "Active"}</Badge>
+                    <Badge variant={user.banned?.status ? "destructive" : "outline"}>{user.banned?.status ? "Banned" : "Active"}</Badge>
                   </TableCell>
                   <TableCell>
                     <Button
@@ -413,7 +431,7 @@ const UserManagement = () => {
                 <Badge variant={selectedUser.role === "doctor" ? "default" : "default"}>
                   {selectedUser.role === "doctor" ? "Doctor" : "Patient"}
                 </Badge>
-                {selectedUser.banned && <Badge variant="destructive">Banned</Badge>}
+                {selectedUser.banned.status && <Badge variant="destructive">Banned</Badge>}
               </DialogTitle>
             </DialogHeader>
             <div className="space-y-2 max-h-[60vh] overflow-y-auto">
@@ -553,7 +571,7 @@ const UserManagement = () => {
             </div>
             <DialogFooter>
               <Button variant="destructive" onClick={() => setBanDialogOpen(true)}>
-                {selectedUser.banned ? "Unban User" : "Ban User"}
+                {selectedUser.banned.status ? "Unban User" : "Ban User"}
               </Button>
               <DialogClose asChild>
                 <Button>Close</Button>
@@ -584,21 +602,61 @@ const UserManagement = () => {
       <AlertDialog open={banDialogOpen} onOpenChange={setBanDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>{selectedUser?.banned ? "Unban User" : "Ban User"}</AlertDialogTitle>
+            <AlertDialogTitle>{selectedUser?.banned?.status ? "Unban User" : "Ban User"}</AlertDialogTitle>
             <AlertDialogDescription>
-              {selectedUser?.banned
+              {selectedUser?.banned?.status
                 ? "Are you sure you want to unban this user? They will regain access to the platform."
                 : "Are you sure you want to ban this user? They will lose access to the platform."}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleBanUser} disabled={banLoading}>
-              {banLoading ? "Processing..." : (selectedUser?.banned ? "Unban" : "Ban")}
+            <AlertDialogAction
+              // Open reason dialog on confirmation
+              onClick={() => {
+                setBanDialogOpen(false)
+                setReasonDialogOpen(true)
+              }}
+            >
+              {selectedUser?.banned.status ? "Unban" : "Ban"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* New dialog for entering ban/unban reason */}
+      {reasonDialogOpen && (
+        <Dialog open={reasonDialogOpen} onOpenChange={setReasonDialogOpen}>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle>
+                {selectedUser?.banned?.status ? "Enter Reason for Unbanning" : "Enter Reason for Banning"}
+              </DialogTitle>
+            </DialogHeader>
+            <div className="mt-2">
+              <textarea
+                value={banReason}
+                onChange={(e) => setBanReason(e.target.value)}
+                placeholder={
+                  selectedUser?.banned?.status
+                    ? "Enter reason for unbanning (optional)"
+                    : "Enter reason for banning"
+                }
+                className="w-full border rounded p-2"
+                rows={4}
+              />
+            </div>
+            <DialogFooter>
+              <Button variant="destructive" onClick={handleReasonSubmit} disabled={banLoading}>
+                {banLoading ? "Processing..." : (selectedUser?.banned?.status ? "Unban" : "Ban")}
+              </Button>
+              <DialogClose asChild>
+                <Button onClick={() => { setReasonDialogOpen(false); setBanReason("") }}>Cancel</Button>
+              </DialogClose>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   )
 }

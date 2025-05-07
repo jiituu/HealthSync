@@ -21,20 +21,20 @@ export const blogApi = createApi({
     }),
   tagTypes: ["BlogPost"], // For cache invalidation
   endpoints: (builder) => ({
-    // Fetch all blogs (with optional filters)
-    getBlogs: builder.query<BlogResponse, { author_id?: string; tag?: string }>({
-        query: (params) => ({
-        
-        url: "/blogs",
-        
-        method: "GET",
-        params, // Automatically converts to `/blogs?author_id=123&tag=health`
+    // Fetch all blogs (with optional filters and pagination)
+    getBlogs: builder.query<BlogResponse, { author_id?: string; tag?: string; page?: number; limit?: number }>({
+      query: (params) => ({
+      url: "/blogs",
+      method: "GET",
+      params, 
       }),
       
       providesTags: (result) => 
-        result?.data?.blogs 
-          ? [...result.data.blogs.map(({ _id }) => ({ type: 'BlogPost' as const, id: _id }))]
-          : ['BlogPost'],    }),
+      result?.data?.blogs 
+        ? [...result.data.blogs.map(({ _id }) => ({ type: 'BlogPost' as const, id: _id }))]
+        : ['BlogPost'],    
+    }),
+
 // Fetch bookmarked blogs for current user
 getBookmarkedBlogs: builder.query<BlogResponse, void>({
   query: () => "/blogs/bookmarks/me",

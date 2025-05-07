@@ -4,7 +4,7 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Download, Eye, X } from "lucide-react"
+import { Download, Eye, X, Loader2, AlertCircle, FileSearch } from "lucide-react"
 import {
   Pagination,
   PaginationContent,
@@ -13,46 +13,9 @@ import {
   PaginationPrevious,
   PaginationNext,
 } from "@/components/ui/pagination"
-import { Dialog, DialogClose, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-
-const doctors = [
-  {
-    bookmarks: [],
-    _id: "67eb15297db753f356e1173e",
-    firstname: "daniel",
-    lastname: "teka",
-    email: "dani@gmail.com",
-    age: 34,
-    gender: "male",
-    phoneNumber: "251987654321",
-    specializations: ["Orthopedics"],
-    qualifications: ["MCh", "MBBS"],
-    licenses: [
-      {
-        url: "https://res.cloudinary.com/drz9aa55k/image/upload/v1743459612/yzs7uqn5gmhxlldpaeje.pdf",
-        type: "pdf",
-        isVerified: false,
-        _id: "67eb15297db753f356e1173f",
-      },
-    ],
-    hospital: {
-      address: {
-        street: "Bethel PO BOX 127",
-        city: "Addis Ababa",
-        region: "Addis Ababa",
-        country: "Ethiopia",
-        postalCode: "35324",
-      },
-      _id: "67e83e268439394e7ff2ee53",
-      name: "Bethel General Hospital",
-      branch: 2,
-      __v: 0,
-    },
-    createdAt: "2025-03-31T22:20:25.702Z",
-    updatedAt: "2025-03-31T22:20:25.702Z",
-    __v: 0,
-  },
-]
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { useGetDoctorsQuery, useUpdateDoctorStatusMutation } from "@/redux/api/doctorApi"
+import { DoctorResponse } from "@/types/doctor"
 
 const ITEMS_PER_PAGE = 2
 
@@ -60,6 +23,11 @@ const IncomingLicenses = () => {
   const [currentPage, setCurrentPage] = useState(1)
   const [selectedPdf, setSelectedPdf] = useState<string | null>(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
+
+  const { data: doctorsData, isLoading, isError, error } = useGetDoctorsQuery({ status: 'pending' });
+  const [updateDoctorStatus] = useUpdateDoctorStatusMutation();
+
+  const doctors: DoctorResponse[] = doctorsData?.data?.doctors || [];
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page)
@@ -99,6 +67,53 @@ const IncomingLicenses = () => {
       month: "short",
       day: "numeric",
     })
+  }
+
+  if (isLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center py-16 bg-gray-50 rounded-lg">
+        <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+        <p className="mt-4 text-lg font-medium text-gray-700">
+          Loading incoming license applications...
+        </p>
+      </div>
+    )
+  }
+
+  if (isError) {
+    console.error("Error fetching doctors:", error)
+    return (
+      <div className="flex flex-col items-center justify-center py-16 bg-gray-50 rounded-lg">
+        <AlertCircle className="w-8 h-8 text-red-600" />
+        <p className="mt-4 text-lg font-medium text-gray-700">
+          Unable to load license applications
+        </p>
+        <p className="mt-2 text-sm text-gray-500">
+          An error occurred while fetching data. Please try again later.
+        </p>
+        <Button
+          variant="outline"
+          className="mt-4"
+          onClick={() => window.location.reload()}
+        >
+          Retry
+        </Button>
+      </div>
+    )
+  }
+
+  if (doctors.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center py-16 bg-gray-50 rounded-lg">
+        <FileSearch className="w-8 h-8 text-gray-600" />
+        <p className="mt-4 text-lg font-medium text-gray-700">
+          No pending Doctors applications
+        </p>
+        <p className="mt-2 text-sm text-gray-500">
+          There are currently no license applications awaiting review.
+        </p>
+      </div>
+    )
   }
 
   return (
@@ -152,8 +167,22 @@ const IncomingLicenses = () => {
             ))}
           </CardContent>
           <div className="flex justify-end gap-2 mt-4">
-            <Button className="bg-green-500 text-white hover:bg-green-600">Accept</Button>
-            <Button variant="destructive">Deny</Button>
+            <Button
+              className="bg-green-500 text-white hover:bg-green-600"
+              onClick={() => {
+                updateDoctorStatus({ doctorId: doctor._id, status: "approved" });
+              }}
+            >
+              Accept
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={() => {
+                updateDoctorStatus({ doctorId: doctor._id, status: "denied" });
+              }}
+            >
+              Deny
+            </Button>
           </div>
         </Card>
       ))}
@@ -162,7 +191,6 @@ const IncomingLicenses = () => {
         <PaginationPrevious
           onClick={() => currentPage > 1 && handlePageChange(currentPage - 1)}
           className={currentPage > 1 ? "cursor-pointer" : "cursor-not-allowed opacity-50"}
-          // disabled={currentPage <= 1}
         />
         <PaginationContent>
           {Array.from({ length: Math.ceil(doctors.length / ITEMS_PER_PAGE) }).map((_, pageIndex) => (
@@ -180,24 +208,22 @@ const IncomingLicenses = () => {
               ? "cursor-pointer"
               : "cursor-not-allowed opacity-50"
           }
-          // disabled={currentPage >= Math.ceil(doctors.length / ITEMS_PER_PAGE)}
         />
       </Pagination>
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogContent className="max-w-4xl h-[80vh] flex flex-col">
-            <DialogHeader className="flex flex-row items-center justify-between">
-              <DialogTitle>License Document</DialogTitle>
-            </DialogHeader>
-            <div className="flex-1 w-full h-full min-h-0">
-              {selectedPdf && (
-                <iframe src={`${selectedPdf}#toolbar=0&navpanes=0`} className="w-full h-full border-0" title="PDF Viewer" />
-              )}
-            </div>
-          </DialogContent>
-        </Dialog>
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent className="max-w-4xl h-[80vh] flex flex-col">
+          <DialogHeader className="flex flex-row items-center justify-between">
+            <DialogTitle>License Document</DialogTitle>
+          </DialogHeader>
+          <div className="flex-1 w-full h-full min-h-0">
+            {selectedPdf && (
+              <iframe src={selectedPdf} className="w-full h-full border-0" title="PDF Viewer" />
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
 
 export default IncomingLicenses
-

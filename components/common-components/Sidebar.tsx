@@ -20,6 +20,13 @@ import { useToast } from "@/hooks/use-toast";
 import { Button } from "../ui/button";
 import { IoOptionsOutline } from "react-icons/io5";
 
+import { MdDashboard } from "react-icons/md";
+import { FaUser } from "react-icons/fa";
+import { FaUserDoctor } from "react-icons/fa6";
+import { MdOutlineContentPaste } from "react-icons/md";
+import { CgMoreO } from "react-icons/cg";
+
+
 interface Props {
   type: 'Doctor'|'Patient'|'Admin'
   open: boolean;
@@ -213,32 +220,32 @@ const Sidebar: React.FC<Props> = ({ type, open, onClose, collapse, onCollapse })
   const adminLinks:ILink[] = [
     {
       title: "Dashboard",
-      icon: MdAccountCircle,
+      icon: MdDashboard,
       link: "/admin/dashboard",
       isActive: isAdminDashboardActive,
       collapsed: collapse,
     },
     {
       title: "User Management",
-      icon: MdAccountCircle,
+      icon: FaUser,
       link: "/admin/userManagement",
       isActive: isAdminUserManagementActive,
       collapsed: collapse,
     },
     {
       title: "Doctor Management",
-      icon: IoMdHelpCircle,
+      icon: FaUserDoctor,
       link: "/admin/doctorManagement",
       isActive: isAdminDoctorManagementActive,
       collapsed: collapse,
     },
     {
       title: "Content Management",
-      icon: IoMdHelpCircle,
+      icon: MdOutlineContentPaste,
       link: "/admin/contentManagement",
       isActive: isAdminContentActive,
       collapsed: collapse,
-    },
+    }
   ];
 
   const getLinks = (link: 'otherLinks' | 'links') => {
@@ -263,6 +270,14 @@ const Sidebar: React.FC<Props> = ({ type, open, onClose, collapse, onCollapse })
         aria-label="Sidebar-Close-Icon"
       >
         <HiX className="h-[40px] w-[40px]" />
+      </span>
+
+      <span
+        className="my-2 mx-auto cursor-pointer hidden md:block"
+        onClick={onCollapse}
+        aria-label="Collapse-Icon"
+      >
+        <FiChevronsLeft size={30} className={`${collapse ? "rotate-180" : ""}`} />
       </span>
 
       <div className={`h-[110px] w-full flex items-center px-6 overflow-hidden`}>
@@ -303,22 +318,15 @@ const Sidebar: React.FC<Props> = ({ type, open, onClose, collapse, onCollapse })
       })}
 
       <hr className="my-5 mx-5" />
-      <span
-        className="my-2 mx-auto cursor-pointer hidden md:block"
-        onClick={onCollapse}
-        aria-label="Collapse-Icon"
-      >
-        <FiChevronsLeft size={30} className={`${collapse ? "rotate-180" : ""}`} />
-      </span>
 
-      {/* New Account Options Popover Trigger */}
+      {/* New Account Options Popover Trigger */} 
       <div className="relative flex justify-center items-center">
         <span
           className="cursor-pointer"
           onClick={() => setShowAccountOptions((prev) => !prev)}
           aria-label="Account-options-icon"
         >
-          <IoOptionsOutline size={30} />
+          <CgMoreO size={30} />
         </span>
         {showAccountOptions && (
           <div className="absolute -bottom-32 flex flex-col items-center justify-center gap-3 p-2 rounded">
