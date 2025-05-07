@@ -130,7 +130,6 @@ const socialMedia = [
 ]
 
 const Help = ({ isDoctor }: { isDoctor?: boolean }) => {
-  // Use the appropriate FAQs based on user type
   const faqs = isDoctor ? faqsDoctor : faqsPatient
   const userType = isDoctor ? "Doctor" : "Patient"
 
