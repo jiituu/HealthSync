@@ -35,32 +35,7 @@ const Content = () => {
       {activeTab === "blog" ? (
         <ContentManagement />
       ) : (
-        <div>
-          {/* Updated hospital sub-tabs container with full width on mobile */}
-          <div className="w-full md:w-1/2 mx-auto mt-4 mb-4">
-            <div className="flex">
-              <div
-                className={`w-1/2 text-center cursor-pointer pb-2 ${activeHospitalTab === "information" ? "border-b-2 border-secondaryColor font-medium" : ""}`}
-                onClick={() => setActiveHospitalTab("information")}
-              >
-                Hospital Information
-              </div>
-              <div
-                className={`w-1/2 text-center cursor-pointer pb-2 ${activeHospitalTab === "add" ? "border-b-2 border-secondaryColor font-medium" : ""}`}
-                onClick={() => setActiveHospitalTab("add")}
-              >
-                Add Hospital
-              </div>
-            </div>
-          </div>
-          <div className="mt-2">
-            {activeHospitalTab === "information" ? (
-              <HospitalInformationPage setActiveHospitalTab={setActiveHospitalTab} />
-            ) : (
-              <AddHospitalPage />
-            )}
-          </div>
-        </div>
+        <HospitalInformationPage />
       )}
     </div>
   )

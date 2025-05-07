@@ -26,6 +26,7 @@ import {
 import { Hospital, Phone, Mail, Calendar } from "lucide-react"
 import { useGetAllDoctorsQuery, useBanDoctorMutation } from "@/redux/api/adminApi" 
 import { FaBan } from "react-icons/fa";
+import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "../ui/dialog"
 
 interface Address {
   street: string
@@ -61,7 +62,10 @@ interface Doctor {
   qualifications: string[]
   licenses: License[]
   hospital: HospitalType
-  banned: boolean
+  banned: {
+    status: boolean
+    reason: string
+  }
   status: string
   createdAt: string
   updatedAt: string
@@ -74,13 +78,15 @@ const BannedDoctors = () => {
   const [processingDoctorId, setProcessingDoctorId] = useState<string | null>(null);
   const [restoreDialogOpen, setRestoreDialogOpen] = useState(false);
   const [doctorToRestoreId, setDoctorToRestoreId] = useState<string | null>(null);
+  const [restoreReason, setRestoreReason] = useState("");
+  const [restoreReasonDialogOpen, setRestoreReasonDialogOpen] = useState(false);
 
   const { data: allfetchedDoctors, isLoading, isError } = useGetAllDoctorsQuery({ page: 1, limit: 1000 })
   const [unbanDoctor] = useBanDoctorMutation();
 
   useEffect(() => {
     if (allfetchedDoctors?.data?.doctors) {
-      const filtered = allfetchedDoctors.data.doctors.filter((doctor: Doctor) => doctor.banned)
+      const filtered = allfetchedDoctors.data.doctors.filter((doctor: Doctor) => doctor?.banned?.status)
       setBannedDoctors(filtered)
     } else {
       setBannedDoctors([])
@@ -100,7 +106,7 @@ const BannedDoctors = () => {
 
     setProcessingDoctorId(doctorToRestoreId);
     try {
-      await unbanDoctor({ doctorId: doctorToRestoreId, banned: false }).unwrap();
+      await unbanDoctor({ doctorId: doctorToRestoreId, banned: { status: false, reason: "" } }).unwrap();
       const updatedBannedCount = bannedDoctors.length - 1;
       const totalPages = Math.ceil(updatedBannedCount / ITEMS_PER_PAGE);
       if (currentPage > totalPages && totalPages > 0) {
@@ -265,12 +271,66 @@ const BannedDoctors = () => {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel onClick={() => setDoctorToRestoreId(null)} disabled={!!processingDoctorId}>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmRestoreAccess} disabled={!!processingDoctorId}>
+            <AlertDialogAction
+              onClick={() => {
+                setRestoreDialogOpen(false);
+                setRestoreReasonDialogOpen(true);
+              }}
+              disabled={!!processingDoctorId}
+            >
               {processingDoctorId === doctorToRestoreId ? "Restoring..." : "Confirm Restore"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {restoreReasonDialogOpen && (
+        <Dialog open={restoreReasonDialogOpen} onOpenChange={setRestoreReasonDialogOpen}>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle>Enter Reason for Restoring Access</DialogTitle>
+            </DialogHeader>
+            <div className="mt-2">
+              <textarea
+                value={restoreReason}
+                onChange={(e) => setRestoreReason(e.target.value)}
+                placeholder="Enter a reason (required)"
+                className="w-full border rounded p-2"
+                rows={4}
+              />
+            </div>
+            <DialogFooter>
+              <Button
+                variant="destructive"
+                onClick={async () => {
+                  if (!restoreReason.trim()) return;
+                  setProcessingDoctorId(doctorToRestoreId);
+                  try {
+                    await unbanDoctor({ doctorId: doctorToRestoreId!, banned: { status: false, reason: restoreReason } }).unwrap();
+                    const updatedCount = bannedDoctors.length - 1;
+                    const totalPages = Math.ceil(updatedCount / ITEMS_PER_PAGE);
+                    if (currentPage > totalPages && totalPages > 0) setCurrentPage(totalPages);
+                    else if (updatedCount === 0) setCurrentPage(1);
+                    setRestoreReasonDialogOpen(false);
+                    setRestoreReason("");
+                  } catch (error) {
+                    console.error("Failed to restore access:", error);
+                  } finally {
+                    setProcessingDoctorId(null);
+                    setDoctorToRestoreId(null);
+                  }
+                }}
+                disabled={!!processingDoctorId || !restoreReason.trim()}
+              >
+                {processingDoctorId === doctorToRestoreId ? "Restoring..." : "Restore Access"}
+              </Button>
+              <DialogClose asChild>
+                <Button onClick={() => { setRestoreReasonDialogOpen(false); setRestoreReason(""); }}>Cancel</Button>
+              </DialogClose>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   )
 }

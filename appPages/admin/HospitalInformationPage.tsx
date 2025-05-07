@@ -11,6 +11,7 @@ import { AlertCircle, CheckCircle2, Edit, Loader2, Plus, Trash2, X } from "lucid
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
+import { useRouter } from "next/navigation"
 
 import { Button } from "@/components/ui/button"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
@@ -63,11 +64,8 @@ type NotificationType = {
   message: string
 }
 
-type HospitalInformationPageProps = {
-  setActiveHospitalTab: (tab: "information" | "add") => void
-}
-
-export default function HospitalInformationPage({ setActiveHospitalTab }: HospitalInformationPageProps) {
+export default function HospitalInformationPage() {
+  const router = useRouter()
   const [notification, setNotification] = useState<NotificationType | null>(null)
   const [hospitalToDelete, setHospitalToDelete] = useState<Hospital | null>(null)
   const [hospitalToEdit, setHospitalToEdit] = useState<string | null>(null)
@@ -238,7 +236,7 @@ export default function HospitalInformationPage({ setActiveHospitalTab }: Hospit
           <h1 className="text-3xl font-bold tracking-tight">Hospitals</h1>
           <p className="text-muted-foreground mt-1">Manage all hospitals in the platform. Total: <span className="text-secondaryColor font-bold">{totalCount}</span></p>
         </div>
-        <Button onClick={() => setActiveHospitalTab("add")}>
+        <Button onClick={() => router.push("/admin/contentManagement/addHospital")}>
           <Plus className="mr-2 h-4 w-4" />
           Add Hospital
         </Button>
@@ -270,7 +268,7 @@ export default function HospitalInformationPage({ setActiveHospitalTab }: Hospit
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-10">
             <p className="text-muted-foreground mb-4">No hospitals found</p>
-            <Button onClick={() => setActiveHospitalTab("add")}>
+            <Button onClick={() => router.push("/admin/contentManagement/addHospital")}>
               <Plus className="mr-2 h-4 w-4" />
               Add Your First Hospital
             </Button>

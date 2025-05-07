@@ -64,7 +64,10 @@ export const adminApi = createApi({
       }),
     }),
 
-    banPatient: builder.mutation<any, { patientId: string; banned: boolean }>({
+    banPatient: builder.mutation<
+      any,
+      { patientId: string; banned: { status: boolean; reason: string } }
+    >({
       async queryFn(
         { patientId, banned },
         _queryApi,
@@ -91,7 +94,10 @@ export const adminApi = createApi({
       invalidatesTags: ["Patient"],
     }),
 
-    banDoctor: builder.mutation<any, { doctorId: string; banned: boolean }>({
+    banDoctor: builder.mutation<
+      any,
+      { doctorId: string; banned: { status: boolean; reason: string } }
+    >({
       async queryFn({ doctorId, banned }, _queryApi, _extraOptions, baseQuery) {
         const doctorResponse = await baseQuery({
           url: `/doctors/${doctorId}`,

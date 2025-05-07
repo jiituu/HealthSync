@@ -1,10 +1,10 @@
 import React from 'react';
-import { FaBell } from "react-icons/fa";
+// import { FaBell } from "react-icons/fa";
 import { CiSearch } from "react-icons/ci";
 import { HiMenu } from "react-icons/hi"; 
-import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
+// import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 import Link from 'next/link';
-import Notification from '../common-components/Notification';
+// import Notification from '../common-components/Notification';
 import { NotificationModel } from '../models/notification';
 
 const notifications: NotificationModel[] = [
@@ -54,7 +54,7 @@ const AdminNavbar = ({ onMenuClick }: { onMenuClick: () => void }) => {
               A
             </div>
         </Link>
-          <Popover>
+          {/* <Popover>
             <PopoverTrigger asChild>
               <button>
                 <FaBell className='text-[#B0C3CC]' size={25}/>
@@ -63,7 +63,7 @@ const AdminNavbar = ({ onMenuClick }: { onMenuClick: () => void }) => {
             <PopoverContent className="w-96 h-64 bg-[#e3ffff] shadow-lg rounded-lg mr-2">
               <Notification notifications={notifications} />
             </PopoverContent>
-          </Popover>
+          </Popover> */}
       </div>
     </nav>
   );
