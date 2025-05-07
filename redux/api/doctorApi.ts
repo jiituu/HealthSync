@@ -75,31 +75,36 @@ export const doctorApi = createApi({
     }),
 
     // Visits
-    getVisitsByDoctorId: builder.query<any, string>({
-      query: (id) => ({
-        url: `/visits?doctor=${id}`,
-        method: "GET",
+    getVisitsByDoctorIdApproval: builder.query<any, {id:string,approval:"Approved"|"Denied"|"Scheduled"}>({
+        query: ({id,approval}) => ({
+          url: `/visits?doctor_id=${id}&approval=${approval}`,
+          method: 'GET',
+        }),
       }),
-    }),
 
-    approveRefuseVisit: builder.mutation<
-      void,
-      { visitID: string; approval: "Approved" | "Denied" }
-    >({
-      query: (visitPayload) => ({
-        url: `/visits/${visitPayload.visitID}/approval`,
-        method: "PATCH",
-        body: { approval: visitPayload.approval },
+      approveRefuseVisit: builder.mutation<void, {visitID:string,approval:'Approved'|'Denied'}>({
+        query: (visitPayload) => ({
+          url: `/visits/${visitPayload.visitID}/approval`,
+          method: 'PATCH',
+          body:{approval:visitPayload.approval}
+        }),
       }),
-    }),
-
-    updateVisit: builder.mutation<void, { visitID: string; body: any }>({
-      query: (visitPayload) => ({
-        url: `/visits/${visitPayload.visitID}`,
-        method: "PATCH",
-        body: visitPayload.body,
+  
+      updateVisit: builder.mutation<void, {visitID:string,body:any}>({
+        query: (visitPayload) => ({
+          url: `/visits/${visitPayload.visitID}`,
+          method: 'PATCH',
+          body:visitPayload.body
+        }),
       }),
-    }),
+  
+      // Patients
+      getAppointedPatients: builder.query<any, string>({
+        query: (id) => ({
+          url: `/doctors/${id}/patients`,
+          method: 'GET',
+        }),
+      }),
 
 
 
@@ -143,11 +148,11 @@ export const {
   useGetVerifiedDoctorsQuery,
   useDeleteDoctorMutation,
   useGetCurrentDoctorQuery,
-
-  useGetVisitsByDoctorIdQuery,
+    useGetVisitsByDoctorIdApprovalQuery,
   useApproveRefuseVisitMutation,
   useUpdateVisitMutation,
   useUpdateDoctorStatusMutation,
+  useGetAppointedPatientsQuery, 
 } = doctorApi;
 
 export const fetchDoctor = async (_id: string) => {

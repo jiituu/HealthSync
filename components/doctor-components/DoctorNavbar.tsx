@@ -6,11 +6,11 @@ import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover
 import Link from 'next/link';
 import Notification from '../common-components/Notification';
 import { NotificationModel } from '../models/notification';
-import { useGetVisitsByDoctorIdQuery } from '@/redux/api/doctorApi';
 import { DoctorModel } from '../models/doctor';
 import { useSessionUser } from '../context/Session';
 import { VisitModel } from '../models/visitModel';
 import dayjs from 'dayjs';
+import { useGetVisitsByDoctorIdApprovalQuery } from '@/redux/api/doctorApi';
 
 const otherNotifications: NotificationModel[] = [
   {
@@ -26,12 +26,9 @@ const otherNotifications: NotificationModel[] = [
 const Navbar = ({ onMenuClick }: { onMenuClick: () => void }) => { 
   const {user}:{user?:DoctorModel} = useSessionUser();
   const [notifications,setNotifications] = useState<NotificationModel[]>([]);
-  const {data,isLoading,error} = useGetVisitsByDoctorIdQuery(user?._id??'');
-
-  console.log('user',user);
+  const {data,isLoading,error} = useGetVisitsByDoctorIdApprovalQuery({id:user?._id??'',approval:'Scheduled'});
 
   useEffect(()=>{
-
     const visitRequests:VisitModel[] = data?.data?.visits??[];
     const visitNotifications: NotificationModel[] = visitRequests.map(vr=>({
       id: vr._id,

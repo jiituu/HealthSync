@@ -10,15 +10,17 @@ import { Badge } from "@/components/ui/badge"
 import { ChevronLeft, ChevronRight, Calendar, Phone, Edit2, XCircle, ClipboardList } from "lucide-react"
 import type { EmblaCarouselType } from "embla-carousel"
 import Link from "next/link"
-import { useGetVisitsByDoctorIdQuery } from "@/redux/api/doctorApi"
+import { useGetAppointedPatientsQuery, useGetVisitsByDoctorIdApprovalQuery, useUpdateVisitMutation } from "@/redux/api/doctorApi"
 import { DoctorModel } from "@/components/models/doctor"
 import { useSessionUser } from "@/components/context/Session"
 import { VisitModel } from "@/components/models/visitModel"
 import dayjs from "dayjs"
 import { EditVisitModal } from "@/components/doctor-components/modals/editVisit"
 import { ViewVisit } from "@/components/doctor-components/modals/viewVisit"
-import {Row, Spin} from "antd"
+import {message, Modal, Row, Spin} from "antd"
 import { LoadingOutlined } from "@ant-design/icons"
+import { FaDropbox } from "react-icons/fa";
+import { Typography } from "@mui/material"
 
 export interface VisitCard extends VisitModel {
   name: string
@@ -28,7 +30,7 @@ export interface VisitCard extends VisitModel {
 }
 
 export const handleDaysCalculation = (date:Date)=>{
-  const diff = dayjs(date).diff(dayjs(),'days');
+  const diff = dayjs(date).diff(dayjs().startOf('day'),'days');
   let days = '';
   if(diff>0){
     days = `In ${diff} day(s)`
@@ -44,23 +46,27 @@ const ActiveVisits: React.FC = () => {
   const {user}:{user?: DoctorModel} = useSessionUser();
   const [scheduledVisits,setScheduledVisits] = useState<VisitCard[]>([]);
   const [completedVisits,setCompletedVisits] = useState<VisitCard[]>([]);
-  const {data,isLoading,isError} = useGetVisitsByDoctorIdQuery(user?._id??'');
+  const {data,isLoading,isError} = useGetVisitsByDoctorIdApprovalQuery({id:user?._id??'',approval:'Approved'});
+  const {data:patientsData,isLoading: patientsIsLoading,isError: patientsIsError} = useGetAppointedPatientsQuery(user?._id??'');
+  const [updateVisit] = useUpdateVisitMutation();
   const [openEditVisit,setOpenEditVisit] = useState(false);
   const [openViewVisit,setOpenViewVisit] = useState(false);
   const [selectedCard,setSelectedCard] = useState<VisitCard>({} as VisitCard);
 
   useEffect(()=>{
     const v:VisitCard[] = []
-
     data?.data?.visits?.map((visit: VisitModel)=>{
       const days = handleDaysCalculation(visit.preferredDate);
-      
+      const appointedPatient = patientsData?.data?.find((d:any)=>d._id==visit.patient);
+
       v.push({
         _id: visit._id,
-        name: "Not specified",
-        contact: "Not specified",
+        name: appointedPatient?`${appointedPatient?.firstname} ${appointedPatient?.lastname}`:"Not specified",
+        contact: appointedPatient?appointedPatient.phoneNumber:"Not specified",
         status: visit.status,
         preferredDate: visit.preferredDate,
+        startDate: visit.startDate,
+        endDate: visit.endDate,
         days,
         patient: visit.patient,
         doctor: visit.doctor,
@@ -76,7 +82,7 @@ const ActiveVisits: React.FC = () => {
 
     setScheduledVisits(v.filter((visit) => visit.status === "Scheduled"))
     setCompletedVisits(v.filter((visit) => visit.status === "Completed"))
-  },[data?.data?.visits,data])
+  },[data?.data?.visits, patientsData?.data])
 
   const [emblaRef, emblaApi] = useEmblaCarousel({
     align: "start",
@@ -116,6 +122,44 @@ const ActiveVisits: React.FC = () => {
     } else {
       return "bg-emerald-500"
     }
+  }
+
+  const handleCompleteVisit = async ({name, contact,days, image,labResults,prescription,_id,createdAt,...visit}:VisitCard)=>{
+    Modal.confirm({
+      title: 'Are you sure?',
+      // content: 'This action ',
+      okText: 'Yes',
+      // okType: 'danger',
+      cancelText: 'Cancel',
+      okButtonProps: {
+        className: 'primary-button squared-button',
+      },
+      cancelButtonProps: {
+        className: 'secondary-button squared-button',
+      },
+      onOk: async () => {
+        try {
+            const visitData = {...visit, status: 'Completed'}
+            await updateVisit({visitID: _id,body: visitData}).unwrap();
+            const formattedVisit:VisitCard = {
+              ...visitData,
+              _id:_id,
+              name,
+              contact,
+              days: handleDaysCalculation(visitData.startDate)
+            } as VisitCard
+
+            // updating the current state
+            setScheduledVisits((prev:VisitCard[])=>prev.filter(v=>v._id!=_id));
+            setCompletedVisits((prev:VisitCard[])=>([formattedVisit,...prev]));
+    
+            message.success("Visit Completed");
+        } catch (error: any) {
+            console.log(error)
+            message.error(error?.data || "Something went wrong, please try again");
+        }
+      },
+    });
   }
 
   return (
@@ -163,16 +207,21 @@ const ActiveVisits: React.FC = () => {
                   <Spin indicator={<LoadingOutlined  spin/>} size='large'/>
               </Row>
               
+              :!scheduledVisits.length?
+              <Row justify='center' align='middle' className="flex-col w-full mt-8 mb-8">
+                <FaDropbox className='text-[#9c9fa0]' size={80}/>
+                <Typography className='text-[#828485]'>No Data</Typography>
+              </Row>
               :scheduledVisits.map((visit) => (
                 <div
                   key={visit._id}
-                  className="embla__slide min-w-0 sm:min-w-[320px] flex-grow-0 flex-shrink-0 basis-[85%] sm:basis-[320px] pr-4"
+                  className="embla__slide min-w-0 sm:min-w-[350px] flex-grow-0 flex-shrink-0 basis-[85%] sm:basis-[320px] pr-4"
                 >
                   <Card onClick={()=>{setOpenViewVisit(true); setSelectedCard(visit);}} className="h-full overflow-hidden transition-all duration-200 hover:shadow-md cursor-pointer">
                     <div className={`h-1.5 w-full ${getUrgencyColor(visit.days)}`} />
                     <CardContent className="p-5">
                       <div className="flex items-center justify-between mb-4">
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-start gap-3">
                           <Avatar className="h-10 w-10 border-2 border-slate-100">
                             <AvatarImage src={visit.image} alt={`${visit.name} profile`} />
                             <AvatarFallback className="bg-slate-100 text-slate-700 font-medium">
@@ -223,10 +272,11 @@ const ActiveVisits: React.FC = () => {
                         className="w-1/2 border-rose-200 bg-primaryColor hover:bg-primaryColor"
                         onClick={(e)=>{
                           e.stopPropagation();
+                          handleCompleteVisit(visit);
                         }}
                       >
                         <XCircle className="h-4 w-4 mr-1.5" />
-                        Cancel
+                        Complete Visit
                       </Button>
                       <Button 
                         size="sm" 
@@ -272,6 +322,11 @@ const ActiveVisits: React.FC = () => {
           isLoading?
           <Row className="h-[20vh] w-full" align='middle' justify='center'>
               <Spin indicator={<LoadingOutlined  spin/>} size='large'/>
+          </Row>
+          :!completedVisits.length?
+          <Row justify='center' align='middle' className="flex-col w-full mt-16 mb-8">
+            <FaDropbox className='text-[#9c9fa0]' size={75}/>
+            <Typography className='text-[#828485]'>No Data</Typography>
           </Row>
           :<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {

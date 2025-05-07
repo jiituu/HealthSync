@@ -3,6 +3,8 @@ export interface VisitModel{
     patient:string,
     doctor:string,
     preferredDate:Date,
+    startDate:Date,
+    endDate:Date
     reason:string,
     diagnosis?:string,
     prescription?: PrescriptionModel[],
