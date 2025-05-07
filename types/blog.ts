@@ -23,6 +23,7 @@ export interface SingleBlogObject {
   published?: boolean;
   createdAt: string;
   updatedAt: string;
+  isBookmarked: boolean;
   __v: number;
 }
 

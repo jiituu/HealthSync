@@ -3,7 +3,7 @@ import React from 'react';
 import imgg from '@/public/images/doctor.png';
 import { FaBookmark, FaRegBookmark } from "react-icons/fa";
 import { useGetBlogsQuery, useBookmarkBlogMutation, useRemoveBookmarkMutation } from '@/redux/api/blogApi';
-import { BlogPost } from '@/types/blog';
+import { BlogPost, SingleBlogObject } from '@/types/blog';
 import { toast } from 'react-toastify';
 
 const Blog: React.FC = () => {
@@ -32,7 +32,7 @@ const Blog: React.FC = () => {
   return (
     <div className="container mx-auto">
       <div className="grid gap-4">
-        {blogs?.data?.blogs.map((blog: BlogPost) => (
+        {blogs?.data?.blogs.map((blog: SingleBlogObject) => (
           <div
             key={blog._id}
             className="bg-[#fff5f5] rounded-lg p-4 shadow-md border border-[#ffcccc] flex items-start"

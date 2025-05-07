@@ -10,7 +10,7 @@ import { useState } from "react";
 import { useGetBlogsQuery, useCreateBlogPostMutation, useDeleteBlogPostMutation } from "@/redux/api/blogApi";
 import { useGetCurrentDoctorQuery } from "@/redux/api/doctorApi";
 import { toast } from "react-hot-toast";
-import type { BlogPost } from '@/types/blog';
+import type { BlogPost, SingleBlogObject } from '@/types/blog';
 
 const EducationCenter = () => {
   const { data: doctorData } = useGetCurrentDoctorQuery();
@@ -28,7 +28,7 @@ const EducationCenter = () => {
   // Form state
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
-  const [selectedPost, setSelectedPost] = useState<BlogPost | null>(null);
+  const [selectedPost, setSelectedPost] = useState<SingleBlogObject | null>(null);
   const [validationErrors, setValidationErrors] = useState<{
     title?: string;
     content?: string;
