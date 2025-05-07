@@ -1,7 +1,7 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { DoctorLoginPayload, DoctorSignupPayload } from "@/types/doctor";
 // import { get } from "http";
-import { DoctorApiResponse } from "@/types/doctor";
+import { DoctorApiResponse, DoctorsListApiResponse } from "@/types/doctor";
 
 export const doctorApi = createApi({
   reducerPath: "doctorApi",
@@ -15,46 +15,49 @@ export const doctorApi = createApi({
   }),
   tagTypes: ["Doctor"],
   endpoints: (builder) => ({
-
     // to login a doctor
     loginDoctor: builder.mutation<any, DoctorLoginPayload>({
-        query: (doctor) => ({
-          url: '/login/doctor',
-          method: 'POST',
-          body: doctor
-        }),
+      query: (doctor) => ({
+        url: "/login/doctor",
+        method: "POST",
+        body: doctor,
+      }),
     }),
 
     // to register a doctor
     registerDoctor: builder.mutation<any, DoctorSignupPayload>({
       query: (doctor) => ({
-      url: '/register/doctor',
-      method: 'POST',
-      body: doctor
+        url: "/register/doctor",
+        method: "POST",
+        body: doctor,
       }),
     }),
 
-
-    // to get all doctors
-    getDoctors: builder.query<any, void>({
-        query: () => ({
-          url: '/doctors',
-          method: 'GET',
-        }),
+    // to get all doctors with optional status query param
+    getDoctors: builder.query<
+      DoctorsListApiResponse,
+      { status?: "pending" | "approved" | "denied" }
+    >({
+      query: ({ status }) => ({
+      url: "/doctors",
+      method: "GET",
+      params: status ? { status } : undefined,
       }),
+      providesTags: ["Doctor"],
+    }),
 
     // to delete a doctor
     deleteDoctor: builder.mutation<void, void>({
       query: () => ({
-      url: '/doctors/me',
-      method: 'DELETE',
+        url: "/doctors/me",
+        method: "DELETE",
       }),
     }),
 
     getVerifiedDoctors: builder.query<any, void>({
       query: () => ({
-        url: '/doctors', // change the url to verified doctors and remove the comment
-        method: 'GET',
+        url: "/doctors", // change the url to verified doctors and remove the comment
+        method: "GET",
       }),
     }),
 
@@ -62,47 +65,79 @@ export const doctorApi = createApi({
     getDoctorById: builder.query<any, string>({
       query: (id) => ({
         url: `/doctors/${id}`,
-        method: 'GET',
+        method: "GET",
       }),
     }),
 
     getCurrentDoctor: builder.query<DoctorApiResponse, void>({
-      query: () => '/doctors/me',
-      providesTags: ['Doctor'],
+      query: () => "/doctors/me",
+      providesTags: ["Doctor"],
     }),
 
     // Visits
     getVisitsByDoctorIdApproval: builder.query<any, {id:string,approval:"Approved"|"Denied"|"Scheduled"}>({
-      query: ({id,approval}) => ({
-        url: `/visits?doctor_id=${id}&approval=${approval}`,
-        method: 'GET',
+        query: ({id,approval}) => ({
+          url: `/visits?doctor_id=${id}&approval=${approval}`,
+          method: 'GET',
+        }),
       }),
-    }), 
 
-    approveRefuseVisit: builder.mutation<void, {visitID:string,approval:'Approved'|'Denied'}>({
-      query: (visitPayload) => ({
-        url: `/visits/${visitPayload.visitID}/approval`,
-        method: 'PATCH',
-        body:{approval:visitPayload.approval}
+      approveRefuseVisit: builder.mutation<void, {visitID:string,approval:'Approved'|'Denied'}>({
+        query: (visitPayload) => ({
+          url: `/visits/${visitPayload.visitID}/approval`,
+          method: 'PATCH',
+          body:{approval:visitPayload.approval}
+        }),
       }),
-    }),
-
-    updateVisit: builder.mutation<void, {visitID:string,body:any}>({
-      query: (visitPayload) => ({
-        url: `/visits/${visitPayload.visitID}`,
-        method: 'PATCH',
-        body:visitPayload.body
-      }),
-    }),
-
-    // Patients
-    getAppointedPatients: builder.query<any, string>({
-      query: (id) => ({
-        url: `/doctors/${id}/patients`,
-        method: 'GET',
-      }),
-    }),
   
+      updateVisit: builder.mutation<void, {visitID:string,body:any}>({
+        query: (visitPayload) => ({
+          url: `/visits/${visitPayload.visitID}`,
+          method: 'PATCH',
+          body:visitPayload.body
+        }),
+      }),
+  
+      // Patients
+      getAppointedPatients: builder.query<any, string>({
+        query: (id) => ({
+          url: `/doctors/${id}/patients`,
+          method: 'GET',
+        }),
+      }),
+
+
+
+    updateDoctorStatus: builder.mutation<
+      any,
+      { doctorId: string; status: "approved" | "denied" }
+    >({
+      async queryFn(
+        { doctorId, status },
+        _queryApi,
+        _extraOptions,
+        baseQuery
+      ) {
+        const doctorResponse = await baseQuery({
+          url: `/doctors/${doctorId}`,
+          method: "GET",
+        });
+        if (doctorResponse.error) {
+          return { error: doctorResponse.error };
+        }
+        const patchResponse = await baseQuery({
+          url: `/doctors/${doctorId}`,
+          method: "PATCH",
+          body: { status },
+        });
+        if (patchResponse.error) {
+          return { error: patchResponse.error };
+        }
+        return { data: patchResponse.data };
+      },
+      invalidatesTags: ["Doctor"],
+    }),
+
   }),
 });
 
@@ -113,21 +148,22 @@ export const {
   useGetVerifiedDoctorsQuery,
   useDeleteDoctorMutation,
   useGetCurrentDoctorQuery,
-  
-  useGetVisitsByDoctorIdApprovalQuery,
+    useGetVisitsByDoctorIdApprovalQuery,
   useApproveRefuseVisitMutation,
   useUpdateVisitMutation,
-
-  useGetAppointedPatientsQuery,
+  useUpdateDoctorStatusMutation,
+  useGetAppointedPatientsQuery, 
 } = doctorApi;
 
-export const fetchDoctor = async (_id:string) => {
+export const fetchDoctor = async (_id: string) => {
   try {
-    // Importing store dynamically since there is circular dependency between doctorApi.ts and store.tsx 
+    // Importing store dynamically since there is circular dependency between doctorApi.ts and store.tsx
     const storeModule = await import("../store");
     const store = storeModule.default;
 
-    const result = await store.dispatch(doctorApi.endpoints.getDoctorById.initiate(_id));
+    const result = await store.dispatch(
+      doctorApi.endpoints.getDoctorById.initiate(_id)
+    );
 
     if ("error" in result) {
       console.error("Error fetching doctors:", result.error);
@@ -141,13 +177,23 @@ export const fetchDoctor = async (_id:string) => {
   }
 };
 
-export const loginDoctor = async (password:string,phone?:string,email?:string) => {
+export const loginDoctor = async (
+  password: string,
+  phone?: string,
+  email?: string
+) => {
   try {
     // Importing store dynamically since there is circular dependency between doctorApi.ts and store.tsx
     const storeModule = await import("../store");
     const store = storeModule.default;
 
-    const result = await store.dispatch(doctorApi.endpoints.loginDoctor.initiate({...(phone?{phone}:{}),password,...(email?{email}:{})}));
+    const result = await store.dispatch(
+      doctorApi.endpoints.loginDoctor.initiate({
+        ...(phone ? { phone } : {}),
+        password,
+        ...(email ? { email } : {}),
+      })
+    );
 
     if ("error" in result) {
       console.error("Error fetching doctors:", result.error);
