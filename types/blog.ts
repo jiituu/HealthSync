@@ -1,4 +1,7 @@
 export interface BlogPost {
+  sections: any;
+  createdAt: string | number | Date;
+  createdAt: any;
   _id: string;
   author: string;
   title: string;
@@ -13,6 +16,7 @@ export interface BlogPost {
 }
 
 export interface SingleBlogObject {
+  sections: any;
   _id: string;
   author: string;
   title: string;
@@ -29,13 +33,20 @@ export interface SingleBlogObject {
 
 export interface BlogResponse {
   success: boolean;
+  data: SingleBlogObject[];
+}
+
+
+export interface GetBlogsResponse {
+  success: boolean;
   data: {
     blogs: SingleBlogObject[];
-    totalCount?: number; // Added
-    currentPage?: number; // Added
-    totalPages?: number; // Added
+    totalCount: number;
+    currentPage: number;
+    totalPages: number;
   };
 }
+
 export interface CreateBlogPostPayload {
   author: string;
   title: string;
