@@ -1,7 +1,6 @@
 export interface BlogPost {
   sections: any;
-  createdAt: string | number | Date;
-  createdAt: any;
+  createdAt: string;
   _id: string;
   author: string;
   title: string;
@@ -56,4 +55,4 @@ export interface CreateBlogPostPayload {
   published?: boolean;
   publishedAt?: string;
 }
-// types/blog.ts
+
