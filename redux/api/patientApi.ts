@@ -3,6 +3,7 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { PatientSignupPayload } from "@/types/patient";
 import { VisitModel } from "@/components/models/visitModel";
 
+import { PatientResponse } from "@/types/patient";
 export const patientApi = createApi({
   reducerPath: "patientApi",
   baseQuery: fetchBaseQuery({
@@ -26,25 +27,25 @@ export const patientApi = createApi({
 
     registerPatient: builder.mutation<any, PatientSignupPayload>({
       query: (patient) => ({
-      url: '/register/patient',
-      method: 'POST',
-      body: patient
+        url: '/register/patient',
+        method: 'POST',
+        body: patient
       }),
     }),
 
-    requestVisit: builder.mutation<any,VisitModel>({
+    requestVisit: builder.mutation<any, VisitModel>({
       query: (visit) => ({
         url: '/visits',
         method: 'POST',
         body: visit
-        }),
+      }),
     }),
 
     // DELETE
     deletePatient: builder.mutation<void, void>({
       query: () => ({
-      url: '/patients/me',
-      method: 'DELETE',
+        url: '/patients/me',
+        method: 'DELETE',
       }),
     }),
 
@@ -57,12 +58,26 @@ export const patientApi = createApi({
     }),
 
     // Visits
-    getVisitsByDoctorIdPatientId: builder.query<any, {doctor_id:string,patient_id:string }>({
-      query: ({doctor_id,patient_id}) => ({
+    getVisitsByDoctorIdPatientId: builder.query<any, { doctor_id: string, patient_id: string }>({
+      query: ({ doctor_id, patient_id }) => ({
         url: `/visits?doctor_id=${doctor_id}&patient_id=${patient_id}`,
         method: 'GET',
       }),
-    }), 
+    }),
+    getCurrentPatient: builder.query<PatientResponse, void>({
+      query: () => "/patients/me",
+      transformResponse: (response: { data: PatientResponse, success: boolean }) => response.data,
+      providesTags: ["Patient"],
+    }),
+    updatePatient: builder.mutation<PatientResponse, Partial<PatientResponse>>({
+      query: (updatedData) => ({
+        url: "/patients/me",
+        method: "PATCH",
+        body: updatedData,
+      }),
+      invalidatesTags: ["Patient"], // This will refetch patient data after update
+    }),
+
 
   }),
 });
@@ -73,10 +88,12 @@ export const {
   useDeletePatientMutation,
   useRequestVisitMutation,
   useGetPatientByIdQuery,
-  useGetVisitsByDoctorIdPatientIdQuery
+  useGetVisitsByDoctorIdPatientIdQuery,
+  useGetCurrentPatientQuery,
+  useUpdatePatientMutation,
 } = patientApi;
 
-export const fetchPatient = async (_id:string) => {
+export const fetchPatient = async (_id: string) => {
   try {
     // Importing store dynamically since there is circular dependency between patientApi.ts and store.tsx
     const storeModule = await import("../store");
@@ -96,13 +113,13 @@ export const fetchPatient = async (_id:string) => {
   }
 };
 
-export const loginPatient = async (password:string,phone?:string,email?:string) => {
+export const loginPatient = async (password: string, phone?: string, email?: string) => {
   try {
     // Importing store dynamically since there is circular dependency between patientApi.ts and store.tsx
     const storeModule = await import("../store");
     const store = storeModule.default;
 
-    const result = await store.dispatch(patientApi.endpoints.loginPatient.initiate({...(phone?{phone}:{}),password,...(email?{email}:{})}));
+    const result = await store.dispatch(patientApi.endpoints.loginPatient.initiate({ ...(phone ? { phone } : {}), password, ...(email ? { email } : {}) }));
 
     if ("error" in result) {
       console.error("Error fetching doctors:", result.error);
