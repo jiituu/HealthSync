@@ -27,12 +27,29 @@ export const commonApi = createApi({
         method: "GET",
       }),
     }),
+
+    verifyOtp: builder.mutation({
+      query: (body: { email: string; otp: string; role: "doctor" | "patient" }) => ({
+        url: "/otp/verify",
+        method: "POST",
+        body,
+      }),
+    }),
+    resendOtp: builder.mutation({
+      query: (body: { email: string; role: "doctor" | "patient" }) => ({
+        url: "/otp/resend",
+        method: "POST",
+        body,
+      }),
+    }),
   }),
 });
 
 export const {
   useLogoutMutation,
-  useMeQuery
+  useMeQuery,
+  useVerifyOtpMutation,
+  useResendOtpMutation,
 } = commonApi;
 
 export const fetchMe = async (role:'patients'|'doctors'|'admin') => {
