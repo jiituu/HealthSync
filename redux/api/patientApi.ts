@@ -2,6 +2,7 @@ import { PatientLoginPayload } from "@/types/patient";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { PatientSignupPayload } from "@/types/patient";
 import { VisitModel } from "@/components/models/visitModel";
+import { use } from "react";
 
 export const patientApi = createApi({
   reducerPath: "patientApi",
@@ -62,7 +63,14 @@ export const patientApi = createApi({
         url: `/visits?doctor_id=${doctor_id}&patient_id=${patient_id}`,
         method: 'GET',
       }),
-    }), 
+    }),
+
+    getVisitsByPatientId: builder.query<any, {id:string}>({
+      query: ({id}) => ({
+        url: `/visits?patient_id=${id}`,
+        method: 'GET',
+      }),
+    }),
 
   }),
 });
@@ -73,7 +81,9 @@ export const {
   useDeletePatientMutation,
   useRequestVisitMutation,
   useGetPatientByIdQuery,
-  useGetVisitsByDoctorIdPatientIdQuery
+  useGetVisitsByDoctorIdPatientIdQuery,
+  useGetVisitsByPatientIdQuery,
+  useLazyGetPatientByIdQuery,
 } = patientApi;
 
 export const fetchPatient = async (_id:string) => {
