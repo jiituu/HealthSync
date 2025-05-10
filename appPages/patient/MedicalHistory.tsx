@@ -9,7 +9,6 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import SearchComponent from "@/components/common-components/SearchComponent";
 import { useSessionUser } from "@/components/context/Session";
-import { useGetAppointedPatientsQuery } from "@/redux/api/doctorApi";
 import { VisitModel } from "@/components/models/visitModel";
 import dayjs from "dayjs";
 import { Spin } from "antd";
