@@ -18,10 +18,7 @@ const generateOptions = (start: number, end: number) => {
   }));
 };
 
-const PatientSignupForm = (
-  {setParentTab}
-  :{setParentTab:any}
-) => {
+const PatientSignupForm = ({ setParentTab, onSignupSuccess }: { setParentTab: any; onSignupSuccess: (email: string, role: "patient") => void }) => {
   const [form] = Form.useForm();
   const [currentStep, setCurrentStep] = useState(0); 
   const [formValues, setFormValues] = useState<PatientSignupPayload>({
@@ -49,7 +46,7 @@ const PatientSignupForm = (
     try {
       await registerPatient(formValues).unwrap();
       message.success("Registration successful!");
-      setParentTab(0); 
+      onSignupSuccess(formValues.email, "patient"); 
     } catch (error: any) {
       message.error(error?.data?.error || "Registration failed, please try again");
     }

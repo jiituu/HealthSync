@@ -13,7 +13,7 @@ const formItemLayout = {
   wrapperCol: { span: 24 },
 }
 
-const DoctorSignupForm = ({ setParentTab }: { setParentTab: any }) => {
+const DoctorSignupForm = ({ setParentTab, onSignupSuccess }: { setParentTab: any; onSignupSuccess: (email: string, role: "doctor") => void }) => {
   const [form] = Form.useForm()
   const [current, setCurrent] = useState(0)
   const [formValues, setFormValues] = useState<DoctorSignupPayload>({
@@ -69,7 +69,7 @@ const DoctorSignupForm = ({ setParentTab }: { setParentTab: any }) => {
     try {
       await registerDoctor(finalValues).unwrap()
       message.success("Registration successful!")
-      setParentTab(0)
+      onSignupSuccess(finalValues.email, "doctor"); 
     } catch (error: any) {
       message.error(error?.data?.error || "Registration failed, please try again")
     }
