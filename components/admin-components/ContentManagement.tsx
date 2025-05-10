@@ -264,7 +264,7 @@ const ContentManagement = () => {
                         <div className="flex items-center text-sm text-gray-500">
                           <span className="flex items-center">
                             <User className="mr-1 h-3 w-3" />
-                            ID: {blog.author.substring(0, 8)}...
+                            <span className="font-semibold">By: Dr.{blog.author.firstname} {blog.author.lastname}</span>
                           </span>
                         </div>
                       </div>
@@ -406,7 +406,12 @@ const ContentManagement = () => {
             </div>
             <div className="flex items-center gap-2 text-sm text-gray-500">
               <User className="h-4 w-4" />
-              <span>Author ID: {selectedBlog?.author}</span>
+              <span>
+                Author:{" "}
+                {selectedBlog?.author
+                  ? `${selectedBlog.author.firstname} ${selectedBlog.author.lastname || ""}`.trim()
+                  : "Anonymous"}
+              </span>
             </div>
             <div className="mt-4 border-t pt-4">
               <h3 className="font-medium mb-2">Content:</h3>
