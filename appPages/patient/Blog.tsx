@@ -194,6 +194,7 @@ interface BlogCardProps {
 const BlogCard: React.FC<BlogCardProps> = ({ blog, onBookmarkToggle, onReadMore }) => {
   // Assuming blog has a createdAt field, otherwise use a placeholder
   const publishedDate = blog.createdAt ? formatDistanceToNow(new Date(blog.createdAt), { addSuffix: true }) : "Recently"
+  const authorName = blog.author ? `${blog.author.firstname} ${blog.author.lastname || ''}`.trim() : "Anonymous";
 
   return (
     <Card className="overflow-hidden transition-all shadow-md bg-[#fff4e3]">
@@ -202,13 +203,13 @@ const BlogCard: React.FC<BlogCardProps> = ({ blog, onBookmarkToggle, onReadMore 
           <div className="flex items-center gap-3">
             <Image
               src={imgg}
-              alt={`${blog.author} profile`}
+              alt={`${authorName} profile`}
               className="rounded-full object-cover border w-16 h-16"
               width={48}
               height={48}
             />
             <div>
-              <h3 className="font-semibold">{blog.author}</h3>
+              <h3 className="font-semibold">{authorName}</h3>
               <p className="text-xs text-muted-foreground">{publishedDate}</p>
             </div>
           </div>
@@ -254,6 +255,7 @@ interface BlogDetailDialogProps {
 }
 
 const BlogDetailDialog: React.FC<BlogDetailDialogProps> = ({ blog, onClose }) => {
+  const authorName = blog?.author ? `${blog.author.firstname} ${blog.author.lastname || ''}`.trim() : "Anonymous";
   return (
     <Dialog open={!!blog} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
@@ -263,13 +265,13 @@ const BlogDetailDialog: React.FC<BlogDetailDialogProps> = ({ blog, onClose }) =>
               <div className="flex items-center gap-3 mb-2">
                 <Image
                   src={imgg}
-                  alt={`${blog.author} profile`}
+                  alt={`${authorName} profile`}
                   className="rounded-full object-cover border w-16 h-16"
                   width={48}
                   height={48}
                 />
                 <div>
-                  <DialogTitle className="text-left">{blog.author}</DialogTitle>
+                  <DialogTitle className="text-left">{authorName}</DialogTitle>
                   <DialogDescription>
                     {blog.createdAt ? formatDistanceToNow(new Date(blog.createdAt), { addSuffix: true }) : "Recently"}
                   </DialogDescription>

@@ -5,7 +5,7 @@ import type React from "react"
 import { useState } from "react"
 import { BookOpen, ChevronLeft, ChevronRight } from "lucide-react"
 import { useGetBookmarkedBlogsQuery, useRemoveBookmarkMutation } from "@/redux/api/blogApi"
-import type { BlogPost } from "@/types/blog"
+import  { SingleBlogObject } from "@/types/blog"
 import { useToast } from "@/hooks/use-toast"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
@@ -22,7 +22,7 @@ const ITEMS_PER_PAGE = 5
 const SavedBlogs: React.FC = () => {
   const { toast } = useToast()
   const [currentPage, setCurrentPage] = useState(1)
-  const [selectedBlog, setSelectedBlog] = useState<BlogPost | null>(null)
+  const [selectedBlog, setSelectedBlog] = useState<SingleBlogObject | null>(null)
 
   const { data: savedBlogsData, isLoading, isError, refetch } = useGetBookmarkedBlogsQuery()
 
@@ -42,7 +42,7 @@ const SavedBlogs: React.FC = () => {
     }
   }
 
-  const handleReadMore = (blog: BlogPost) => {
+  const handleReadMore = (blog: SingleBlogObject) => {
     setSelectedBlog(blog)
   }
 
@@ -106,7 +106,7 @@ const SavedBlogs: React.FC = () => {
       ) : (
         <>
           <div className="space-y-6">
-            {currentBlogs.map((blog: BlogPost) => (
+            {currentBlogs.map((blog: SingleBlogObject) => (
               <BlogCard
                 key={blog._id}
                 blog={blog}
@@ -142,9 +142,9 @@ const SavedBlogs: React.FC = () => {
 }
 
 interface BlogCardProps {
-  blog: BlogPost
+  blog: SingleBlogObject
   onRemoveBookmark: (blogId: string) => void
-  onReadMore: (blog: BlogPost) => void
+  onReadMore: (blog: SingleBlogObject) => void
 }
 
 const BlogCard: React.FC<BlogCardProps> = ({ blog, onRemoveBookmark, onReadMore }) => {
@@ -158,13 +158,13 @@ const BlogCard: React.FC<BlogCardProps> = ({ blog, onRemoveBookmark, onReadMore 
           <div className="flex items-center gap-3">
             <Image
               src={imgg}
-              alt={`${blog.author} profile`}
+              alt={`${blog.author.firstname} profile`}
               className="rounded-full object-cover border w-16 h-16"
               width={48}
               height={48}
             />
             <div>
-              <h3 className="font-semibold">{blog.author}</h3>
+              <h3 className="font-semibold">{blog.author.firstname}</h3>
               <p className="text-xs text-muted-foreground">{publishedDate}</p>
             </div>
           </div>
@@ -205,7 +205,7 @@ const BlogCard: React.FC<BlogCardProps> = ({ blog, onRemoveBookmark, onReadMore 
 }
 
 interface BlogDetailDialogProps {
-  blog: BlogPost | null
+  blog: SingleBlogObject | null
   onClose: () => void
 }
 
@@ -225,7 +225,7 @@ const BlogDetailDialog: React.FC<BlogDetailDialogProps> = ({ blog, onClose }) =>
                   src={imgg}
                 />
                 <div>
-                  <DialogTitle className="text-left">{blog.author}</DialogTitle>
+                  <DialogTitle className="text-left">{blog.author.firstname}</DialogTitle>
                   <DialogDescription>
                     {blog.createdAt ? formatDistanceToNow(new Date(blog.createdAt), { addSuffix: true }) : "Recently"}
                   </DialogDescription>

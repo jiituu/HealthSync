@@ -1,6 +1,6 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { RootState } from "../store"; // Adjust the import path as necessary
-import type { BlogResponse, CreateBlogPostPayload, GetBlogsResponse } from '@/types/blog';
+import type { BlogResponse, CreateBlogPostPayload, GetBlogsResponse, SingleBlogObject } from '@/types/blog';
 
 export const blogApi = createApi({
   reducerPath: "blogApi", // Unique key for this API slice
@@ -18,7 +18,13 @@ export const blogApi = createApi({
       method: "GET",
       params, 
       }),
-      providesTags: ['BlogPost'],  
+      providesTags: (result, error, arg) =>
+        result
+          ? [
+              ...result.data.blogs.map(({ _id }) => ({ type: "BlogPost" as const, id: _id })),
+              { type: "BlogPost", id: "LIST" },
+            ]
+          : [{ type: "BlogPost", id: "LIST" }],  
     }),
 
 // Fetch bookmarked blogs for current user
@@ -47,7 +53,7 @@ removeBookmark: builder.mutation<void, { blogId: string }>({
   invalidatesTags: ['BlogPost'],
 }),
     // Create a blog post
-    createBlogPost: builder.mutation<BlogPost, CreateBlogPostPayload>({
+    createBlogPost: builder.mutation<SingleBlogObject, CreateBlogPostPayload>({
         query: (newPost) => {
           return {
             url: "/blogs",
@@ -63,7 +69,7 @@ removeBookmark: builder.mutation<void, { blogId: string }>({
             },
           }
         },
-        invalidatesTags: ["BlogPost"],
+        invalidatesTags: [{ type: "BlogPost", id: "LIST" }],
       }),
 
     // Delete a blog post
@@ -72,22 +78,33 @@ removeBookmark: builder.mutation<void, { blogId: string }>({
         url: `/blogs/${blogId}`,
         method: "DELETE",
       }),
-      invalidatesTags: ["BlogPost"],
+      invalidatesTags: (result, error, id) => [{ type: "BlogPost", id }, { type: "BlogPost", id: "LIST" }],
     }),
+
+
+    // delete a blog post by author
+    deleteBlogPostByAuthor: builder.mutation<void, string>({
+      query: (blogId) => ({
+        url: `/blogs/me/${blogId}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: (result, error, id) => [{ type: "BlogPost", id }, { type: "BlogPost", id: "LIST" }],
+    }),
+
+
+    // update a blog post owned by the author
+    updateBlogPostByAuthor: builder.mutation<SingleBlogObject, { blogId: string; data: Partial<CreateBlogPostPayload> }>({
+      query: ({ blogId, data }) => ({
+        url: `/blogs/me/${blogId}`,
+        method: "PATCH",
+        body: data,
+      }),
+      invalidatesTags: [{ type: "BlogPost", id: "LIST" }],
+      }),
+
+
   }),
 });
-
-// Types
-interface BlogPost {
-  id: string;
-  author: string; // Doctor ID
-  title: string;
-  content: string;
-  tags?: string[];
-  publishedAt: string;
-}
-
-
 
 // Export hooks
 export const {
@@ -97,4 +114,6 @@ export const {
   useGetBookmarkedBlogsQuery,
   useBookmarkBlogMutation,
   useRemoveBookmarkMutation,
+  useDeleteBlogPostByAuthorMutation,
+  useUpdateBlogPostByAuthorMutation,
 } = blogApi;

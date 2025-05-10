@@ -17,7 +17,11 @@ export interface BlogPost {
 export interface SingleBlogObject {
   sections: any;
   _id: string;
-  author: string;
+  author: {
+    _id: string;
+    firstname: string;
+    lastname: string;
+  };
   title: string;
   content: string;
   tags?: string[];
@@ -35,7 +39,6 @@ export interface BlogResponse {
   data: SingleBlogObject[];
 }
 
-
 export interface GetBlogsResponse {
   success: boolean;
   data: {
@@ -47,7 +50,7 @@ export interface GetBlogsResponse {
 }
 
 export interface CreateBlogPostPayload {
-  author: string;
+  author: string; // Changed back to string
   title: string;
   content: string;
   tags?: string[];
@@ -55,4 +58,3 @@ export interface CreateBlogPostPayload {
   published?: boolean;
   publishedAt?: string;
 }
-
