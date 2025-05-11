@@ -1,9 +1,9 @@
 import { PatientLoginPayload } from "@/types/patient";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { PatientSignupPayload } from "@/types/patient";
-import { VisitModel } from "@/components/models/visitModel";
-
+import { VisitModel, Prescription, PrescriptionWithStatus, VisitsResponse, Visit } from "@/components/models/visitModel";
 import { PatientResponse } from "@/types/patient";
+
 export const patientApi = createApi({
   reducerPath: "patientApi",
   baseQuery: fetchBaseQuery({
@@ -14,7 +14,7 @@ export const patientApi = createApi({
       return headers;
     },
   }),
-  tagTypes: ["Patient"],
+  tagTypes: ["Patient", "Visits"],
   endpoints: (builder) => ({
     // POST
     loginPatient: builder.mutation<any, PatientLoginPayload>({
@@ -39,6 +39,7 @@ export const patientApi = createApi({
         method: 'POST',
         body: visit
       }),
+      invalidatesTags: ["Visits"],
     }),
 
     // DELETE
@@ -49,7 +50,7 @@ export const patientApi = createApi({
       }),
     }),
 
-    // to get a patient by id
+    // GET
     getPatientById: builder.query<any, string>({
       query: (id) => ({
         url: `/patients/${id}`,
@@ -57,28 +58,55 @@ export const patientApi = createApi({
       }),
     }),
 
-    // Visits
     getVisitsByDoctorIdPatientId: builder.query<any, { doctor_id: string, patient_id: string }>({
       query: ({ doctor_id, patient_id }) => ({
         url: `/visits?doctor_id=${doctor_id}&patient_id=${patient_id}`,
         method: 'GET',
       }),
+      providesTags: ["Visits"],
     }),
+
+    getScheduledVisits: builder.query<PrescriptionWithStatus[], string>({
+      query: (patient_id: string) => ({
+        url: `/visits?patient_id=${patient_id}&status=Scheduled`,
+        method: 'GET',
+      }),
+      transformResponse: (response: VisitsResponse): PrescriptionWithStatus[] => {
+        const allPrescriptions = response.data.visits.flatMap((visit: Visit) =>
+          visit.prescription?.map((prescription: Prescription) => ({
+            ...prescription,
+            visitDate: visit.preferredDate,
+            status: 'Taken' as const
+          })) || []
+        );
+        return allPrescriptions;
+      },
+      providesTags: ["Visits"],
+    }),
+    getUpcomingAppointments: builder.query<Visit[], string>({
+      query: (patient_id) => ({
+        url: `/visits?patient_id=${patient_id}&status=Scheduled&approval=Approved`,
+        method: 'GET',
+      }),
+      transformResponse: (response: VisitsResponse) => response.data.visits,
+      providesTags: ['Visits'],
+    }),
+
     getCurrentPatient: builder.query<PatientResponse, void>({
       query: () => "/patients/me",
       transformResponse: (response: { data: PatientResponse, success: boolean }) => response.data,
       providesTags: ["Patient"],
     }),
+
+    // PATCH
     updatePatient: builder.mutation<PatientResponse, Partial<PatientResponse>>({
       query: (updatedData) => ({
         url: "/patients/me",
         method: "PATCH",
         body: updatedData,
       }),
-      invalidatesTags: ["Patient"], // This will refetch patient data after update
+      invalidatesTags: ["Patient"],
     }),
-
-
   }),
 });
 
@@ -89,8 +117,10 @@ export const {
   useRequestVisitMutation,
   useGetPatientByIdQuery,
   useGetVisitsByDoctorIdPatientIdQuery,
+  useGetScheduledVisitsQuery,
   useGetCurrentPatientQuery,
   useUpdatePatientMutation,
+  useGetUpcomingAppointmentsQuery,
 } = patientApi;
 
 export const fetchPatient = async (_id: string) => {

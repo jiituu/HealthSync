@@ -20,6 +20,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
+import Email from "next-auth/providers/email"
 
 
 const PatientProfile = () => {
@@ -36,7 +37,8 @@ const PatientProfile = () => {
 
   const [profile, setProfile] = useState({
     fullName: "",
-    phoneNumber: "",
+    // phoneNumber: "",
+    email: "",
     gender: "",
     age: "",
     firstName: "",
@@ -60,10 +62,12 @@ const PatientProfile = () => {
   })
   const [isPasswordDialogOpen, setIsPasswordDialogOpen] = useState(false)
   useEffect(() => {
+    console.log("Patient data received from API:", patientData) // Add this
     if (patientData) {
       setProfile({
         fullName: `${patientData.firstname} ${patientData.lastname}`,
-        phoneNumber: patientData.phoneNumber || "",
+        email: patientData.email,
+        // phoneNumber: patientData.phoneNumber || "",
         // gender: patientData.gender ? patientData.gender.charAt(0).toUpperCase() + patientData.gender.slice(1).toLowerCase() : "",
         gender: patientData.gender ? patientData.gender.charAt(0).toUpperCase() + patientData.gender.slice(1).toLowerCase() : "",
         age: patientData.age?.toString() || "",
@@ -128,9 +132,11 @@ const PatientProfile = () => {
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault()
+    console.log("Submitting form with data:", profile) // Add this
 
     // Validate gender before conversion
     if (!["Male", "Female"].includes(profile.gender)) {
+      console.log("Invalid gender:", profile.gender) // Add this
       alert("Please select a valid gender")
       return
     }
@@ -144,15 +150,19 @@ const PatientProfile = () => {
         height: Number(profile.height),
         weight: Number(profile.weight),
         blood: profile.bloodType,
-        phoneNumber: profile.phoneNumber,
+        // phoneNumber: profile.phoneNumber,
         medicalConditions: profile.knownConditions,
         allergies: profile.allergies,
       }
+      console.log("Data being sent to API:", updateData) // Add this
 
       await updatePatient(updateData).unwrap()
       alert("Profile updated successfully!")
     } catch (error) {
       console.error("Failed to update profile:", error)
+      if (error instanceof Error) {
+        console.log("Error details:", error.message) // Add this
+      }
       alert("Failed to update profile. Please try again.")
     }
   }
@@ -215,8 +225,7 @@ const PatientProfile = () => {
       </button>
     </div>
   )
-  console.log("Raw gender from API:", patientData?.gender);
-  console.log("Transformed gender in state:", profile.gender);
+
 
   return (
     <div className="container mx-auto p-4 md:p-6">
@@ -409,13 +418,13 @@ const PatientProfile = () => {
                   <div className="space-y-2">
                     <label htmlFor="phoneNumber" className="text-sm font-medium flex items-center gap-2">
                       <Phone size={16} className="text-gray-400" />
-                      Phone Number
+                      Email
                     </label>
                     <Input
-                      id="phoneNumber"
-                      placeholder="Your Phone Number"
-                      value={profile.phoneNumber}
-                      onChange={(e) => handleInputChange("phoneNumber", e.target.value)}
+                      id="email"
+                      placeholder="Your Email"
+                      value={profile.email}
+                      onChange={(e) => handleInputChange("email", e.target.value)}
                       className="border-gray-200 focus:border-teal-500"
                     />
                   </div>
