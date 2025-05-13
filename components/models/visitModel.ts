@@ -43,28 +43,28 @@ export interface LabResult {
     _id: string;
 }
 
-export interface Visit {
-    _id: string;
-    patient: string;
-    doctor: string;
-    preferredDate: string;
-    reason: string;
-    diagnosis?: string;
-    notes?: string;
-    status: 'Scheduled' | 'Completed' | 'Cancelled'; // Add other possible statuses
-    approval: 'Approved' | 'Pending' | 'Rejected'; // Add other possible approval statuses
-    prescription: Prescription[];
-    labResults: LabResult[];
-    createdAt: string;
-    updatedAt: string;
-    __v?: number;
-    endDate?: string;
-    startDate?: string;
-}
+// export interface Visit {
+//     _id: string;
+//     patient: string;
+//     doctor: string;
+//     preferredDate: string;
+//     reason: string;
+//     diagnosis?: string;
+//     notes?: string;
+//     status: 'Scheduled' | 'Completed' | 'Cancelled'; 
+//     approval: 'Approved' | 'Pending' | 'Rejected'; 
+//     prescription: Prescription[];
+//     labResults: LabResult[];
+//     createdAt: string;
+//     updatedAt: string;
+//     __v?: number;
+//     endDate?: string;
+//     startDate?: string;
+// }
 
 export interface VisitsResponse {
     data: {
-        visits: Visit[];
+        visits: VisitModel[];
         totalCount: number;
         currentPage: number;
         totalPages: number;

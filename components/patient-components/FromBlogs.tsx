@@ -6,10 +6,9 @@ import { useGetBlogsQuery } from '@/redux/api/blogApi'
 import { format } from 'date-fns'
 
 const FromBlogs = () => {
-  // Fetch the 3 most recent blogs
   const { data: blogsData, isLoading, isError } = useGetBlogsQuery({
     page: 1,
-    limit: 3,
+    limit: 2,
     sort: '-publishedAt' // Ensure newest blogs come first
   })
 

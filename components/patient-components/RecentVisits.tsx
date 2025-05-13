@@ -1,54 +1,67 @@
-// src/components/RecentVisits.jsx
+// src/components/RecentVisits.tsx
 import React from 'react'
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@/components/ui/table'
 import { Button } from '@/components/ui/button';
-// import { IoChatbubbleSharp } from "react-icons/io5";
-// import Link from 'next/link';
 import { MdEmail } from "react-icons/md";
+import { useGetDoctorsQuery } from '@/redux/api/doctorApi';
 
-const doctorData = [
-  {
-    doctor: 'Dr Bekele',
-    specialty: 'Upper Abdomen General',
-  },
-  {
-    doctor: 'Dr Habtamu',
-    specialty: 'Gynecologic Disorders',
-  },
-  {
-    doctor: 'Dr Habtamu',
-    specialty: 'Gynecologic Disorders',
-  },
-]
+interface Doctor {
+  _id: string;
+  firstname: string;
+  lastname: string;
+  specializations: string[];
+}
 
 const RecentVisits = () => {
+  const { data, isLoading, isError } = useGetDoctorsQuery({ status: "approved" });
+
+  const getRandomDoctors = (doctors: Doctor[]): Doctor[] => {
+    if (!doctors || doctors.length === 0) return [];
+    const shuffled = [...doctors].sort(() => 0.5 - Math.random());
+    return shuffled.slice(0, 3);
+  };
+
+  const randomDoctors = data?.data?.doctors ? getRandomDoctors(data.data.doctors as Doctor[]) : [];
+
+  if (isLoading) return <div className="p-4 text-center">Loading doctors...</div>;
+  if (isError) return <div className="p-4 text-center text-red-500">Error loading doctors</div>;
+
   return (
     <div className="container mx-auto p-4 basis-1/2">
-      <div className="bg-white rounded-xl shadow-md border border-gray-200">
+      <div className="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden">
         <div className="p-4 border-b border-gray-200">
           <h2 className="text-lg font-semibold text-gray-800">DOCTOR VIEWS</h2>
         </div>
-        
-        <Table className=''>
+
+        <Table className="min-w-full">
           <TableHeader>
             <TableRow>
-              <TableHead className="text-left text-sm font-medium text-gray-600 bg-gray-50 p-4">DOCTOR</TableHead>
-              <TableHead className="text-left text-sm font-medium text-gray-600 bg-gray-50 p-4">SPECIALTY</TableHead>
-              <TableHead className="text-left text-sm font-medium text-gray-600 bg-gray-50 p-4">SEND INVITATION</TableHead>
+              <TableHead className="w-[35%] px-4 py-3 text-left text-sm font-medium text-gray-600 bg-gray-50">DOCTOR</TableHead>
+              <TableHead className="w-[45%] px-4 py-3 text-left text-sm font-medium text-gray-600 bg-gray-50">SPECIALTY</TableHead>
+              <TableHead className="w-[20%] px-4 py-3 text-left text-sm font-medium text-gray-600 bg-gray-50">ACTION</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {doctorData.map((doctor, index) => (
-              <TableRow key={index} className="border-b border-gray-200 hover:bg-gray-50">
-                <TableCell className="text-md text-gray-800 p-4 font-bold">{doctor.doctor}</TableCell>
-                <TableCell className="text-md text-gray-800 p-4">{doctor.specialty}</TableCell>
-                <TableCell className="text-md text-gray-800 p-4">
-                  <Button 
-                    variant="outline" 
-                    size="icon" 
-                    className="bg-transparent hover:bg-gray-100 text-gray-500 border-gray-300 flex justify-center w-full"
+            {randomDoctors.map((doctor) => (
+              <TableRow key={doctor._id} className="hover:bg-gray-50">
+                <TableCell className="px-4 py-3 max-w-[200px] truncate">
+                  <div className="font-medium text-gray-800">
+                    <span className="whitespace-nowrap">Dr {doctor.firstname}</span>
+                    <span className="whitespace-nowrap block">{doctor.lastname}</span>
+                  </div>
+                </TableCell>
+                <TableCell className="px-4 py-3 text-gray-800">
+                  <div className="line-clamp-2">
+                    {doctor.specializations?.join(', ')}
+                  </div>
+                </TableCell>
+                <TableCell className="px-4 py-3">
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    className="h-9 w-9 bg-transparent hover:bg-gray-100 text-gray-500 border-gray-300"
                   >
-                    <span className="text-lg text-center"><MdEmail size={35}/></span>
+                    <MdEmail size={18} />
                   </Button>
                 </TableCell>
               </TableRow>
