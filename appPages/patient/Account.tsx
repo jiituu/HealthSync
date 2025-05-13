@@ -150,7 +150,7 @@ const PatientProfile = () => {
         height: Number(profile.height),
         weight: Number(profile.weight),
         blood: profile.bloodType,
-        // phoneNumber: profile.phoneNumber,
+        phoneNumber: profile.phoneNumber,
         medicalConditions: profile.knownConditions,
         allergies: profile.allergies,
       }
