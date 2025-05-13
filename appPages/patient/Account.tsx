@@ -37,8 +37,8 @@ const PatientProfile = () => {
 
   const [profile, setProfile] = useState({
     fullName: "",
-    // phoneNumber: "",
-    email: "",
+    phoneNumber: "",
+    // email: "",
     gender: "",
     age: "",
     firstName: "",
@@ -66,8 +66,8 @@ const PatientProfile = () => {
     if (patientData) {
       setProfile({
         fullName: `${patientData.firstname} ${patientData.lastname}`,
-        email: patientData.email,
-        // phoneNumber: patientData.phoneNumber || "",
+        // email: patientData.email,
+        phoneNumber: patientData.phoneNumber || "",
         // gender: patientData.gender ? patientData.gender.charAt(0).toUpperCase() + patientData.gender.slice(1).toLowerCase() : "",
         gender: patientData.gender ? patientData.gender.charAt(0).toUpperCase() + patientData.gender.slice(1).toLowerCase() : "",
         age: patientData.age?.toString() || "",
@@ -418,13 +418,13 @@ const PatientProfile = () => {
                   <div className="space-y-2">
                     <label htmlFor="phoneNumber" className="text-sm font-medium flex items-center gap-2">
                       <Phone size={16} className="text-gray-400" />
-                      Email
+                      Phone Number
                     </label>
                     <Input
-                      id="email"
-                      placeholder="Your Email"
-                      value={profile.email}
-                      onChange={(e) => handleInputChange("email", e.target.value)}
+                      id="phoneNumber"
+                      placeholder="Your phone number"
+                      value={profile.phoneNumber}
+                      onChange={(e) => handleInputChange("phoneNumber", e.target.value)}
                       className="border-gray-200 focus:border-teal-500"
                     />
                   </div>
