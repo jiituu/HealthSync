@@ -9,7 +9,9 @@ export const blogApi = createApi({
     credentials: "include",
 
     }),
-  tagTypes: ["BlogPost"], // For cache invalidation
+  tagTypes: ["BlogPost"], 
+  
+  // For cache invalidation
   endpoints: (builder) => ({
     // Fetch all blogs (with optional filters and pagination)
     getBlogs: builder.query<GetBlogsResponse, { author_id?: string; tag?: string; page?: number; limit?: number }>({

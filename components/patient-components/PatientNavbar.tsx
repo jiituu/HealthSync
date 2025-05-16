@@ -120,7 +120,7 @@ const Navbar = ({ onMenuClick }: { onMenuClick: () => void }) => {
                           <span className='text-[13px] text-gray-500'>{doctor.email}</span>
                         </Row>
                       </Row>
-                      <Row className='gap-x-3 gap-y-2 justify-between mt-2'>
+                      <Row className='flex flex-col items-start mt-2'>
                         <span className='text-sm text-gray-500'>📍 {doctor?.hospital.address.city}</span>
                         <span className='text-sm text-gray-500'>🏨 {doctor?.hospital.name}</span>
                         <span className='text-sm text-gray-500'>🩺 {doctor.specializations.join(', ')}</span>
