@@ -21,6 +21,9 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import Email from "next-auth/providers/email"
+import { z } from "zod"
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
 
 
 const PatientProfile = () => {
@@ -30,6 +33,17 @@ const PatientProfile = () => {
     isError,
     refetch
   } = useGetCurrentPatientQuery()
+
+  const phoneSchema = z.string()
+    .min(12, { message: "Phone number must be 12 characters" })
+    .max(12, { message: "Phone number must be 12 characters" })
+    .regex(/^251\d{9}$/, {
+      message: "Phone number must start with 251"
+    });
+
+
+  const [phoneError, setPhoneError] = useState("")
+
 
   const [updatePatient, { isLoading: isUpdating }] = useUpdatePatientMutation()
   const { toast } = useToast()
@@ -85,6 +99,20 @@ const PatientProfile = () => {
   const handleInputChange = (field: string, value: string) => {
     setProfile(prev => ({ ...prev, [field]: value }))
   }
+  const handlePhoneChange = (field: string, value: string) => {
+    if (field === "phoneNumber") {
+      const cleanedValue = value.replace(/\D/g, "")
+      const validation = phoneSchema.safeParse(cleanedValue)
+      if (!validation.success) {
+        setPhoneError(validation.error.errors[0].message)
+      } else {
+        setPhoneError("")
+      }
+      setProfile(prev => ({ ...prev, [field]: cleanedValue }))
+    } else {
+      setProfile(prev => ({ ...prev, [field]: value }))
+    }
+  }
 
   const handlePasswordChange = (field: string, value: string) => {
     setPasswordData(prev => ({ ...prev, [field]: value }))
@@ -132,11 +160,14 @@ const PatientProfile = () => {
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault()
-    console.log("Submitting form with data:", profile) // Add this
+    const phoneValidation = phoneSchema.safeParse(profile.phoneNumber)
+    if (!phoneValidation.success) {
+      setPhoneError(phoneValidation.error.errors[0].message)
+      return
+    }
 
-    // Validate gender before conversion
     if (!["Male", "Female"].includes(profile.gender)) {
-      console.log("Invalid gender:", profile.gender) // Add this
+      console.log("Invalid gender:", profile.gender)
       alert("Please select a valid gender")
       return
     }
@@ -154,14 +185,11 @@ const PatientProfile = () => {
         medicalConditions: profile.knownConditions,
         allergies: profile.allergies,
       }
-      console.log("Data being sent to API:", updateData) // Add this
 
       await updatePatient(updateData).unwrap()
       alert("Profile updated successfully!")
     } catch (error) {
-      console.error("Failed to update profile:", error)
       if (error instanceof Error) {
-        console.log("Error details:", error.message) // Add this
       }
       alert("Failed to update profile. Please try again.")
     }
@@ -422,14 +450,15 @@ const PatientProfile = () => {
                     </label>
                     <Input
                       id="phoneNumber"
-                      placeholder="Your phone number"
+                      placeholder="251XXXXXXXXX"
                       value={profile.phoneNumber}
-                      onChange={(e) => handleInputChange("phoneNumber", e.target.value)}
-                      className="border-gray-200 focus:border-teal-500"
-                    />
+                      onChange={(e) => handlePhoneChange("phoneNumber", e.target.value)}
+                      className={`border-gray-200 focus:border-teal-500 ${phoneError ? "border-red-500" : ""}`} maxLength={12}
+                    /> {phoneError && (
+                      <p className="text-red-500 text-sm">{phoneError}</p>)}
                   </div>
 
-                  <div className="space-y-2">
+                  {/* <div className="space-y-2">
                     <label htmlFor="gender" className="text-sm font-medium flex items-center gap-2">
                       <User size={16} className="text-gray-400" />
                       Gender
@@ -449,7 +478,7 @@ const PatientProfile = () => {
                         ))}
                       </SelectContent>
                     </Select>
-                  </div>
+                  </div> */}
 
                   <div className="space-y-2">
                     <label htmlFor="age" className="text-sm font-medium flex items-center gap-2">
