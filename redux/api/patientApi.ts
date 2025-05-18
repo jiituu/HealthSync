@@ -1,7 +1,12 @@
 import { PatientLoginPayload } from "@/types/patient";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { PatientSignupPayload } from "@/types/patient";
-import { VisitModel, Prescription, PrescriptionWithStatus, VisitsResponse } from "@/components/models/visitModel";
+import {
+  VisitModel,
+  Prescription,
+  PrescriptionWithStatus,
+  VisitsResponse,
+} from "@/components/models/visitModel";
 import { PatientResponse } from "@/types/patient";
 
 export const patientApi = createApi({
@@ -19,25 +24,25 @@ export const patientApi = createApi({
     // POST
     loginPatient: builder.mutation<any, PatientLoginPayload>({
       query: (patient) => ({
-        url: '/login/patient',
-        method: 'POST',
-        body: patient
+        url: "/login/patient",
+        method: "POST",
+        body: patient,
       }),
     }),
 
     registerPatient: builder.mutation<any, PatientSignupPayload>({
       query: (patient) => ({
-        url: '/register/patient',
-        method: 'POST',
-        body: patient
+        url: "/register/patient",
+        method: "POST",
+        body: patient,
       }),
     }),
 
     requestVisit: builder.mutation<any, VisitModel>({
       query: (visit) => ({
-        url: '/visits',
-        method: 'POST',
-        body: visit
+        url: "/visits",
+        method: "POST",
+        body: visit,
       }),
       invalidatesTags: ["Visits"],
     }),
@@ -45,8 +50,8 @@ export const patientApi = createApi({
     // DELETE
     deletePatient: builder.mutation<void, void>({
       query: () => ({
-        url: '/patients/me',
-        method: 'DELETE',
+        url: "/patients/me",
+        method: "DELETE",
       }),
     }),
 
@@ -54,54 +59,64 @@ export const patientApi = createApi({
     getPatientById: builder.query<any, string>({
       query: (id) => ({
         url: `/patients/${id}`,
-        method: 'GET',
+        method: "GET",
       }),
     }),
 
-    getVisitsByDoctorIdPatientId: builder.query<any, { doctor_id: string, patient_id: string }>({
+    getVisitsByDoctorIdPatientId: builder.query<
+      any,
+      { doctor_id: string; patient_id: string }
+    >({
       query: ({ doctor_id, patient_id }) => ({
         url: `/visits?doctor_id=${doctor_id}&patient_id=${patient_id}`,
-        method: 'GET',
+        method: "GET",
       }),
       providesTags: ["Visits"],
     }),
 
-    getVisitsByPatientId: builder.query<any, {id:string}>({
-      query: ({id}) => ({
+    getVisitsByPatientId: builder.query<any, { id: string }>({
+      query: ({ id }) => ({
         url: `/visits?patient_id=${id}`,
-        method: 'GET',
+        method: "GET",
       }),
     }),
 
     getScheduledVisits: builder.query<PrescriptionWithStatus[], string>({
       query: (patient_id: string) => ({
         url: `/visits?patient_id=${patient_id}&status=Scheduled`,
-        method: 'GET',
+        method: "GET",
       }),
-      transformResponse: (response: VisitsResponse): PrescriptionWithStatus[] => {
-        const allPrescriptions = response.data.visits.flatMap((visit: VisitModel) =>
-          visit.prescription?.map((prescription: Prescription) => ({
-            ...prescription,
-            visitDate: visit.preferredDate.toISOString(), 
-            status: 'Taken' as const
-          })) || []
+      transformResponse: (
+        response: VisitsResponse
+      ): PrescriptionWithStatus[] => {
+        const allPrescriptions = response.data.visits.flatMap(
+          (visit: VisitModel) =>
+            visit.prescription?.map((prescription: Prescription) => ({
+              ...prescription,
+              visitDate: new Date(visit.preferredDate).toISOString(), 
+              status: "Taken" as const,
+            })) || []
         );
         return allPrescriptions;
       },
       providesTags: ["Visits"],
     }),
+
     getUpcomingAppointments: builder.query<VisitModel[], string>({
       query: (patient_id) => ({
         url: `/visits?patient_id=${patient_id}&status=Scheduled&approval=Approved`,
-        method: 'GET',
+        method: "GET",
       }),
       transformResponse: (response: VisitsResponse) => response.data.visits,
-      providesTags: ['Visits'],
+      providesTags: ["Visits"],
     }),
 
     getCurrentPatient: builder.query<PatientResponse, void>({
       query: () => "/patients/me",
-      transformResponse: (response: { data: PatientResponse, success: boolean }) => response.data,
+      transformResponse: (response: {
+        data: PatientResponse;
+        success: boolean;
+      }) => response.data,
       providesTags: ["Patient"],
     }),
 
@@ -138,7 +153,9 @@ export const fetchPatient = async (_id: string) => {
     const storeModule = await import("../store");
     const store = storeModule.default;
 
-    const result = await store.dispatch(patientApi.endpoints.getPatientById.initiate(_id));
+    const result = await store.dispatch(
+      patientApi.endpoints.getPatientById.initiate(_id)
+    );
 
     if ("error" in result) {
       console.error("Error fetching doctors:", result.error);
@@ -152,13 +169,23 @@ export const fetchPatient = async (_id: string) => {
   }
 };
 
-export const loginPatient = async (password: string, phone?: string, email?: string) => {
+export const loginPatient = async (
+  password: string,
+  phone?: string,
+  email?: string
+) => {
   try {
     // Importing store dynamically since there is circular dependency between patientApi.ts and store.tsx
     const storeModule = await import("../store");
     const store = storeModule.default;
 
-    const result = await store.dispatch(patientApi.endpoints.loginPatient.initiate({ ...(phone ? { phone } : {}), password, ...(email ? { email } : {}) }));
+    const result = await store.dispatch(
+      patientApi.endpoints.loginPatient.initiate({
+        ...(phone ? { phone } : {}),
+        password,
+        ...(email ? { email } : {}),
+      })
+    );
 
     if ("error" in result) {
       console.error("Error fetching doctors:", result.error);
