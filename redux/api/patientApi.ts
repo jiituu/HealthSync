@@ -152,6 +152,7 @@ export const {
   useGetUpcomingAppointmentsQuery,
   useGetVisitsByPatientIdQuery,
   useGetOnlyScheduledVisitsQuery,
+  useLazyGetPatientByIdQuery,
 } = patientApi;
 
 export const fetchPatient = async (_id: string) => {
