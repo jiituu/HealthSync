@@ -144,7 +144,6 @@ export const {
   useUpdatePatientMutation,
   useGetUpcomingAppointmentsQuery,
   useGetVisitsByPatientIdQuery,
-  useLazyGetPatientByIdQuery,
 } = patientApi;
 
 export const fetchPatient = async (_id: string) => {

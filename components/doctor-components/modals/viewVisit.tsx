@@ -4,6 +4,8 @@ import { PatientModel } from "@/components/models/patient";
 import { Box, useMediaQuery } from "@mui/material";
 import { Descriptions, Form, Row } from "antd";
 import { VisitCard } from "@/appPages/doctor/ActiveVisits";
+import { useGetDoctorByIdQuery } from "@/redux/api/doctorApi"
+// import {useGetPatientByIdQuery} from "@/redux/api/patientApi"
 
 
 interface props{
@@ -14,6 +16,8 @@ interface props{
 
 export const ViewVisit = ({ open, setOpen, visit }: props) => {
     const { user }: { user?: PatientModel } = useSessionUser();
+    const { data: doctorData } = useGetDoctorByIdQuery(visit.doctor);
+
     const [form] = Form.useForm();
     const matches = useMediaQuery("(min-width:900px)");
 
@@ -24,10 +28,21 @@ export const ViewVisit = ({ open, setOpen, visit }: props) => {
         setOpen={setOpen}
         width={matches ? "75%" : "100%"}
       >
-        <Row className="justify-around">
-          <Descriptions className="w-[45%]" column={1} bordered size="middle" labelStyle={{ fontWeight: 600 }}>
-            <Descriptions.Item label="Patient ID">{visit.patient}</Descriptions.Item>
-            <Descriptions.Item label="Doctor ID">{visit.doctor}</Descriptions.Item>
+        <Row
+          className={`flex flex-col ${matches ? "md:flex-row md:justify-around" : "flex-col"} w-full gap-4`}
+          style={{ width: '100%' }}
+        >
+          <Descriptions
+            className={matches ? "w-[45%] min-w-[250px]" : "w-full"}
+            column={1}
+            bordered
+            size="middle"
+            labelStyle={{ fontWeight: 600 }}
+          >
+            <Descriptions.Item label="Patient Name">{user?.firstname} {user?.lastname}</Descriptions.Item>
+            <Descriptions.Item label="Visited Doctor">
+              Dr. {doctorData?.data?.firstname} {doctorData?.data?.lastname}
+            </Descriptions.Item>
             <Descriptions.Item label="Preferred Date">
               {new Date(visit.preferredDate).toLocaleString()}
             </Descriptions.Item>
@@ -43,12 +58,11 @@ export const ViewVisit = ({ open, setOpen, visit }: props) => {
             <Descriptions.Item label="Created At">
               {new Date(visit.createdAt).toLocaleString()}
             </Descriptions.Item>
-  
           </Descriptions>
-          
+
           {
             visit.prescription?.length||visit.labResults?.length?
-            <Descriptions className="w-[45%]" column={1} bordered size="middle" labelStyle={{ fontWeight: 600 }}>
+            <Descriptions className={`${matches ? "w-[45%] min-w-[250px]" : "w-full"}`} column={1} bordered size="middle" labelStyle={{ fontWeight: 600 }}>
                   {/* Prescription List */}
                   {visit.prescription && visit.prescription.length > 0 && (
                   <Descriptions.Item label="Prescriptions">
