@@ -39,9 +39,9 @@ export const doctorApi = createApi({
       { status?: "pending" | "approved" | "denied" }
     >({
       query: ({ status }) => ({
-      url: "/doctors",
-      method: "GET",
-      params: status ? { status } : undefined,
+        url: "/doctors",
+        method: "GET",
+        params: status ? { status } : undefined,
       }),
       providesTags: ["Doctor"],
     }),
@@ -75,12 +75,12 @@ export const doctorApi = createApi({
     }),
 
     // Visits
-    getVisitsByDoctorIdApproval: builder.query<any, {id:string,approval:"Approved"|"Denied"|"Scheduled"}>({
-        query: ({id,approval}) => ({
-          url: `/visits?doctor_id=${id}&approval=${approval}`,
-          method: 'GET',
-        }),
+    getVisitsByDoctorIdApproval: builder.query<any, { id: string, approval: "Approved" | "Denied" | "Scheduled" }>({
+      query: ({ id, approval }) => ({
+        url: `/visits?doctor_id=${id}&approval=${approval}`,
+        method: 'GET',
       }),
+    }),
 
     getVisitsByDoctorId: builder.query<any, {id:string}>({
         query: ({id}) => ({
@@ -89,29 +89,29 @@ export const doctorApi = createApi({
         }),
     }),
 
-      approveRefuseVisit: builder.mutation<void, {visitID:string,approval:'Approved'|'Denied'}>({
-        query: (visitPayload) => ({
-          url: `/visits/${visitPayload.visitID}/approval`,
-          method: 'PATCH',
-          body:{approval:visitPayload.approval}
-        }),
+    approveRefuseVisit: builder.mutation<void, { visitID: string, approval: 'Approved' | 'Denied' }>({
+      query: (visitPayload) => ({
+        url: `/visits/${visitPayload.visitID}/approval`,
+        method: 'PATCH',
+        body: { approval: visitPayload.approval }
       }),
-  
-      updateVisit: builder.mutation<void, {visitID:string,body:any}>({
-        query: (visitPayload) => ({
-          url: `/visits/${visitPayload.visitID}`,
-          method: 'PATCH',
-          body:visitPayload.body
-        }),
+    }),
+
+    updateVisit: builder.mutation<void, { visitID: string, body: any }>({
+      query: (visitPayload) => ({
+        url: `/visits/${visitPayload.visitID}`,
+        method: 'PATCH',
+        body: visitPayload.body
       }),
-  
-      // Patients
-      getAppointedPatients: builder.query<any, string>({
-        query: (id) => ({
-          url: `/doctors/${id}/patients`,
-          method: 'GET',
-        }),
+    }),
+
+    // Patients
+    getAppointedPatients: builder.query<any, string>({
+      query: (id) => ({
+        url: `/doctors/${id}/patients`,
+        method: 'GET',
       }),
+    }),
 
 
 
@@ -159,7 +159,7 @@ export const {
   useApproveRefuseVisitMutation,
   useUpdateVisitMutation,
   useUpdateDoctorStatusMutation,
-  useGetAppointedPatientsQuery, 
+  useGetAppointedPatientsQuery,
   useGetVisitsByDoctorIdQuery,
   useGetDoctorByIdQuery,
 

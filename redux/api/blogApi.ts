@@ -14,65 +14,65 @@ export const blogApi = createApi({
   // For cache invalidation
   endpoints: (builder) => ({
     // Fetch all blogs (with optional filters and pagination)
-    getBlogs: builder.query<GetBlogsResponse, { author_id?: string; tag?: string; page?: number; limit?: number }>({
+    getBlogs: builder.query<GetBlogsResponse, { author_id?: string; tag?: string; page?: number; limit?: number; sort?: string; }>({
       query: (params) => ({
-      url: "/blogs",
-      method: "GET",
-      params, 
+        url: "/blogs",
+        method: "GET",
+        params,
       }),
       providesTags: (result, error, arg) =>
         result
           ? [
-              ...result.data.blogs.map(({ _id }) => ({ type: "BlogPost" as const, id: _id })),
-              { type: "BlogPost", id: "LIST" },
-            ]
-          : [{ type: "BlogPost", id: "LIST" }],  
+            ...result.data.blogs.map(({ _id }) => ({ type: "BlogPost" as const, id: _id })),
+            { type: "BlogPost", id: "LIST" },
+          ]
+          : [{ type: "BlogPost", id: "LIST" }],
     }),
 
-// Fetch bookmarked blogs for current user
-getBookmarkedBlogs: builder.query<BlogResponse, void>({
-  query: () => ({
-    url: "/blogs/bookmarks/me",
-    method: "GET",
-  }),
-  providesTags: ['BlogPost'],
-}),
+    // Fetch bookmarked blogs for current user
+    getBookmarkedBlogs: builder.query<BlogResponse, void>({
+      query: () => ({
+        url: "/blogs/bookmarks/me",
+        method: "GET",
+      }),
+      providesTags: ['BlogPost'],
+    }),
 
-// Bookmark a blog
-bookmarkBlog: builder.mutation<void, { blogId: string }>({
-  query: ({ blogId }) => ({
-    url: `/blogs/${blogId}/bookmarks/me`,
-    method: 'PATCH',
-  }),
-  invalidatesTags: ['BlogPost'],
-}),
-// Remove bookmark from a blog
-removeBookmark: builder.mutation<void, { blogId: string }>({
-  query: ({ blogId }) => ({
-    url: `/blogs/${blogId}/bookmarks/me`,
-    method: 'DELETE',
-  }),
-  invalidatesTags: ['BlogPost'],
-}),
+    // Bookmark a blog
+    bookmarkBlog: builder.mutation<void, { blogId: string }>({
+      query: ({ blogId }) => ({
+        url: `/blogs/${blogId}/bookmarks/me`,
+        method: 'PATCH',
+      }),
+      invalidatesTags: ['BlogPost'],
+    }),
+    // Remove bookmark from a blog
+    removeBookmark: builder.mutation<void, { blogId: string }>({
+      query: ({ blogId }) => ({
+        url: `/blogs/${blogId}/bookmarks/me`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: ['BlogPost'],
+    }),
     // Create a blog post
     createBlogPost: builder.mutation<SingleBlogObject, CreateBlogPostPayload>({
-        query: (newPost) => {
-          return {
-            url: "/blogs",
-            method: "POST",
-            body: {
-                author: newPost.author,
-                title: newPost.title,
-                content: newPost.content,
-                tags: newPost.tags || [], // Default empty array if not provided
-                thumbnail: newPost.thumbnail, // Optional
-                published: newPost.published ?? true, // Default to true
-                publishedAt: newPost.publishedAt || new Date().toISOString()
-            },
-          }
-        },
-        invalidatesTags: [{ type: "BlogPost", id: "LIST" }],
-      }),
+      query: (newPost) => {
+        return {
+          url: "/blogs",
+          method: "POST",
+          body: {
+            author: newPost.author,
+            title: newPost.title,
+            content: newPost.content,
+            tags: newPost.tags || [], // Default empty array if not provided
+            thumbnail: newPost.thumbnail, // Optional
+            published: newPost.published ?? true, // Default to true
+            publishedAt: newPost.publishedAt || new Date().toISOString()
+          },
+        }
+      },
+      invalidatesTags: [{ type: "BlogPost", id: "LIST" }],
+    }),
 
     // Delete a blog post
     deleteBlogPost: builder.mutation<void, string>({
@@ -102,7 +102,7 @@ removeBookmark: builder.mutation<void, { blogId: string }>({
         body: data,
       }),
       invalidatesTags: [{ type: "BlogPost", id: "LIST" }],
-      }),
+    }),
 
 
   }),

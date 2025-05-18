@@ -1,84 +1,73 @@
-// src/components/ActiveMedication.jsx
-import React from 'react'
-import { Card, CardHeader, CardContent } from '@/components/ui/card'
-
-const activeMedicines = [
-  {
-    name: 'Fenofibrate (48mg)',
-    instructions: 'Take with food every morning',
-    status: 'Taken'
-  },
-  {
-    name: 'Alfuzosin (10mg)',
-    instructions: 'Take 1 with food twice a day and avoid drinking alcohol for 2 hours after',
-    status: 'Missed'
-  },
-  {
-    name: 'Dexamethasone (4mg)',
-    instructions: 'Take 3 tablets 3 times a day for 7 days',
-    status: 'Taken'
-  },
-  {
-    name: 'Metformin (500mg)',
-    instructions: 'Take 1 tablet twice a day with meals',
-    status: 'Taken'
-  },
-  {
-    name: 'Lisinopril (10mg)',
-    instructions: 'Take 1 tablet daily',
-    status: 'Missed'
-  },
-  {
-    name: 'Atorvastatin (20mg)',
-    instructions: 'Take 1 tablet daily at bedtime',
-    status: 'Taken'
-  },
-  {
-    name: 'Amlodipine (5mg)',
-    instructions: 'Take 1 tablet daily',
-    status: 'Taken'
-  },
-  {
-    name: 'Omeprazole (20mg)',
-    instructions: 'Take 1 capsule daily before breakfast',
-    status: 'Missed'
-  }
-]
-
-const getStatusColor = (status: string) => {
-  return status === 'Missed' ? 'bg-red-500' : 'bg-green-500';
-}
-
-const getCardBgColor = (status: string) => {
-  return status === 'Missed' ? 'bg-red-50' : 'bg-green-50';
-}
+// src/components/ActiveMedication.tsx
+import React from 'react';
+import { Card, CardHeader, CardContent } from '@/components/ui/card';
+import { useGetScheduledVisitsQuery } from '@/redux/api/patientApi';
 
 const ActiveMedication = () => {
+  const patientId = '67b8554a85c8a7f8cf1f971a';
+
+  const {
+    data: prescriptions,
+    isLoading,
+    isError,
+    error
+  } = useGetScheduledVisitsQuery(patientId);
+
+  if (isLoading) {
+    return <div className="text-gray-500 text-sm p-4">Loading medications...</div>;
+  }
+
+  if (isError) {
+    return <div className="text-red-500 text-sm p-4">Error loading medications</div>;
+  }
+
   return (
     <div className="container mx-auto flex flex-col basis-1/2 space-y-5">
-      <h1 className='font-bold text-start'>Active Medications</h1>
-      <div className="overflow-y-auto max-h-96 space-y-5 px-2">
-        {activeMedicines.map((medication, index) => (
-          <Card key={index} className={`shadow-md rounded-xl border border-gray-200 hover:shadow-lg transition-shadow ${getCardBgColor(medication.status)}`}>
-            <CardHeader className="p-4">
-              <div className="flex items-start gap-4">
-                <div className="flex-1">
-                  <h2 className="text-sm font-bold text-gray-800">{medication.name}</h2>
-                  <p className="text-md text-gray-600 leading-relaxed mt-1">{medication.instructions}</p>
+      <h1 className='font-bold text-lg text-gray-800'>Active Medications</h1>
+      <div className="overflow-y-auto max-h-96 space-y-4 pr-2">
+        {prescriptions?.map((prescription, index) => {
+          const isMissed = prescription.status === 'Missed';
+          const bgColor = isMissed ? 'bg-red-50' : 'bg-green-50';
+          const statusColor = isMissed ? 'bg-red-500' : 'bg-green-500';
+          const textColor = isMissed ? 'text-red-700' : 'text-green-700';
+
+          return (
+            <Card
+              key={index}
+              className={`rounded-lg shadow-sm hover:shadow-md transition-shadow ${bgColor}`}
+            >
+              <CardHeader className="px-4 py-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <span className={`h-2.5 w-2.5 rounded-full ${statusColor}`}></span>
+                    <h2 className="text-base font-semibold text-gray-800">
+                      {prescription.medication}
+                      <span className="text-gray-500 text-sm ml-1.5">({prescription.dosage})</span>
+                    </h2>
+                  </div>
+                  <span className={`text-xs px-2 py-1 rounded-full ${textColor}`}>
+                    {prescription.status}
+                  </span>
                 </div>
-                <div className="flex flex-col items-end gap-1">
-                  <span className={`w-4 h-4 ${getStatusColor(medication.status)} rounded-full`}></span>
+              </CardHeader>
+              <CardContent className="px-4 pb-3">
+                <div className="text-sm text-gray-700 space-y-1.5">
+                  {prescription.instructions.split('\n').filter(Boolean).map((line, i) => (
+                    <p key={i} className="leading-snug">{line}</p>
+                  ))}
                 </div>
-              </div>
-            </CardHeader>
-            <CardContent className="p-4 pt-0">
-              <p className="text-xs text-gray-600 font-medium">{medication.status}</p>
-            </CardContent>
-          </Card>
-        ))}
+                {prescription.visitDate && (
+                  <div className="mt-2 text-xs text-gray-500">
+                    Prescribed: {new Date(prescription.visitDate).toLocaleDateString()}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          );
+        })}
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default ActiveMedication
+export default ActiveMedication;
