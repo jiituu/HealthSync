@@ -101,35 +101,35 @@ const Navbar = ({ onMenuClick }: { onMenuClick: () => void }) => {
                     <Spin indicator={<LoadingOutlined spin />} />
                   </Row>
 
-                  : filteredResults.length > 0 ? (
-                    <ul>
-                      {filteredResults.map((doctor, index) => (
-                        <li
-                          key={index}
-                          className="p-2 hover:bg-gray-100 rounded cursor-pointer border-b-2"
-                          onClick={() => {
-                            router.push(`/patient/search?key=${doctor._id}`);
-                            setIsOpen(false);
-                          }}
-                        >
-                          <Row className='gap-3 items-center'>
-                            <div className="w-8 h-8 bg-teal-400 rounded-full flex items-center justify-center text-white">
-                              {doctor.firstname.at(0) ?? 'U'}
-                            </div>
-                            <Row className='flex-col'>
-                              <span className='font-semibold'>Dr. {doctor.firstname} {doctor?.lastname?.at(0)?.toUpperCase()}.</span>
-                              <span className='text-[13px] text-gray-500'>{doctor.email}</span>
-                            </Row>
-                          </Row>
-                          <Row className='gap-x-3 gap-y-2 justify-between mt-2'>
-                            <span className='text-sm text-gray-500'>📍 {doctor?.hospital.address.city}</span>
-                            <span className='text-sm text-gray-500'>🏨 {doctor?.hospital.name}</span>
-                            <span className='text-sm text-gray-500'>🩺 {doctor.specializations.join(', ')}</span>
-                          </Row>
-                        </li>
-                      ))}
-                    </ul>
-                  )
+              :filteredResults.length > 0 ? (
+                <ul>
+                  {filteredResults.map((doctor, index) => (
+                    <li
+                      key={index}
+                      className="p-2 hover:bg-gray-100 rounded cursor-pointer border-b-2"
+                      onClick={()=>{
+                        router.push(`/patient/search?key=${doctor._id}`);
+                        setIsOpen(false);
+                      }}
+                    >
+                      <Row className='gap-3 items-center'>
+                        <div className="w-8 h-8 bg-teal-400 rounded-full flex items-center justify-center text-white">
+                          {doctor.firstname.at(0)??'U'}
+                        </div>
+                        <Row className='flex-col'>
+                          <span className='font-semibold'>Dr. {doctor.firstname} {doctor?.lastname?.at(0)?.toUpperCase()}.</span>
+                          <span className='text-[13px] text-gray-500'>{doctor.email}</span>
+                        </Row>
+                      </Row>
+                      <Row className='flex flex-col items-start mt-2'>
+                        <span className='text-sm text-gray-500'>📍 {doctor?.hospital.address.city}</span>
+                        <span className='text-sm text-gray-500'>🏨 {doctor?.hospital.name}</span>
+                        <span className='text-sm text-gray-500'>🩺 {doctor.specializations.join(', ')}</span>
+                      </Row>
+                    </li>
+                  ))}
+                </ul>
+              ) 
 
                     : <Row><p className="text-sm text-gray-500">No data</p></Row>
             }

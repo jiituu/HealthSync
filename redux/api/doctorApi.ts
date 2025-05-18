@@ -56,7 +56,7 @@ export const doctorApi = createApi({
 
     getVerifiedDoctors: builder.query<any, void>({
       query: () => ({
-        url: "/doctors", // change the url to verified doctors and remove the comment
+        url: "/doctors?status=approved",
         method: "GET",
       }),
     }),
@@ -162,6 +162,7 @@ export const {
   useGetAppointedPatientsQuery,
   useGetVisitsByDoctorIdQuery,
   useGetDoctorByIdQuery,
+
 } = doctorApi;
 
 export const fetchDoctor = async (_id: string) => {

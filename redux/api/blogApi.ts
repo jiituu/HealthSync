@@ -8,8 +8,10 @@ export const blogApi = createApi({
     baseUrl: "https://healthsync-backend-bfrv.onrender.com/api",
     credentials: "include",
 
-  }),
-  tagTypes: ["BlogPost"], // For cache invalidation
+    }),
+  tagTypes: ["BlogPost"], 
+  
+  // For cache invalidation
   endpoints: (builder) => ({
     // Fetch all blogs (with optional filters and pagination)
     getBlogs: builder.query<GetBlogsResponse, { author_id?: string; tag?: string; page?: number; limit?: number; sort?: string; }>({
