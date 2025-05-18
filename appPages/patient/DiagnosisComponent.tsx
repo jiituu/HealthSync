@@ -30,9 +30,6 @@ const DiagnosisComponent: React.FC = () => {
   const { data: visitData, isLoading, isError } = useGetOnlyScheduledVisitsQuery(patientId || "")
   const [activeVisitIndex, setActiveVisitIndex] = useState(0)
 
-
-  console.log("visitData####################", visitData)
-
   if (isLoading) {
     return (
       <div className="flex justify-center items-center h-64">
