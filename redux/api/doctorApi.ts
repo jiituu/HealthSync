@@ -82,6 +82,13 @@ export const doctorApi = createApi({
       }),
     }),
 
+    getVisitsByDoctorId: builder.query<any, {id:string}>({
+        query: ({id}) => ({
+          url: `/visits?doctor_id=${id}`,
+          method: 'GET',
+        }),
+    }),
+
     approveRefuseVisit: builder.mutation<void, { visitID: string, approval: 'Approved' | 'Denied' }>({
       query: (visitPayload) => ({
         url: `/visits/${visitPayload.visitID}/approval`,
@@ -153,6 +160,7 @@ export const {
   useUpdateVisitMutation,
   useUpdateDoctorStatusMutation,
   useGetAppointedPatientsQuery,
+  useGetVisitsByDoctorIdQuery,
   useGetDoctorByIdQuery,
 } = doctorApi;
 

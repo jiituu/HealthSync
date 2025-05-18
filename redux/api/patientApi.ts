@@ -1,7 +1,7 @@
 import { PatientLoginPayload } from "@/types/patient";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { PatientSignupPayload } from "@/types/patient";
-import { VisitModel, Prescription, PrescriptionWithStatus, VisitsResponse, Visit } from "@/components/models/visitModel";
+import { VisitModel, Prescription, PrescriptionWithStatus, VisitsResponse } from "@/components/models/visitModel";
 import { PatientResponse } from "@/types/patient";
 
 export const patientApi = createApi({
@@ -66,16 +66,23 @@ export const patientApi = createApi({
       providesTags: ["Visits"],
     }),
 
+    getVisitsByPatientId: builder.query<any, {id:string}>({
+      query: ({id}) => ({
+        url: `/visits?patient_id=${id}`,
+        method: 'GET',
+      }),
+    }),
+
     getScheduledVisits: builder.query<PrescriptionWithStatus[], string>({
       query: (patient_id: string) => ({
         url: `/visits?patient_id=${patient_id}&status=Scheduled`,
         method: 'GET',
       }),
       transformResponse: (response: VisitsResponse): PrescriptionWithStatus[] => {
-        const allPrescriptions = response.data.visits.flatMap((visit: Visit) =>
+        const allPrescriptions = response.data.visits.flatMap((visit: VisitModel) =>
           visit.prescription?.map((prescription: Prescription) => ({
             ...prescription,
-            visitDate: visit.preferredDate,
+            visitDate: visit.preferredDate.toISOString(), 
             status: 'Taken' as const
           })) || []
         );
@@ -83,7 +90,7 @@ export const patientApi = createApi({
       },
       providesTags: ["Visits"],
     }),
-    getUpcomingAppointments: builder.query<Visit[], string>({
+    getUpcomingAppointments: builder.query<VisitModel[], string>({
       query: (patient_id) => ({
         url: `/visits?patient_id=${patient_id}&status=Scheduled&approval=Approved`,
         method: 'GET',
@@ -121,6 +128,8 @@ export const {
   useGetCurrentPatientQuery,
   useUpdatePatientMutation,
   useGetUpcomingAppointmentsQuery,
+  useGetVisitsByPatientIdQuery,
+  useLazyGetPatientByIdQuery,
 } = patientApi;
 
 export const fetchPatient = async (_id: string) => {
