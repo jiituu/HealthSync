@@ -7,6 +7,7 @@ import store from "@/redux/store";
 import { Toaster } from "@/components/ui/toaster";
 import { StyledEngineProvider } from "@mui/material";
 import NextAuthSessionProvider from "@/components/context/Session";
+import { Analytics } from "@vercel/analytics/next"
 
 const inter = Inter({ subsets: ["latin"] });
 
