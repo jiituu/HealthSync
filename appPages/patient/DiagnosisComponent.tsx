@@ -1,234 +1,265 @@
-// DiagnosisComponent.tsx
-import Image from 'next/image';
-import React from 'react';
-import imgg from '@/public/images/doctor.png';
-import { 
-  Stethoscope, 
-  Pill, 
-} from 'lucide-react';
-import { CiHeart } from "react-icons/ci";
-import { FaFileMedicalAlt } from "react-icons/fa";
-import { HiOutlineDocumentText } from 'react-icons/hi';
+"use client"
 
-interface Vitals {
-  bloodGlucose: string;
-  weight: string;
-  heartRate: string;
-  oxygenSaturation: string;
-  bodyTemperature: string;
-  bloodPressure: string;
-}
+import Image from "next/image"
+import type React from "react"
+import { useState } from "react"
+import {
+  Stethoscope,
+  Pill,
+  Calendar,
+  FileText,
+  ClipboardList,
+  ChevronLeft,
+  ChevronRight,
+  // ExternalLink,
+} from "lucide-react"
+import { HiOutlineDocumentText } from "react-icons/hi"
+import { useGetOnlyScheduledVisitsQuery } from "@/redux/api/patientApi"
+import { useSessionUser } from "@/components/context/Session"
+import type { PatientModel } from "@/components/models/patient"
+import { format } from "date-fns"
+import { Badge } from "@/components/ui/badge"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+// import Link from "next/link"
 
-interface Symptoms {
-  headache: string;
-  nausea: string;
-  heartRate: string;
-}
-
-interface Medication {
-  name: string;
-  dosage: string;
-  time: string;
-}
-
-interface TestReport {
-  name: string;
-  time: string;
-  report: string;
-}
-
-interface DiagnosisData {
-  doctorName: string;
-  doctorTitle: string;
-  appointment: string;
-  vitals: Vitals;
-  symptoms: Symptoms;
-  diagnoses: string[];
-  medications: Medication[];
-  notes: string;
-  testReports: TestReport[];
-}
-
-const diagnosisData: DiagnosisData = {
-  doctorName: 'Dr. Ermiyas Kinde, MS.',
-  doctorTitle: 'Orthopedists Specialist',
-  appointment: '3 Round Appointment',
-  vitals: {
-    bloodGlucose: '120 mg/dL',
-    weight: '55 Kg',
-    heartRate: '70 bpm',
-    oxygenSaturation: '7%',
-    bodyTemperature: '98.1°F',
-    bloodPressure: '120/80 mm Hg',
-  },
-  symptoms: {
-    headache: 'Headache',
-    nausea: 'Nausea',
-    heartRate: 'Heart rate',
-  },
-  diagnoses: ['Severe Nerve Disorder(SND)', 'UTI', 'UTI'],
-  medications: [
-    {
-      name: 'Indexer 20',
-      dosage: '1 Pill',
-      time: '02:00 PM'
-    },
-    {
-      name: 'Ursofalk 300',
-      dosage: '2 Pills',
-      time: '02:00 PM'
-    }
-  ],
-  notes: 'Take medication before meal',
-  testReports: [
-    {
-      name: 'UV Invasive Ultrasound',
-      time: '02:00 PM',
-      report: 'A small nerve in the left-mid section of the neck has shown swollen properties. A brain scan is suggested'
-    },
-    {
-      name: 'Blood Test',
-      time: '02:00 PM',
-      report: 'HIV - A small nerve in the left-mid section of the neck has shown swollen properties. A brain scan is suggested'
-    }
-  ],
-};
 
 const DiagnosisComponent: React.FC = () => {
+  const { user }: { user?: PatientModel } = useSessionUser()
+  const patientId = user?._id
+  const { data: visitData, isLoading, isError } = useGetOnlyScheduledVisitsQuery(patientId || "")
+  const [activeVisitIndex, setActiveVisitIndex] = useState(0)
+
+
+  console.log("visitData####################", visitData)
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    )
+  }
+
+  if (isError || !visitData?.data?.visits || visitData.data.visits.length === 0) {
+    return (
+      <div className="container mx-auto p-8 text-center">
+        <h2 className="text-2xl font-semibold text-gray-700 mb-4">No Visit Records Found</h2>
+        <p className="text-gray-500">You don&apos;t have any visit records at the moment.</p>
+      </div>
+    )
+  }
+
+  const visits = visitData.data.visits
+  const activeVisit = visits[activeVisitIndex]
+
+  const handlePrevVisit = () => {
+    setActiveVisitIndex((prev) => (prev > 0 ? prev - 1 : prev))
+  }
+
+  const handleNextVisit = () => {
+    setActiveVisitIndex((prev) => (prev < visits.length - 1 ? prev + 1 : prev))
+  }
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "Scheduled":
+        return "bg-blue-100 text-blue-800"
+      case "Completed":
+        return "bg-green-100 text-green-800"
+      case "Cancelled":
+        return "bg-red-100 text-red-800"
+      default:
+        return "bg-gray-100 text-gray-800"
+    }
+  }
+
+  const formatDate = (dateInput: string | Date) => {
+    try {
+      const date = typeof dateInput === "string" ? new Date(dateInput) : dateInput
+      return format(date, "MMM dd, yyyy")
+    } catch (error) {
+      return "Invalid date"
+    }
+  }
+
   return (
     <div className="container mx-auto p-4 bg-white shadow-md rounded-lg">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 pb-4 border-b">
-        <div className="flex items-center mb-4 sm:mb-0">
-          <Image
-            src={imgg}
-            alt={`${diagnosisData.doctorName} profile`}
-            className="w-12 h-12 rounded-full mr-4"
-            width={48}
-            height={48}
-          />
-          <div>
-            <h2 className="text-lg font-semibold text-gray-800">{diagnosisData.doctorName}</h2>
-            <p className="text-sm text-gray-600">{diagnosisData.doctorTitle}</p>
+      {/* Visit Navigation */}
+      <div className="flex justify-between items-center mb-6">
+        <button
+          onClick={handlePrevVisit}
+          disabled={activeVisitIndex === 0}
+          className={`p-2 rounded-full ${activeVisitIndex === 0 ? "text-gray-300" : "text-blue-600 hover:bg-blue-50"}`}
+        >
+          <ChevronLeft size={24} />
+        </button>
+        <div className="text-center">
+          <h2 className="text-xl font-semibold text-gray-800">Visit Record</h2>
+          <p className="text-sm text-gray-500">
+            {activeVisitIndex + 1} of {visits.length}
+          </p>
+        </div>
+        <button
+          onClick={handleNextVisit}
+          disabled={activeVisitIndex === visits.length - 1}
+          className={`p-2 rounded-full ${activeVisitIndex === visits.length - 1 ? "text-gray-300" : "text-blue-600 hover:bg-blue-50"}`}
+        >
+          <ChevronRight size={24} />
+        </button>
+      </div>
+
+      {/* Visit Header */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 pb-4 border-b">
+        <div className="flex flex-col mb-4 sm:mb-0">
+          <div className="flex items-center gap-2 mb-2">
+            <Calendar className="text-gray-500" size={20} />
+            <span className="text-sm text-gray-600">
+              {activeVisit.startDate ? formatDate(activeVisit.startDate) : formatDate(activeVisit.preferredDate)}
+            </span>
+          </div>
+          <div className="flex items-center gap-2">
+            <FileText className="text-gray-500" size={20} />
+            <span className="text-sm text-gray-600">ID: {activeVisit._id.substring(0, 8)}</span>
           </div>
         </div>
-        <div className="bg-blue-100 px-4 py-2 rounded-lg">
-          <span className="text-sm font-semibold text-blue-800">{diagnosisData.appointment}</span>
+        <div className={`px-4 py-2 rounded-lg ${getStatusColor(activeVisit.status)}`}>
+          <span className="text-sm font-semibold">{activeVisit.status}</span>
         </div>
       </div>
 
-      <div className="space-y-4 mb-10">
-        {/* Vitals */}
-      <div className="rounded-lg border shadow-md">
-        <div className="flex items-center px-4 bg-gray-50 gap-2 rounded-md w-fit mt-2 ml-4 py-1">
-          <CiHeart className='text-gray-600 font-bold' size={25}/>
-          <p className="text-gray-400 font-semibold">Vitals</p>
-        </div>
-        <div className="flex flex-wrap justify-between mb-6 px-4 pt-3 gap-5">
-          {Object.entries(diagnosisData.vitals).map(([key, value]) => (
-            <div key={key} className="space-y-1">
-              <span className="text-sm font-semibold text-gray-600 capitalize">{key}</span>
-              <p className="text-gray-800">{value}</p>
-            </div>
-          ))}
-        </div>
-      </div>
+      <Tabs defaultValue="overview" className="w-full mb-8">
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="prescription">Prescription</TabsTrigger>
+          <TabsTrigger value="labResults">Lab Results</TabsTrigger>
+        </TabsList>
 
-      {/* Symptoms */}
-      <div className="rounded-lg border shadow-md">
-        <div className="flex items-center px-4 bg-gray-50 gap-2 rounded-md w-fit mt-2 ml-4 py-1">
-          <FaFileMedicalAlt className='text-gray-400 font-bold' size={25}/>
-          <p className="text-gray-400 font-semibold">Symptoms</p>
-        </div>
-        <div className="flex flex-wrap items-center gap-5 md:gap-24 mb-6 px-4 pt-3">
-          {Object.entries(diagnosisData.symptoms).map(([key, value]) => (
-            <div key={key} className="space-y-1">
-              <span className="text-sm font-semibold text-gray-600 capitalize">{key}</span>
-              <p className="text-gray-800">{value}</p>
-            </div>
-          ))}
-        </div>
-      </div>
+        <TabsContent value="overview" className="mt-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">Visit Details</CardTitle>
+              <CardDescription>Information about your medical visit</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <h3 className="text-sm font-medium text-gray-500">Reason for Visit</h3>
+                  <p className="text-gray-800">{activeVisit.reason}</p>
+                </div>
 
-
-      {/* Diagnosis & Medications */}
-      <div className="flex flex-wrap items-start justify-between border rounded-md shadow-md">
-        <div className="">
-          <div className="flex items-center px-4 bg-gray-50 gap-2 rounded-md w-fit mt-2 ml-4 py-1">
-            <Stethoscope className='text-gray-500 font-bold' size={25}/>
-            <p className="text-gray-400 font-semibold">Diagnosis</p>
-          </div>
-          <ul className="space-y-1 p-4">
-            {diagnosisData.diagnoses.map((diagnosis, index) => (
-              <li key={index} className="text-gray-800">{diagnosis}</li>
-            ))}
-          </ul>
-        </div>
-
-        
-        <div className="">
-          <div className="flex items-center px-4 bg-gray-50 gap-2 rounded-md w-fit mt-2 ml-4 py-1">
-              <Pill className='text-gray-500 font-bold' size={25}/>
-              <p className="text-gray-400 font-semibold">Medications</p>
-          </div>
-          <div className="space-y-1 p-4">
-            {diagnosisData.medications.map((med, index) => (
-              <div key={index} className="flex justify-between items-center">
-                <span className="font-medium text-gray-800">{med.name}</span>
-                <span className="text-sm text-gray-600">{med.dosage} - {med.time}</span>
+                {activeVisit.diagnosis && (
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <Stethoscope className="text-gray-500" size={18} />
+                      <h3 className="text-sm font-medium text-gray-500">Diagnosis</h3>
+                    </div>
+                    <p className="text-gray-800">{activeVisit.diagnosis}</p>
+                  </div>
+                )}
               </div>
-            ))}
-          </div>
-        </div>
 
-          {/* Notes */}
-          <div className="mb-6 p-4">
-            <h3 className="text-lg font-semibold text-gray-800 mb-2">Notes</h3>
-            <p className="text-gray-800">{diagnosisData.notes}</p>
-        </div>
-      </div>
+              {activeVisit.notes && (
+                <div className="pt-4 border-t">
+                  <div className="flex items-center gap-2 mb-2">
+                    <ClipboardList className="text-gray-500" size={18} />
+                    <h3 className="text-sm font-medium text-gray-500">Doctor&apos;s Notes</h3>
+                  </div>
+                  <p className="text-gray-800 whitespace-pre-line">{activeVisit.notes}</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
 
-      {/* Test Reports */}
-      <div className="border rounded-lg shadow-md">
-        <div className="flex items-center px-4 bg-gray-50 gap-2 rounded-md w-fit mt-2 ml-4 py-1">
-          <HiOutlineDocumentText size={25} className='text-gray-500 font-bold'/>
-          <span className='text-gray-400 font-semibold'>Test Reports</span>
-        </div>
-        <div className="space-y-4 p-4">
-          {/* UV Invasive Ultrasound */}
-            <div className="flex flex-col md:flex-row items-start md:items-center space-y-2 md:space-y-0 md:space-x-4">
-            <div className="flex-shrink-0 w-full md:w-1/5">
-              <p className="text-sm font-medium">UV Invasive Ultrasound</p>
-              <p className="text-xs text-gray-500">02:00 PM</p>
-            </div>
-            <div className="flex-1 w-full md:w-4/5 border-l-2 border-gray-400 pl-4">
-              <p className="text-sm">Nerve Disorder</p>
-              <p className="text-sm">
-              A small nerve in the left-mid section of the neck has shown swollen
-              properties. A brain scan is suggested
-              </p>
-            </div>
-            </div>
+        <TabsContent value="prescription" className="mt-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Pill className="text-gray-500" size={20} />
+                <span>Prescription</span>
+              </CardTitle>
+              <CardDescription>Medications prescribed during your visit</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {(activeVisit?.prescription ?? []).length > 0 ? (
+                <div className="space-y-6">
+                  {(activeVisit.prescription ?? []).map((med: any) => (
+                    <div key={med._id} className="border rounded-lg p-4 shadow-sm">
+                      <div className="flex justify-between items-start mb-3">
+                        <h3 className="text-lg font-semibold text-gray-800">{med.medication}</h3>
+                        <Badge variant="outline">{med.dosage}</Badge>
+                      </div>
+                      <div className="text-gray-700 whitespace-pre-line">{med.instructions}</div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-gray-500 text-center py-6">No prescription information available</p>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
 
-          {/* Blood Test */}
-            <div className="flex flex-col md:flex-row items-start md:items-center space-y-2 md:space-y-0 md:space-x-4">
-            <div className="flex-shrink-0 w-full md:w-1/5">
-              <p className="text-sm font-medium">Blood Test</p>
-              <p className="text-xs text-gray-500">02:00 PM</p>
-            </div>
-            <div className="flex-1 w-full md:w-4/5 border-l-2 border-gray-400 pl-4">
-              <p className="text-sm">HIV -</p>
-              <p className="text-sm">
-              A small nerve in the left-mid section of the neck has shown swollen
-              properties. A brain scan is suggested
-              </p>
-            </div>
-            </div>
-        </div>
-      </div>
-      </div>
+        <TabsContent value="labResults" className="mt-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <HiOutlineDocumentText size={20} className="text-gray-500" />
+                <span>Lab Results</span>
+              </CardTitle>
+              <CardDescription>Test results from your medical visit</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {(activeVisit.labResults?.length ?? 0) > 0 ? (
+                <div className="space-y-6">
+                  {activeVisit.labResults?.map((lab: any) => (
+                    <div key={lab._id} className="border rounded-lg p-4 shadow-sm">
+                      <div className="flex justify-between items-start mb-3">
+                        <h3 className="text-lg font-semibold text-gray-800">{lab.testName}</h3>
+                        {lab.normalRange && (
+                          <div className="text-sm text-gray-500">
+                            Normal Range: {lab.normalRange} {lab.unit}
+                          </div>
+                        )}
+                      </div>
+
+                      {lab.result && lab.result.startsWith("http") ? (
+                        <div className="mt-2">
+                          {/* <Link
+                            href={lab.result}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-2 text-blue-600 hover:text-blue-800"
+                          >
+                            <ExternalLink size={16} />
+                            <span>View Result Image</span>
+                          </Link> */}
+                          <div className="mt-3 max-w-md mx-auto">
+                            <Image
+                              src={lab.result || "/placeholder.svg"}
+                              alt={`${lab.testName} result`}
+                              width={400}
+                              height={300}
+                              className="rounded-md border shadow-sm"
+                            />
+                          </div>
+                        </div>
+                      ) : (
+                        <p className="text-gray-700">{lab.result}</p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-gray-500 text-center py-6">No lab results available</p>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
-  );
-};
+  )
+}
 
-export default DiagnosisComponent;
+export default DiagnosisComponent
