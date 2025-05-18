@@ -93,13 +93,20 @@ export const patientApi = createApi({
           (visit: VisitModel) =>
             visit.prescription?.map((prescription: Prescription) => ({
               ...prescription,
-              visitDate: new Date(visit.preferredDate).toISOString(), 
+              visitDate: new Date(visit.preferredDate).toISOString(),
               status: "Taken" as const,
             })) || []
         );
         return allPrescriptions;
       },
       providesTags: ["Visits"],
+    }),
+
+    getOnlyScheduledVisits: builder.query<VisitsResponse, string>({
+      query: (patient_id: string) => ({
+        url: `/visits?patient_id=${patient_id}&status=Scheduled`,
+        method: "GET",
+      }),
     }),
 
     getUpcomingAppointments: builder.query<VisitModel[], string>({
@@ -144,7 +151,7 @@ export const {
   useUpdatePatientMutation,
   useGetUpcomingAppointmentsQuery,
   useGetVisitsByPatientIdQuery,
-  useLazyGetPatientByIdQuery,
+  useGetOnlyScheduledVisitsQuery,
 } = patientApi;
 
 export const fetchPatient = async (_id: string) => {

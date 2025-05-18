@@ -22,6 +22,7 @@ import type { VisitModel } from "@/components/models/visitModel"
 import { ViewVisit } from "@/components/doctor-components/modals/viewVisit"
 import type { VisitCard } from "../doctor/ActiveVisits"
 import { useGetDoctorByIdQuery } from "@/redux/api/doctorApi"
+import {useGetPatientByIdQuery} from "@/redux/api/patientApi"
 import dayjs from "dayjs"
 
 const ITEMS_PER_PAGE = 7
@@ -54,6 +55,8 @@ const PatientMedicalHistory = () => {
   } = useGetVisitsByPatientIdQuery({
     id: user?._id ?? "",
   })
+
+
 
   // Determine severity based on diagnosis
   const getSeverity = (diagnosis: string): "low" | "medium" | "high" => {
@@ -182,7 +185,7 @@ const PatientMedicalHistory = () => {
           </div>
         </div>
       </CardHeader>
-      <CardContent className="p-0">
+      <CardContent className="p-0 overflow-x-auto">
         {isLoading ? (
           <div className="flex justify-center items-center h-64">
             <div className="flex flex-col items-center gap-2">
@@ -204,49 +207,44 @@ const PatientMedicalHistory = () => {
           </div>
         ) : (
           <>
-            <Table>
+            <Table className="table-fixed min-w-[600px] w-full">
               <TableHeader>
                 <TableRow className="bg-slate-50 hover:bg-slate-50">
-                  <TableHead className="w-[120px]">
-                    <div className="flex items-center gap-1">
+                  <TableHead className="w-1/4 px-2 sm:px-4 text-xs sm:text-sm">
+                    <div className="flex items-center gap-1 justify-center">
                       <Calendar className="h-4 w-4 text-slate-500" />
                       <span>Visit Date</span>
                     </div>
                   </TableHead>
-                  <TableHead>
-                    <div className="flex items-center gap-1">
-                      <User className="h-4 w-4 text-slate-500" />
-                      <span>Doctor</span>
-                    </div>
-                  </TableHead>
-                  <TableHead>
-                    <div className="flex items-center gap-1">
+                  <TableHead className="w-1/4 px-2 sm:px-4 text-xs sm:text-sm">
+                    <div className="flex items-center gap-1 justify-center">
                       <Filter className="h-4 w-4 text-slate-500" />
                       <span>Diagnosis</span>
                     </div>
                   </TableHead>
-                  <TableHead>
-                    <div className="flex items-center gap-1">
+                  <TableHead className="w-1/4 px-2 sm:px-4 text-xs sm:text-sm">
+                    <div className="flex items-center gap-1 justify-center">
                       <Phone className="h-4 w-4 text-slate-500" />
                       <span>Contact</span>
                     </div>
                   </TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
+                  <TableHead className="w-1/4 px-2 sm:px-4 text-xs sm:text-sm text-right">
+                    Actions
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {paginatedData.map((entry) => (
                   <TableRow key={entry.id} className="hover:bg-slate-50">
-                    <TableCell className="font-medium">{entry.date}</TableCell>
-                    <TableCell>{entry.doctor}</TableCell>
-                    <TableCell>
+                    <TableCell className="w-1/4 font-medium px-2 sm:px-4 text-xs sm:text-sm text-center">{entry.date}</TableCell>
+                    <TableCell className="w-1/4 px-2 sm:px-4 text-xs sm:text-sm">
                       <div className="flex items-center gap-2">
                         <span className="text-slate-700">{entry.diagnosis}</span>
                         {getSeverityBadge(entry.severity || "medium")}
                       </div>
                     </TableCell>
-                    <TableCell>{entry.contact}</TableCell>
-                    <TableCell className="text-right">
+                    <TableCell className="w-1/4 px-2 sm:px-4 text-xs sm:text-sm text-center">{entry.contact}</TableCell>
+                    <TableCell className="w-1/4 px-2 sm:px-4 text-xs sm:text-sm text-right">
                       <Button
                         variant="outline"
                         size="sm"

@@ -26,6 +26,7 @@ export interface LabResultsModel {
   result: string;
   normalRange: string;
   unit: string;
+  _id: string;
 }
 
 export interface Prescription {
