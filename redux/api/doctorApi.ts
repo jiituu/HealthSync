@@ -155,9 +155,9 @@ export const doctorApi = createApi({
 
 
     // update doctor
-    updateDoctor: builder.mutation<any, { doctorId: string; body: any }>({
-      query: ({ doctorId, body }) => ({
-        url: `/doctors/${doctorId}`,
+    updateDoctor: builder.mutation<any, { body: any }>({
+      query: ({ body }) => ({
+        url: `/doctors/me`,
         method: "PATCH",
         body,
       }),

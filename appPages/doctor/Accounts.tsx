@@ -92,14 +92,15 @@ const Accounts = () => {
 
   const onProfileSubmit: SubmitHandler<ProfileFormValues> = async (data) => {
     if (!doctor?._id) return;
+    const { email, phoneNumber, ...rest } = data; // Exclude email and phoneNumber from the data
     const updatedData = {
-      ...data,
-      specializations: data.specializations?.split(",").map((s) => s.trim()).filter((s) => s) || [],
-      licenses: [...preExistingDocuments, ...newlyUploadedDocuments],
+      ...rest,
+      specializations: rest.specializations?.split(",").map((s) => s.trim()).filter((s) => s) || [],
+      licenses: newlyUploadedDocuments, // Include only newly uploaded licenses
     };
     console.log("Submitting profile data:", updatedData);
     try {
-      await updateDoctor({ doctorId: doctor._id, body: updatedData }).unwrap();
+      await updateDoctor({ body: updatedData }).unwrap();
       message.success("Profile updated successfully!");
       setPreExistingDocuments((prev) => [...prev, ...newlyUploadedDocuments]);
       setNewlyUploadedDocuments([]);
@@ -213,7 +214,7 @@ const Accounts = () => {
                     <FormItem>
                       <FormLabel>Phone Number</FormLabel>
                       <FormControl>
-                        <Input {...field} placeholder="Your Phone Number" />
+                        <Input {...field} placeholder="Your Phone Number" readOnly={!!doctor?.phoneNumber} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
