@@ -1,4 +1,5 @@
 export interface VisitModel {
+  name: ReactNode;
   _id: string;
   patient: string;
   doctor: string;
