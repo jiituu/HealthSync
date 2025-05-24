@@ -2,6 +2,7 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { DoctorLoginPayload, DoctorSignupPayload } from "@/types/doctor";
 // import { get } from "http";
 import { DoctorApiResponse, DoctorsListApiResponse } from "@/types/doctor";
+import { VisitsResponse } from "@/types/visit";
 
 export const doctorApi = createApi({
   reducerPath: "doctorApi",
@@ -105,6 +106,13 @@ export const doctorApi = createApi({
       }),
     }),
 
+    getDoctorCompletedVisits: builder.query<VisitsResponse, string>({
+          query: (doctor_id: string) => ({
+            url: `/visits?doctor_id=${doctor_id}&status=Completed`,
+            method: "GET",
+          }),
+        }),
+
     // Patients
     getAppointedPatients: builder.query<any, string>({
       query: (id) => ({
@@ -145,7 +153,32 @@ export const doctorApi = createApi({
       invalidatesTags: ["Doctor"],
     }),
 
-  }),
+
+    // update doctor
+    updateDoctor: builder.mutation<any, { doctorId: string; body: any }>({
+      query: ({ doctorId, body }) => ({
+        url: `/doctors/${doctorId}`,
+        method: "PATCH",
+        body,
+      }),
+      invalidatesTags: ["Doctor"],
+    }),
+
+
+    getDoctorVisitPerformance: builder.query<any, { doctor_id: string; status?: string; approval?: string; new_in?: number }>({
+      query: ({ doctor_id, status, approval, new_in }) => ({
+        url: `/figures/visits`,
+        method: "GET",
+        params: {
+          doctor_id,
+          ...(status ? { status } : {}),
+          ...(approval ? { approval } : {}),
+          ...(new_in !== undefined ? { new_in } : {}),
+        },
+      }),
+    }),
+
+  })
 });
 
 export const {
@@ -162,6 +195,9 @@ export const {
   useGetAppointedPatientsQuery,
   useGetVisitsByDoctorIdQuery,
   useGetDoctorByIdQuery,
+  useGetDoctorCompletedVisitsQuery,
+  useUpdateDoctorMutation,
+  useGetDoctorVisitPerformanceQuery,
 
 } = doctorApi;
 

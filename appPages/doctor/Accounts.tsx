@@ -1,11 +1,10 @@
 "use client"
 
-import type React from "react"
-import { useState } from "react"
+import React, { useState, useEffect } from "react"
 import { useForm, type SubmitHandler } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
-import { Form, FormItem, FormLabel, FormControl, FormMessage, FormDescription } from "@/components/ui/form"
+import { Form, FormItem, FormLabel, FormControl, FormMessage, FormDescription, FormField } from "@/components/ui/form"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
@@ -13,15 +12,23 @@ import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { Badge } from "@/components/ui/badge"
 import Image from "next/image"
-import { CheckCircle, Clock, Upload, FileText, Edit } from "lucide-react"
-import imgg from '@/public/images/doctor.png'
-;
+import { CheckCircle, Clock, Upload, FileText, Edit, Trash2 } from "lucide-react"
+import imgg from '@/public/images/doctor.png';
+import {useUpdateDoctorMutation} from "@/redux/api/doctorApi"
+import { useSessionUser } from "@/components/context/Session"
+import { DoctorResponse } from "@/types/doctor"
+import CloudinaryUploader from "@/components/doctor-components/CloudinaryUploader"
+import { message } from "antd"
+import { Dialog, DialogContent, DialogTrigger, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+
 const profileSchema = z.object({
-  fullName: z.string().min(1, "Full Name is required"),
+  firstname: z.string().min(1, "First Name is required"),
+  lastname: z.string().min(1, "Last Name is required"),
   phoneNumber: z.string().min(10, "Enter a valid phone number"),
   gender: z.string().min(1, "Gender is required"),
   age: z.number().min(0, "Age must be a positive number").max(120, "Age must be realistic"),
-  specialization: z.string().optional(),
+  specializations: z.string().optional(), 
+  email: z.string().email("Invalid email address").optional(), 
 })
 
 const documentSchema = z.object({
@@ -30,47 +37,86 @@ const documentSchema = z.object({
 
 type ProfileFormValues = z.infer<typeof profileSchema>
 type DocumentFormValues = z.infer<typeof documentSchema>
-const isVerified = true
+type Document = { url: string; type: string; isVerified: boolean }
 
 const Accounts = () => {
-  const [verifiedDocuments, setVerifiedDocuments] = useState<string[]>(["Gynaecology certification"])
-  const [uploadedFileName, setUploadedFileName] = useState<string | null>(null)
+  const { user } = useSessionUser(); 
+  const doctor = user; 
+
+  const [updateDoctor, { isLoading: isUpdatingDoctor }] = useUpdateDoctorMutation();
+  const [newlyUploadedDocuments, setNewlyUploadedDocuments] = useState<Document[]>([]);
+  const [preExistingDocuments, setPreExistingDocuments] = useState<Document[]>([]);
+  const [selectedDocumentUrl, setSelectedDocumentUrl] = useState<string | null>(null);
 
   const profileForm = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
-      fullName: "Dr Belete Abebe",
+      firstname: "",
+      lastname: "",
       phoneNumber: "",
       gender: "",
       age: 0,
-      specialization: "Gynaecology",
+      specializations: "",
+      email: "",
     },
-  })
+  });
+
+  useEffect(() => {
+    if (doctor) {
+      profileForm.reset({
+        firstname: doctor.firstname || "",
+        lastname: doctor.lastname || "",
+        phoneNumber: doctor.phoneNumber || "",
+        gender: doctor.gender || "male",
+        age: doctor.age || 0,
+        specializations: doctor.specializations?.join(", ") || "",
+        email: doctor.email || "",
+      });
+      setPreExistingDocuments(doctor.licenses || []);
+      setNewlyUploadedDocuments([]);
+    }
+  }, [doctor]);
 
   const documentForm = useForm<DocumentFormValues>({
     resolver: zodResolver(documentSchema),
-  })
+  });
 
-  const onProfileSubmit: SubmitHandler<ProfileFormValues> = (data) => {
-    console.log(data)
-  }
+  const handleLicenseUpload = (url: string) => {
+    const newLicense = { url, type: "pdf", isVerified: false };
+    setNewlyUploadedDocuments((prev) => [...prev, newLicense]);
+  };
 
-  const onDocumentSubmit: SubmitHandler<DocumentFormValues> = (data) => {
-    console.log(data)
-    if (data.document) {
-      setVerifiedDocuments((prev) => [...prev, data.document.name])
+  const handleDeleteDocument = (url: string) => {
+    setNewlyUploadedDocuments((prev) => prev.filter((doc) => doc.url !== url));
+  };
+
+  const onProfileSubmit: SubmitHandler<ProfileFormValues> = async (data) => {
+    if (!doctor?._id) return;
+    const updatedData = {
+      ...data,
+      specializations: data.specializations?.split(",").map((s) => s.trim()).filter((s) => s) || [],
+      licenses: [...preExistingDocuments, ...newlyUploadedDocuments],
+    };
+    console.log("Submitting profile data:", updatedData);
+    try {
+      await updateDoctor({ doctorId: doctor._id, body: updatedData }).unwrap();
+      message.success("Profile updated successfully!");
+      setPreExistingDocuments((prev) => [...prev, ...newlyUploadedDocuments]);
+      setNewlyUploadedDocuments([]);
+    } catch (error: any) {
+      console.error("Failed to update profile:", error);
+      message.error(error?.data?.error || "Failed to update profile.");
     }
-  }
+  };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setUploadedFileName(e.target.files[0].name)
-    }
+  const isDoctorVerified = doctor?.status === "approved";
+
+  if (!doctor) {
+    return <div className="container mx-auto p-4">Loading doctor information...</div>;
   }
 
   return (
     <div className="container mx-auto pb-8 px-4">
-
       <Card className="mb-8 shadow-sm">
         <CardHeader className="pb-4">
           <CardTitle className="text-xl font-semibold text-slate-800">Personal Information</CardTitle>
@@ -81,7 +127,7 @@ const Accounts = () => {
             <div className="flex items-center gap-5">
               <div className="relative">
                 <Image
-                  src={imgg}
+                  src={imgg} 
                   alt="profile image"
                   width={100}
                   height={100}
@@ -93,9 +139,11 @@ const Accounts = () => {
                 </Button>
               </div>
               <div className="flex flex-col gap-1">
-                <h2 className="font-bold text-2xl text-slate-800">Dr Belete Abebe</h2>
-                <p className="text-slate-500">Beleteabebe@gmail.com</p>
-                {isVerified ? (
+                <h2 className="font-bold text-2xl text-slate-800">
+                  Dr {doctor?.firstname || ""} {doctor?.lastname || ""}
+                </h2>
+                <p className="text-slate-500">{doctor?.email || "No email provided"}</p>
+                {isDoctorVerified ? (
                   <Badge
                     variant="outline"
                     className="mt-1 gap-1 text-emerald-600 border-emerald-200 bg-emerald-50 w-fit"
@@ -106,7 +154,7 @@ const Accounts = () => {
                 ) : (
                   <Badge variant="outline" className="mt-1 gap-1 text-amber-600 border-amber-200 bg-amber-50 w-fit">
                     <Clock className="h-3.5 w-3.5" />
-                    <span>Verification Pending</span>
+                    <span>{doctor?.status ? `Status: ${doctor.status}` : "Verification Pending"}</span>
                   </Badge>
                 )}
               </div>
@@ -118,140 +166,189 @@ const Accounts = () => {
           <Form {...profileForm}>
             <form onSubmit={profileForm.handleSubmit(onProfileSubmit)} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <FormItem>
-                  <FormLabel>Full Name</FormLabel>
-                  <FormControl>
-                    <Input {...profileForm.register("fullName")} placeholder="Your Full Name" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
+                <FormField
+                  control={profileForm.control}
+                  name="firstname"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>First Name</FormLabel>
+                      <FormControl>
+                        <Input {...field} placeholder="Your First Name" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={profileForm.control}
+                  name="lastname"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Last Name</FormLabel>
+                      <FormControl>
+                        <Input {...field} placeholder="Your Last Name" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={profileForm.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email</FormLabel>
+                      <FormControl>
+                        <Input {...field} placeholder="Your Email Address" type="email" readOnly={!!doctor?.email} />
+                      </FormControl>
+                      <FormDescription>Email address (cannot be changed if already set).</FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={profileForm.control}
+                  name="phoneNumber"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Phone Number</FormLabel>
+                      <FormControl>
+                        <Input {...field} placeholder="Your Phone Number" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={profileForm.control}
+                  name="gender"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Gender</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={doctor?.gender || "male"} // Initialize with gender from user object
+                        value={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select gender" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="male">Male</SelectItem>
+                          <SelectItem value="female">Female</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={profileForm.control}
+                  name="age"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Age</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          {...field}
+                          onChange={event => field.onChange(+event.target.value)}
+                          placeholder="Your Age"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={profileForm.control}
+                  name="specializations"
+                  render={({ field }) => (
+                    <FormItem className="md:col-span-2">
+                      <FormLabel>Specializations</FormLabel>
+                      <FormControl>
+                        <Input {...field} placeholder="e.g., Cardiology, Neurology" />
+                      </FormControl>
+                      <FormDescription>Enter your medical specializations, separated by commas.</FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
 
-                <FormItem>
-                  <FormLabel>Phone Number</FormLabel>
-                  <FormControl>
-                    <Input {...profileForm.register("phoneNumber")} placeholder="Your Phone Number" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-
-                <FormItem>
-                  <FormLabel>Gender</FormLabel>
-                  <Select
-                    onValueChange={(value) => profileForm.setValue("gender", value)}
-                    defaultValue={profileForm.getValues("gender")}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select gender" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="male">Male</SelectItem>
-                      <SelectItem value="female">Female</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-
-                <FormItem>
-                  <FormLabel>Age</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="number"
-                      {...profileForm.register("age", { valueAsNumber: true })}
-                      placeholder="Your Age"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-
-                <FormItem className="md:col-span-2">
-                  <FormLabel>Specialization</FormLabel>
-                  <FormControl>
-                    <Input {...profileForm.register("specialization")} placeholder="Your Medical Specialization" />
-                  </FormControl>
-                  <FormDescription>Enter your primary medical specialization</FormDescription>
-                  <FormMessage />
-                </FormItem>
+              <div className="space-y-6">
+                <h3 className="text-lg font-medium text-slate-700">Upload Licenses</h3>
+                <CloudinaryUploader onUploadSuccess={handleLicenseUpload} />
+                {(preExistingDocuments.length > 0 || newlyUploadedDocuments.length > 0) && (
+                  <div className="mt-4">
+                    <h4 className="text-sm font-medium text-slate-600">Uploaded Licenses:</h4>
+                    <ul className="list-disc list-inside">
+                      {preExistingDocuments.map((doc, index) => (
+                        <li key={`pre-${index}`} className="flex items-center gap-2">
+                          <Dialog>
+                            <DialogTrigger asChild>
+                              <Button variant="link" className="text-blue-500 hover:underline">
+                                License {index + 1} ({doc.type})
+                              </Button>
+                            </DialogTrigger>
+                            <DialogContent>
+                              <DialogHeader>
+                                <DialogTitle>License {index + 1}</DialogTitle>
+                              </DialogHeader>
+                              <iframe
+                                src={doc.url}
+                                className="w-full h-[500px] border rounded-md"
+                                title={`License ${index + 1}`}
+                              />
+                            </DialogContent>
+                          </Dialog>
+                          {doc.isVerified && (
+                            <Badge variant="outline" className="text-emerald-600 border-emerald-200 bg-emerald-50">
+                              Verified
+                            </Badge>
+                          )}
+                        </li>
+                      ))}
+                      {newlyUploadedDocuments.map((doc, index) => (
+                        <li key={`new-${index}`} className="flex items-center gap-2">
+                          <Dialog>
+                            <DialogTrigger asChild>
+                              <Button variant="link" className="text-blue-500 hover:underline">
+                                License {preExistingDocuments.length + index + 1} ({doc.type})
+                              </Button>
+                            </DialogTrigger>
+                            <DialogContent>
+                              <DialogHeader>
+                                <DialogTitle>License {preExistingDocuments.length + index + 1}</DialogTitle>
+                              </DialogHeader>
+                              <iframe
+                                src={doc.url}
+                                className="w-full h-[500px] border rounded-md"
+                                title={`License ${preExistingDocuments.length + index + 1}`}
+                              />
+                            </DialogContent>
+                          </Dialog>
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            onClick={() => handleDeleteDocument(doc.url)}
+                            className="h-6 w-6 p-0"
+                            title="Delete this license"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
               </div>
 
               <div className="flex justify-end">
-                <Button type="submit" className="bg-secondaryColor hover:bg-emerald-600 text-white">
-                  Save Changes
-                </Button>
-              </div>
-            </form>
-          </Form>
-        </CardContent>
-      </Card>
-
-      {/* this is forLicense Documents Card */}
-      <Card className="shadow-sm">
-        <CardHeader className="pb-4">
-          <CardTitle className="text-xl font-semibold text-slate-800">License Documents</CardTitle>
-          <CardDescription>Manage your medical license and certification documents</CardDescription>
-        </CardHeader>
-        <CardContent>
-          {verifiedDocuments.length > 0 && (
-            <div className="mb-6 space-y-4">
-              <h3 className="text-sm font-medium text-slate-500">Verified Documents</h3>
-              {verifiedDocuments.map((doc, index) => (
-                <div key={index} className="flex items-center gap-3 p-3 rounded-lg border bg-slate-50">
-                  <div className="p-2 rounded-md bg-slate-100">
-                    <FileText className="h-5 w-5 text-slate-600" />
-                  </div>
-                  <div className="flex-1">
-                    <p className="font-medium text-slate-700">{doc}</p>
-                    <p className="text-xs text-slate-500">Verified 1 month ago</p>
-                  </div>
-                  <Badge variant="outline" className="gap-1 text-emerald-600 border-emerald-200 bg-emerald-50">
-                    <CheckCircle className="h-3 w-3" />
-                    <span>Verified</span>
-                  </Badge>
-                </div>
-              ))}
-            </div>
-          )}
-
-          <Separator className="my-6" />
-
-          <Form {...documentForm}>
-            <form onSubmit={documentForm.handleSubmit(onDocumentSubmit)} className="space-y-6">
-              <FormItem>
-                <FormLabel>Upload New Document</FormLabel>
-                <FormDescription>Upload your medical license or certification (PDF only)</FormDescription>
-                <FormControl>
-                  <div className="mt-2">
-                    <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-slate-300 rounded-lg cursor-pointer bg-slate-50 hover:bg-slate-100 transition-colors">
-                      <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                        <Upload className="h-8 w-8 text-slate-400 mb-2" />
-                        {uploadedFileName ? (
-                          <p className="text-sm text-slate-700 font-medium">{uploadedFileName}</p>
-                        ) : (
-                          <>
-                            <p className="mb-1 text-sm text-slate-700 font-medium">
-                              <span className="font-semibold">Click to upload</span> or drag and drop
-                            </p>
-                            <p className="text-xs text-slate-500">PDF (MAX. 10MB)</p>
-                          </>
-                        )}
-                      </div>
-                      <input
-                        type="file"
-                        className="hidden"
-                        {...documentForm.register("document")}
-                        accept="application/pdf"
-                        onChange={handleFileChange}
-                      />
-                    </label>
-                  </div>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-
-              <div className="flex justify-end">
-                <Button type="submit" className="bg-secondaryColor hover:bg-emerald-600 text-white">
-                  Submit Document
+                <Button type="submit" className="bg-secondaryColor hover:bg-emerald-600 text-white" disabled={isUpdatingDoctor}>
+                  {isUpdatingDoctor ? "Saving..." : "Save Changes"}
                 </Button>
               </div>
             </form>
@@ -259,7 +356,7 @@ const Accounts = () => {
         </CardContent>
       </Card>
     </div>
-  )
-}
+  );
+};
 
-export default Accounts
+export default Accounts;
