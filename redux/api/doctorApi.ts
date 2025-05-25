@@ -178,6 +178,16 @@ export const doctorApi = createApi({
       }),
     }),
 
+
+    giveDoctorRating: builder.mutation<any, { doctorId: string; rate: number }>({
+      query: ({ doctorId, rate }) => ({
+        url: `/doctors/${doctorId}/rate`,
+        method: "PATCH",
+        body: { rate },
+      }),
+      invalidatesTags: ["Doctor"],
+    }),
+
   })
 });
 
@@ -198,6 +208,7 @@ export const {
   useGetDoctorCompletedVisitsQuery,
   useUpdateDoctorMutation,
   useGetDoctorVisitPerformanceQuery,
+  useGiveDoctorRatingMutation,
 
 } = doctorApi;
 
