@@ -249,7 +249,7 @@ const BlogCard: React.FC<BlogCardProps> = ({ blog, layout, onBookmarkToggle, onR
 
   if (layout === "grid") {
     return (
-      <Card className="overflow-hidden transition-all shadow-md bg-[#fff4e3] h-fit">
+      <Card className="overflow-hidden transition-all shadow-md bg-[#fff4e3] h-fit bg-gradient-to-br from-green-100 to-green-200 text-black/90">
         <CardHeader className="pb-3">
           <div className="flex justify-between items-start">
             <div className="flex items-center gap-2">
@@ -305,7 +305,7 @@ const BlogCard: React.FC<BlogCardProps> = ({ blog, layout, onBookmarkToggle, onR
   }
 
   return (
-    <Card className="overflow-hidden transition-all shadow-md bg-[#fff4e3]">
+    <Card className="overflow-hidden transition-all shadow-md bg-gradient-to-br from-green-100 to-green-200 text-black/90">
       <CardHeader className="pb-3">
         <div className="flex justify-between items-start">
           <div className="flex items-center gap-3">

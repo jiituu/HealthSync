@@ -13,16 +13,16 @@ import dayjs from 'dayjs';
 import Logout from '../auth/Logout';
 import { useGetVisitsByDoctorIdApprovalQuery } from '@/redux/api/doctorApi';
 
-const otherNotifications: NotificationModel[] = [
-  {
-    id: '2',
-    targetID: 'e8e8-455r',
-    triggerID: "@hunban",
-    message: "You have an appointment in 2 days.",
-    time: "Last Wednesday at 9:42 AM",
-    type: "noAction"
-  },
-];
+// const otherNotifications: NotificationModel[] = [
+//   {
+//     id: '2',
+//     targetID: 'e8e8-455r',
+//     triggerID: "@hunban",
+//     message: "You have an appointment in 2 days.",
+//     time: "Last Wednesday at 9:42 AM",
+//     type: "noAction"
+//   },
+// ];
 
 const Navbar = ({ onMenuClick }: { onMenuClick: () => void }) => {
   const { user }: { user?: DoctorModel } = useSessionUser();
@@ -46,7 +46,7 @@ const Navbar = ({ onMenuClick }: { onMenuClick: () => void }) => {
 
     setNotifications([
       ...visitNotifications,
-      ...otherNotifications
+      // ...otherNotifications
     ])
 
   }, [data, data?.visits, user?._id])
