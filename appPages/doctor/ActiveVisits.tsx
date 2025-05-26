@@ -88,7 +88,9 @@ const ActiveVisits: React.FC = () => {
     })
 
     setScheduledVisits(v.filter((visit) => visit.status === "Scheduled"))
-    setCompletedVisits(v.filter((visit) => visit.status === "Completed"))
+    setCompletedVisits(
+      v.filter((visit) => visit.status === "Completed").sort((a, b) => new Date(b.endDate).getTime() - new Date(a.endDate).getTime())
+    ) 
   },[data?.data?.visits, patientsData])
 
   const [emblaRef, emblaApi] = useEmblaCarousel({
@@ -341,7 +343,7 @@ const ActiveVisits: React.FC = () => {
           </Row>
           :<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {
-            completedVisits.map((visit) => (
+            completedVisits.slice(0, 6).map((visit) => (
               <Card key={visit._id} className="overflow-hidden transition-all duration-200 hover:shadow-md">
                 <div className="h-1.5 w-full bg-slate-300" />
                 <CardContent className="p-5">
