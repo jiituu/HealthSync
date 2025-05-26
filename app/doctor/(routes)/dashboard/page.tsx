@@ -9,10 +9,10 @@ const page = () => {
     <div>
       <Dashboard />
     </div>
-        <Link href='/patient/chat' className='absolute bottom-0 right-0 p-4 translate-y-20 flex items-center justify-center'>
+        {/* <Link href='/patient/chat' className='absolute bottom-0 right-0 p-4 translate-y-20 flex items-center justify-center'>
         <IoChatbubbleSharp className='text-primaryColor' size={80}/>
         <span className='absolute text-white text-md font-bold'>Your AI</span>
-      </Link>
+      </Link> */}
 </div>
   )
 }

@@ -3,7 +3,7 @@
 import Image from "next/image"
 import type React from "react"
 import { useState, useEffect } from "react"
-import { Bookmark, BookmarkCheck, ChevronLeft, ChevronRight, Search, X } from "lucide-react"
+import { Bookmark, BookmarkCheck, ChevronLeft, ChevronRight, Search, X, Grid3X3, List, Filter } from "lucide-react"
 import { useGetBlogsQuery, useBookmarkBlogMutation } from "@/redux/api/blogApi"
 import type { SingleBlogObject } from "@/types/blog"
 import { useToast } from "@/hooks/use-toast"
@@ -13,18 +13,24 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import { formatDistanceToNow } from "date-fns"
 import { useDebounce } from "@/hooks/use-debounce"
-import imgg from '@/public/images/doctor.png';
+import imgg from "@/public/images/doctor.png"
 
+const ITEMS_PER_PAGE = 6
 
-const ITEMS_PER_PAGE = 3
+type LayoutType = "grid" | "list"
+type SortType = "latest" | "oldest" | "popular" | "alphabetical"
 
 const Blog: React.FC = () => {
   const { toast } = useToast()
   const [currentPage, setCurrentPage] = useState(1)
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedBlog, setSelectedBlog] = useState<SingleBlogObject | null>(null)
+  const [layout, setLayout] = useState<LayoutType>("grid")
+  const [sortBy, setSortBy] = useState<SortType>("latest")
   const debouncedSearchTerm = useDebounce(searchTerm, 500)
 
   const {
@@ -36,12 +42,13 @@ const Blog: React.FC = () => {
     page: currentPage,
     limit: ITEMS_PER_PAGE,
     tag: debouncedSearchTerm || undefined,
+    sort: sortBy,
   })
 
-  // Reset to first page when search term changes
+  // Reset to first page when search term or sort changes
   useEffect(() => {
     setCurrentPage(1)
-  }, [debouncedSearchTerm])
+  }, [debouncedSearchTerm, sortBy])
 
   const [bookmarkBlog] = useBookmarkBlogMutation()
 
@@ -82,32 +89,75 @@ const Blog: React.FC = () => {
     setSelectedBlog(blog)
   }
 
+  const getSortLabel = (sort: SortType) => {
+    switch (sort) {
+      case "latest":
+        return "Latest"
+      case "oldest":
+        return "Oldest"
+      case "popular":
+        return "Most Popular"
+      case "alphabetical":
+        return "A-Z"
+      default:
+        return "Latest"
+    }
+  }
+
   return (
     <div className="mx-auto py-8">
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">Articles</h1>
         <p className="text-muted-foreground mb-6">Discover the latest insights and stories from our community</p>
 
-        <div className="relative mb-6">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            type="text"
-            placeholder="Search by title or content..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10 pr-10"
-          />
-          {searchTerm && (
-            <Button
-              variant="ghost"
-              size="icon"
-              className="absolute right-1 top-1/2 transform -translate-y-1/2 h-8 w-8"
-              onClick={handleClearSearch}
-            >
-              <X className="h-4 w-4" />
-              <span className="sr-only">Clear search</span>
-            </Button>
-          )}
+        {/* Search and Filters */}
+        <div className="flex flex-col sm:flex-row gap-4 items-center justify-between mb-6">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              type="text"
+              placeholder="Search by title or content..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10 pr-10"
+            />
+            {searchTerm && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="absolute right-1 top-1/2 transform -translate-y-1/2 h-8 w-8"
+                onClick={handleClearSearch}
+              >
+                <X className="h-4 w-4" />
+                <span className="sr-only">Clear search</span>
+              </Button>
+            )}
+          </div>
+
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2">
+              <Filter className="h-4 w-4 text-muted-foreground" />
+              <Select value={sortBy} onValueChange={(value: SortType) => setSortBy(value)}>
+                <SelectTrigger className="w-[140px]">
+                  <SelectValue placeholder="Sort by" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="latest">Latest</SelectItem>
+                  <SelectItem value="oldest">Oldest</SelectItem>
+                  <SelectItem value="popular">Most Popular</SelectItem>
+                  <SelectItem value="alphabetical">A-Z</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <ToggleGroup type="single" value={layout} onValueChange={(value: LayoutType) => value && setLayout(value)}>
+              <ToggleGroupItem value="grid" aria-label="Grid view">
+                <Grid3X3 className="h-4 w-4" />
+              </ToggleGroupItem>
+              <ToggleGroupItem value="list" aria-label="List view">
+                <List className="h-4 w-4" />
+              </ToggleGroupItem>
+            </ToggleGroup>
+          </div>
         </div>
 
         {debouncedSearchTerm && (
@@ -122,9 +172,9 @@ const Blog: React.FC = () => {
       </div>
 
       {isLoading ? (
-        <div className="space-y-4">
-          {[...Array(3)].map((_, index) => (
-            <BlogCardSkeleton key={index} />
+        <div className={layout === "grid" ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" : "space-y-4"}>
+          {[...Array(layout === "grid" ? 6 : 3)].map((_, index) => (
+            <BlogCardSkeleton key={index} layout={layout} />
           ))}
         </div>
       ) : isError ? (
@@ -151,20 +201,21 @@ const Blog: React.FC = () => {
         </Card>
       ) : (
         <>
-          <div className="space-y-6">
+          <div className={layout === "grid" ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" : "space-y-6"}>
             {blogs.map((blog: SingleBlogObject) => (
               <BlogCard
                 key={blog._id}
                 blog={blog}
+                layout={layout}
                 onBookmarkToggle={handleBookmarkToggle}
                 onReadMore={handleReadMore}
               />
             ))}
           </div>
 
-          <div className="flex justify-between items-center mt-8">
+          <div className="flex flex-col sm:flex-row justify-between items-center mt-8 gap-4">
             <div className="text-sm text-muted-foreground">
-              Showing page {currentPage} of {totalPages}
+              Showing page {currentPage} of {totalPages} ({blogs.length} articles)
             </div>
             <div className="flex gap-2">
               <Button variant="outline" size="sm" onClick={handlePreviousPage} disabled={currentPage <= 1}>
@@ -187,14 +238,71 @@ const Blog: React.FC = () => {
 
 interface BlogCardProps {
   blog: SingleBlogObject
+  layout: LayoutType
   onBookmarkToggle: (blogId: string) => void
   onReadMore: (blog: SingleBlogObject) => void
 }
 
-const BlogCard: React.FC<BlogCardProps> = ({ blog, onBookmarkToggle, onReadMore }) => {
-  // Assuming blog has a createdAt field, otherwise use a placeholder
+const BlogCard: React.FC<BlogCardProps> = ({ blog, layout, onBookmarkToggle, onReadMore }) => {
   const publishedDate = blog.createdAt ? formatDistanceToNow(new Date(blog.createdAt), { addSuffix: true }) : "Recently"
-  const authorName = blog.author ? `${blog.author.firstname} ${blog.author.lastname || ''}`.trim() : "Anonymous";
+  const authorName = blog.author ? `${blog.author.firstname} ${blog.author.lastname || ""}`.trim() : "Anonymous"
+
+  if (layout === "grid") {
+    return (
+      <Card className="overflow-hidden transition-all shadow-md bg-[#fff4e3] h-fit">
+        <CardHeader className="pb-3">
+          <div className="flex justify-between items-start">
+            <div className="flex items-center gap-2">
+              <Image
+                src={imgg || "/placeholder.svg"}
+                alt={`${authorName} profile`}
+                className="rounded-full object-cover border w-10 h-10"
+                width={40}
+                height={40}
+              />
+              <div className="min-w-0 flex-1">
+                <h3 className="font-semibold text-sm truncate">{authorName}</h3>
+                <p className="text-xs text-muted-foreground">{publishedDate}</p>
+              </div>
+            </div>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => onBookmarkToggle(blog._id)}
+              className="text-muted-foreground hover:text-primary shrink-0"
+              aria-label={blog.isBookmarked ? "Remove bookmark" : "Add bookmark"}
+            >
+              {blog.isBookmarked ? (
+                <BookmarkCheck className="h-4 w-4 text-primary" />
+              ) : (
+                <Bookmark className="h-4 w-4" />
+              )}
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent className="pb-3">
+          <h2 className="text-lg font-semibold mb-2 line-clamp-2">{blog.title}</h2>
+          <p className="text-muted-foreground text-sm line-clamp-3">{blog.content}</p>
+        </CardContent>
+        <CardFooter className="flex flex-col items-start gap-3 pt-2 pb-4">
+          <div className="flex flex-wrap gap-1">
+            {blog.tags?.slice(0, 2).map((tag, index) => (
+              <Badge key={index} className="font-normal bg-secondaryColor text-xs">
+                {tag}
+              </Badge>
+            ))}
+            {blog.tags && blog.tags.length > 2 && (
+              <Badge className="font-normal bg-muted text-xs">+{blog.tags.length - 2}</Badge>
+            )}
+            {!blog.tags?.length && <Badge className="font-normal bg-secondaryColor text-xs">General</Badge>}
+          </div>
+          <Button variant="link" className="p-0 h-auto text-primary text-sm" onClick={() => onReadMore(blog)}>
+            Read more
+          </Button>
+        </CardFooter>
+      </Card>
+    )
+  }
 
   return (
     <Card className="overflow-hidden transition-all shadow-md bg-[#fff4e3]">
@@ -202,7 +310,7 @@ const BlogCard: React.FC<BlogCardProps> = ({ blog, onBookmarkToggle, onReadMore 
         <div className="flex justify-between items-start">
           <div className="flex items-center gap-3">
             <Image
-              src={imgg}
+              src={imgg || "/placeholder.svg"}
               alt={`${authorName} profile`}
               className="rounded-full object-cover border w-16 h-16"
               width={48}
@@ -235,11 +343,7 @@ const BlogCard: React.FC<BlogCardProps> = ({ blog, onBookmarkToggle, onReadMore 
               {tag}
             </Badge>
           ))}
-          {!blog.tags?.length && (
-            <Badge className="font-normal bg-secondaryColor">
-              General
-            </Badge>
-          )}
+          {!blog.tags?.length && <Badge className="font-normal bg-secondaryColor">General</Badge>}
         </div>
         <Button variant="link" className="p-0 h-auto text-primary" onClick={() => onReadMore(blog)}>
           Read more
@@ -255,7 +359,7 @@ interface BlogDetailDialogProps {
 }
 
 const BlogDetailDialog: React.FC<BlogDetailDialogProps> = ({ blog, onClose }) => {
-  const authorName = blog?.author ? `${blog.author.firstname} ${blog.author.lastname || ''}`.trim() : "Anonymous";
+  const authorName = blog?.author ? `${blog.author.firstname} ${blog.author.lastname || ""}`.trim() : "Anonymous"
   return (
     <Dialog open={!!blog} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
@@ -264,7 +368,7 @@ const BlogDetailDialog: React.FC<BlogDetailDialogProps> = ({ blog, onClose }) =>
             <DialogHeader>
               <div className="flex items-center gap-3 mb-2">
                 <Image
-                  src={imgg}
+                  src={imgg || "/placeholder.svg"}
                   alt={`${authorName} profile`}
                   className="rounded-full object-cover border w-16 h-16"
                   width={48}
@@ -284,7 +388,6 @@ const BlogDetailDialog: React.FC<BlogDetailDialogProps> = ({ blog, onClose }) =>
               <div className="prose prose-sm max-w-none dark:prose-invert">
                 <p>{blog.content}</p>
 
-                {/* If the blog has sections or additional content, you can add it here */}
                 {blog.sections?.map((section: { title: string; content: string }, index: number) => (
                   <div key={index} className="mt-6">
                     <h3 className="text-xl font-semibold mb-2">{section.title}</h3>
@@ -300,9 +403,7 @@ const BlogDetailDialog: React.FC<BlogDetailDialogProps> = ({ blog, onClose }) =>
                   </Badge>
                 ))}
                 {!blog.tags?.length && (
-                  <Badge className="font-normal text-muted-foreground bg-secondaryColor">
-                    General
-                  </Badge>
+                  <Badge className="font-normal text-muted-foreground bg-secondaryColor">General</Badge>
                 )}
               </div>
             </div>
@@ -313,7 +414,42 @@ const BlogDetailDialog: React.FC<BlogDetailDialogProps> = ({ blog, onClose }) =>
   )
 }
 
-const BlogCardSkeleton: React.FC = () => {
+interface BlogCardSkeletonProps {
+  layout: LayoutType
+}
+
+const BlogCardSkeleton: React.FC<BlogCardSkeletonProps> = ({ layout }) => {
+  if (layout === "grid") {
+    return (
+      <Card className="overflow-hidden">
+        <CardHeader className="pb-3">
+          <div className="flex justify-between items-start">
+            <div className="flex items-center gap-2">
+              <Skeleton className="h-10 w-10 rounded-full" />
+              <div className="flex-1">
+                <Skeleton className="h-3 w-16 mb-1" />
+                <Skeleton className="h-2 w-12" />
+              </div>
+            </div>
+            <Skeleton className="h-6 w-6 rounded-full" />
+          </div>
+        </CardHeader>
+        <CardContent className="pb-3">
+          <Skeleton className="h-5 w-3/4 mb-2" />
+          <Skeleton className="h-3 w-full mb-1" />
+          <Skeleton className="h-3 w-full mb-1" />
+          <Skeleton className="h-3 w-2/3" />
+        </CardContent>
+        <CardFooter className="pt-2 pb-4">
+          <div className="flex gap-1">
+            <Skeleton className="h-4 w-12 rounded-full" />
+            <Skeleton className="h-4 w-12 rounded-full" />
+          </div>
+        </CardFooter>
+      </Card>
+    )
+  }
+
   return (
     <Card className="overflow-hidden">
       <CardHeader className="pb-3">
