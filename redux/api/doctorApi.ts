@@ -5,6 +5,17 @@ import { DoctorApiResponse, DoctorsListApiResponse } from "@/types/doctor";
 import { VisitsResponse } from "@/types/visit";
 import { notificationsApi } from "./notificationsApi";
 
+interface InteractionPayload {
+  medicines:string[],
+  medical_conditions:string[],
+  type:'dd_interaction'|'md_interaction',
+}
+
+interface Chat{
+  text:string,
+  type:'chat'
+}
+
 export const doctorApi = createApi({
   reducerPath: "doctorApi",
   baseQuery: fetchBaseQuery({
@@ -311,3 +322,40 @@ export const loginDoctor = async (
     return null;
   }
 };
+
+export const doctorApi2 = createApi({
+  reducerPath: "doctorApi2",
+  baseQuery: fetchBaseQuery({
+    baseUrl: "https://localhost:8000/",
+    credentials: "include",
+    prepareHeaders: (headers) => {
+      headers.set("Content-Type", `application/json`);
+      return headers;
+    },
+  }),
+  tagTypes: ["Doctor"],
+  endpoints: (builder) => ({
+    // Interaction
+    drugInteraction: builder.mutation<any, InteractionPayload>({
+      query: (body) => ({
+        url: "/drug-interaction",
+        method: "POST",
+        body: body,
+      }),
+    }),
+
+    // Chat
+    chat: builder.mutation<any, Chat>({
+      query: (body) => ({
+        url: "/chat",
+        method: "POST",
+        body: body,
+      }),
+    }),
+  }),
+});
+
+export const {
+  useDrugInteractionMutation,
+  useChatMutation
+} = doctorApi2;

@@ -7,7 +7,7 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { ChevronLeft, ChevronRight, Calendar, Phone, Edit2, XCircle, ClipboardList } from "lucide-react"
+import { ChevronLeft, ChevronRight, Calendar, Phone, Edit2, XCircle, ClipboardList, CheckCircle } from "lucide-react"
 import type { EmblaCarouselType } from "embla-carousel"
 import Link from "next/link"
 import { useGetAppointedPatientsQuery, useGetVisitsByDoctorIdApprovalQuery, useUpdateVisitMutation } from "@/redux/api/doctorApi"
@@ -21,6 +21,7 @@ import {message, Modal, Row, Spin} from "antd"
 import { LoadingOutlined } from "@ant-design/icons"
 import { FaDropbox } from "react-icons/fa";
 import { Typography } from "@mui/material"
+import { PatientModel } from "@/components/models/patient"
 
 export interface VisitCard extends VisitModel {
   name: string
@@ -47,17 +48,23 @@ const ActiveVisits: React.FC = () => {
   const [scheduledVisits,setScheduledVisits] = useState<VisitCard[]>([]);
   const [completedVisits,setCompletedVisits] = useState<VisitCard[]>([]);
   const {data,isLoading,isError} = useGetVisitsByDoctorIdApprovalQuery({id:user?._id??'',approval:'Approved'});
-  const {data:patientsData,isLoading: patientsIsLoading,isError: patientsIsError} = useGetAppointedPatientsQuery(user?._id??'');
+  const {data:pData,isLoading: patientsIsLoading,isError: patientsIsError} = useGetAppointedPatientsQuery(user?._id??'');
   const [updateVisit] = useUpdateVisitMutation();
   const [openEditVisit,setOpenEditVisit] = useState(false);
   const [openViewVisit,setOpenViewVisit] = useState(false);
   const [selectedCard,setSelectedCard] = useState<VisitCard>({} as VisitCard);
+  const [selectedPatient,setSelectedPatient] = useState<PatientModel>({} as PatientModel);
+  const [patientsData,setPatientsData] = useState<PatientModel[]>([]);
+
+  useEffect(()=>{
+    setPatientsData(pData?.data??[]);
+  },[pData?.data])
 
   useEffect(()=>{
     const v:VisitCard[] = []
     data?.data?.visits?.map((visit: VisitModel)=>{
       const days = handleDaysCalculation(visit.preferredDate);
-      const appointedPatient = patientsData?.data?.find((d:any)=>d._id==visit.patient);
+      const appointedPatient = patientsData.find((d:any)=>d._id==visit.patient);
 
       v.push({
         _id: visit._id,
@@ -82,7 +89,7 @@ const ActiveVisits: React.FC = () => {
 
     setScheduledVisits(v.filter((visit) => visit.status === "Scheduled"))
     setCompletedVisits(v.filter((visit) => visit.status === "Completed"))
-  },[data?.data?.visits, patientsData?.data])
+  },[data?.data?.visits, patientsData])
 
   const [emblaRef, emblaApi] = useEmblaCarousel({
     align: "start",
@@ -212,88 +219,92 @@ const ActiveVisits: React.FC = () => {
                 <FaDropbox className='text-[#9c9fa0]' size={80}/>
                 <Typography className='text-[#828485]'>No Data</Typography>
               </Row>
-              :scheduledVisits.map((visit) => (
-                <div
-                  key={visit._id}
-                  className="embla__slide min-w-0 sm:min-w-[350px] flex-grow-0 flex-shrink-0 basis-[85%] sm:basis-[320px] pr-4"
-                >
-                  <Card onClick={()=>{setOpenViewVisit(true); setSelectedCard(visit);}} className="h-full overflow-hidden transition-all duration-200 hover:shadow-md cursor-pointer">
-                    <div className={`h-1.5 w-full ${getUrgencyColor(visit.days)}`} />
-                    <CardContent className="p-5">
-                      <div className="flex items-center justify-between mb-4">
-                        <div className="flex items-start gap-3">
-                          <Avatar className="h-10 w-10 border-2 border-slate-100">
-                            <AvatarImage src={visit.image} alt={`${visit.name} profile`} />
-                            <AvatarFallback className="bg-slate-100 text-slate-700 font-medium">
-                              {visit.name
-                                .split(" ")
-                                .map((n) => n[0])
-                                .join("")}
-                            </AvatarFallback>
-                          </Avatar>
-                          <div>
-                            <h3 className="font-semibold text-slate-800">{visit.name}</h3>
-                            <div className="flex items-center text-xs text-slate-500">
-                              <Calendar className="h-3.5 w-3.5 mr-1" />
-                              {visit.days}
+              :scheduledVisits.map((visit) => {
+                const appointedPatient = patientsData.find((d:any)=>d._id==visit.patient);
+                return (
+                  <div
+                    key={visit._id}
+                    className="embla__slide min-w-0 sm:min-w-[350px] flex-grow-0 flex-shrink-0 basis-[85%] sm:basis-[320px] pr-4"
+                  >
+                    <Card onClick={()=>{setOpenViewVisit(true); setSelectedCard(visit);}} className="h-full overflow-hidden transition-all duration-200 hover:shadow-md cursor-pointer">
+                      <div className={`h-1.5 w-full ${getUrgencyColor(visit.days)}`} />
+                      <CardContent className="p-5">
+                        <div className="flex items-center justify-between mb-4">
+                          <div className="flex items-start gap-3">
+                            <Avatar className="h-10 w-10 border-2 border-slate-100">
+                              <AvatarImage src={visit.image} alt={`${visit.name} profile`} />
+                              <AvatarFallback className="bg-slate-100 text-slate-700 font-medium">
+                                {visit.name
+                                  .split(" ")
+                                  .map((n) => n[0])
+                                  .join("")}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div>
+                              <h3 className="font-semibold text-slate-800">{visit.name}</h3>
+                              <div className="flex items-center text-xs text-slate-500">
+                                <Calendar className="h-3.5 w-3.5 mr-1" />
+                                {visit.days}
+                              </div>
+                            </div>
+                          </div>
+                          <Badge
+                            variant="outline"
+                            className={`
+                              ${
+                                visit.days.includes("3 days")
+                                  ? "bg-rose-50 text-rose-700 border-rose-200"
+                                  : visit.days.includes("5 days")
+                                    ? "bg-amber-50 text-amber-700 border-amber-200"
+                                    : "bg-emerald-50 text-emerald-700 border-emerald-200"
+                              }
+                            `}
+                          >
+                            {visit.days}
+                          </Badge>
+                        </div>
+
+                        <div className="space-y-3 mt-4">
+                          <div className="flex items-center justify-between py-2 border-b border-slate-100">
+                            <span className="text-sm font-medium text-slate-600">Contact</span>
+                            <div className="flex items-center text-sm text-slate-800">
+                              <Phone className="h-3.5 w-3.5 mr-1.5 text-slate-400" />
+                              {visit.contact}
                             </div>
                           </div>
                         </div>
-                        <Badge
+                      </CardContent>
+                      <CardFooter className="px-5 py-4 bg-slate-50 flex justify-between gap-3">
+                        <Button
                           variant="outline"
-                          className={`
-                            ${
-                              visit.days.includes("3 days")
-                                ? "bg-rose-50 text-rose-700 border-rose-200"
-                                : visit.days.includes("5 days")
-                                  ? "bg-amber-50 text-amber-700 border-amber-200"
-                                  : "bg-emerald-50 text-emerald-700 border-emerald-200"
-                            }
-                          `}
+                          size="sm"
+                          className="w-1/2 border-rose-200 bg-primaryColor hover:bg-primaryColor"
+                          onClick={(e)=>{
+                            e.stopPropagation();
+                            handleCompleteVisit(visit);
+                          }}
                         >
-                          {visit.days}
-                        </Badge>
-                      </div>
-
-                      <div className="space-y-3 mt-4">
-                        <div className="flex items-center justify-between py-2 border-b border-slate-100">
-                          <span className="text-sm font-medium text-slate-600">Contact</span>
-                          <div className="flex items-center text-sm text-slate-800">
-                            <Phone className="h-3.5 w-3.5 mr-1.5 text-slate-400" />
-                            {visit.contact}
-                          </div>
-                        </div>
-                      </div>
-                    </CardContent>
-                    <CardFooter className="px-5 py-4 bg-slate-50 flex justify-between gap-3">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="w-1/2 border-rose-200 bg-primaryColor hover:bg-primaryColor"
-                        onClick={(e)=>{
-                          e.stopPropagation();
-                          handleCompleteVisit(visit);
-                        }}
-                      >
-                        <XCircle className="h-4 w-4 mr-1.5" />
-                        Complete Visit
-                      </Button>
-                      <Button 
-                        size="sm" 
-                        className="w-1/2 bg-secondaryColor text-white"
-                        onClick={(e)=>{
-                          e.stopPropagation();
-                          setSelectedCard(visit)
-                          setOpenEditVisit(true);
-                        }}
-                      >
-                        <Edit2 className="h-4 w-4 mr-1.5" />
-                        Edit
-                      </Button>
-                    </CardFooter>
-                  </Card>
-                </div>
-              ))
+                          <CheckCircle className="h-4 w-4 mr-1.5" />
+                          Complete Visit
+                        </Button>
+                        <Button 
+                          size="sm" 
+                          className="w-1/2 bg-secondaryColor text-white"
+                          onClick={(e)=>{
+                            e.stopPropagation();
+                            setSelectedCard(visit);
+                            if(appointedPatient) setSelectedPatient(appointedPatient);
+                            setOpenEditVisit(true);
+                          }}
+                        >
+                          <Edit2 className="h-4 w-4 mr-1.5" />
+                          Edit
+                        </Button>
+                      </CardFooter>
+                    </Card>
+                  </div>
+                )
+              })
             }
 
           </div>
@@ -383,7 +394,9 @@ const ActiveVisits: React.FC = () => {
       open={openEditVisit}
       setOpen={setOpenEditVisit}
       visit={selectedCard}
+      selectedPatient={selectedPatient}
       setScheduledVisits={setScheduledVisits}
+      setPatientsData={setPatientsData}
     />
 
     <ViewVisit
