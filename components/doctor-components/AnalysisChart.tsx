@@ -47,7 +47,7 @@ const DoctorVisitDashboard = () => {
       {/* Key Metrics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Total Visits Card */}
-        <Card className="relative overflow-hidden bg-gradient-to-br from-green-600 to-green-700 text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"> 
+        <Card className="relative overflow-hidden bg-gradient-to-br from-teal-500 to-teal-600 text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"> 
           <CardHeader className="pb-2">
             <CardTitle className="flex items-center gap-2 text-sm font-semibold tracking-wide opacity-90">
               <Users className="h-5 w-5" aria-hidden="true" />

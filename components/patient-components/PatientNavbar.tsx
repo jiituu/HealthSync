@@ -14,26 +14,10 @@ import { DoctorModel } from '../models/doctor';
 import { useSessionUser } from '../context/Session';
 import { PatientModel } from '../models/patient';
 import Logout from '../auth/Logout';
-import { Button } from '../ui/button';
+// import { Button } from '../ui/button';
+import {useGetAllPatientNotificationsQuery} from '@/redux/api/notificationsApi';
+import PatientNotification from './PatientNotification';
 
-const notifications: NotificationModel[] = [
-  {
-    id: '1',
-    targetID: 'e8e8-455r',
-    triggerID: "@Mihret223",
-    message: "has requested your service.",
-    time: "9:42 AM",
-    type: "visitRequest"
-  },
-  {
-    id: '2',
-    targetID: 'e8e8-455r',
-    triggerID: "@hunban",
-    message: "You have an appointment in 2 days.",
-    time: "Last Wednesday at 9:42 AM",
-    type: "noAction"
-  },
-];
 
 const Navbar = ({ onMenuClick }: { onMenuClick: () => void }) => {
   const { user }: { user?: PatientModel } = useSessionUser();
@@ -44,6 +28,11 @@ const Navbar = ({ onMenuClick }: { onMenuClick: () => void }) => {
 
   const { data, status, error, isLoading } = useGetVerifiedDoctorsQuery();
   const doctors: DoctorModel[] = data?.data?.doctors || [];
+
+
+  // Fetch notifications for the patient
+  const { data: notificationsData, isLoading: notificationsLoading, error: notificationsError } = useGetAllPatientNotificationsQuery({ isRead: false });
+  const onlyNotifications = notificationsData?.notifications || [];
 
   // Close the modal if the user clicks outside the container
   useEffect(() => {
@@ -159,7 +148,7 @@ const Navbar = ({ onMenuClick }: { onMenuClick: () => void }) => {
               </button>
             </PopoverTrigger>
             <PopoverContent className="w-96 h-64 bg-[#e3ffff] shadow-lg rounded-lg mr-2">
-              <Notification notifications={notifications} />
+              <PatientNotification notifications={onlyNotifications} />
             </PopoverContent>
           </Popover>
         </div>

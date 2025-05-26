@@ -91,9 +91,12 @@ export default function DoctorProfile({ doctorID }: DoctorProfileProps) {
                     {[1, 2, 3, 4, 5].map((star) => (
                       <Star
                         key={star}
-                        className={`h-4 w-4 ${star <= 3 ? "fill-yellow-400 text-yellow-400" : "text-gray-300"}`}
+                        className={`h-4 w-4 ${
+                          star <= Math.round(doctor.rating) ? "fill-yellow-400 text-yellow-400" : "text-gray-300"
+                        }`}
                       />
                     ))}
+                    <span className="ml-2 text-sm text-white">{doctor.rating.toFixed(1)}</span>
                   </div>
                 </div>
               </div>
@@ -178,11 +181,13 @@ export default function DoctorProfile({ doctorID }: DoctorProfileProps) {
                 {[1, 2, 3, 4, 5].map((star) => (
                   <Star
                     key={star}
-                    className={`h-6 w-6 ${star <= 3 ? "fill-yellow-400 text-yellow-400" : "text-white/40"}`}
+                    className={`h-6 w-6 ${
+                      star <= Math.round(doctor.rating) ? "fill-yellow-400 text-yellow-400" : "text-white/40"
+                    }`}
                   />
                 ))}
               </div>
-              <span className="text-lg font-medium">3.0</span>
+              <span className="text-lg font-medium">{doctor.rating.toFixed(1)}</span>
             </div>
 
             <Separator className="h-8 w-px bg-white/20 md:block" />

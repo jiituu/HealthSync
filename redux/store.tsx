@@ -6,6 +6,7 @@ import { commonApi } from "./api/commonApi";
 import { hospitalApi } from "./api/hospitalApi";
 import { blogApi } from "./api/blogApi";
 import { chatApi } from "./api/chatApi";
+import {notificationsApi} from "./api/notificationsApi";
 
 const store = configureStore({
   reducer: {
@@ -16,6 +17,7 @@ const store = configureStore({
     [hospitalApi.reducerPath]: hospitalApi.reducer,
     [blogApi.reducerPath]: blogApi.reducer,
     [chatApi.reducerPath]: chatApi.reducer,
+    [notificationsApi.reducerPath]: notificationsApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(
@@ -25,7 +27,8 @@ const store = configureStore({
       adminApi.middleware,
       hospitalApi.middleware,
       blogApi.middleware,
-      chatApi.middleware
+      chatApi.middleware,
+      notificationsApi.middleware
     ),
 });
 

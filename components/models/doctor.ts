@@ -10,6 +10,7 @@ export interface DoctorModel extends Omit<UserModel,'role'> {
     licenses: LicenseModel[];
     role: string;
     hospital: HospitalModel;
+    rating: number;
 }
 
 export interface LicenseModel {
