@@ -52,7 +52,8 @@ export default function Notification({notifications}:prob) {
       message.success(`Visit ${approval}`)
       setNotifList((prev) => prev.filter((notif) => notif.id !== visitID));
     }catch(error:any){
-      message.error(error??'Something went wrong')
+      console.log(error)
+      message.error(error?.data||'Something went wrong')
     }finally{
       setLoadingType(null)
     }
