@@ -203,3 +203,17 @@
   background: rgba(58, 58, 58, 0.5);
   border-radius: 4px;
 }
+
+/* Ant D steps */
+.ant-steps-item-icon{
+  background-color: #84D0CC !important;
+  border-color: #84D0CC !important;
+}
+.ant-steps-item-title::after{
+  background-color: #84D0CC !important;
+}
+
+.ant-steps-icon{
+  color: white !important;
+}
+
