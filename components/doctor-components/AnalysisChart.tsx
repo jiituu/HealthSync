@@ -47,7 +47,7 @@ const DoctorVisitDashboard = () => {
       {/* Key Metrics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Total Visits Card */}
-        <Card className="relative overflow-hidden bg-gradient-to-br from-teal-500 to-teal-600 text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"> 
+        <Card className="relative overflow-hidden bg-gradient-to-br from-teal-500 to-teal-600 text-white rounded-xl shadow-lg hover:scale-105 hover:shadow-xl transition-all duration-300"> 
           <CardHeader className="pb-2">
             <CardTitle className="flex items-center gap-2 text-sm font-semibold tracking-wide opacity-90">
               <Users className="h-5 w-5" aria-hidden="true" />
@@ -62,7 +62,7 @@ const DoctorVisitDashboard = () => {
         </Card>
 
         {/* This Month Card */}
-        <Card className="relative overflow-hidden bg-gradient-to-br from-teal-500 to-teal-600 text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300">
+        <Card className="relative overflow-hidden bg-gradient-to-br from-teal-500 to-teal-600 text-white rounded-xl shadow-lg hover:shadow-xl transition-all hover:scale-105 duration-300">
           <CardHeader className="pb-2">
             <CardTitle className="flex items-center gap-2 text-sm font-semibold tracking-wide opacity-90">
               <Calendar className="h-5 w-5" aria-hidden="true" />
@@ -78,7 +78,7 @@ const DoctorVisitDashboard = () => {
 
         {/* Growth Rate Card */}
         <Card
-          className={`relative overflow-hidden text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 ${
+          className={`relative overflow-hidden text-white rounded-xl shadow-lg hover:shadow-xl transition-all hover:scale-105 duration-300 ${
             isPositiveGrowth
               ? "bg-gradient-to-br from-emerald-500 to-emerald-600"
               : "bg-gradient-to-br from-red-500 to-red-600"
