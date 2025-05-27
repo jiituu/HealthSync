@@ -1,21 +1,27 @@
-'use client'
-import React from 'react';
-import { PieChart, Pie, Cell, Tooltip } from 'recharts';
+"use client";
+import React from "react";
+import { PieChart, Pie, Cell, Tooltip } from "recharts";
+import { useSessionUser } from "@/components/context/Session";
+import { DoctorModel } from "@/components/models/doctor";
 
 const RatingChart = () => {
-  const rating = 75; 
+  const { user } = useSessionUser();
+  const doctor = user as DoctorModel;
+
+  // Calculate percentage from rating
+  const percentage = (doctor.rating / 5) * 100;
 
   const data = [
-    { name: 'Rating', value: rating },
-    { name: 'Remaining', value: 100 - rating },
+    { name: "Rating", value: percentage },
+    { name: "Remaining", value: 100 - percentage },
   ];
 
-  const COLORS = ['#FFA07A', '#E0E0E0']; 
+  const COLORS = ["#FFA07A", "#E0E0E0"];
 
   return (
-    <div className='flex flex-col items-center justify-center'>
-      <h2 className='text-lg font-bold'>Your Rating</h2>
-      <PieChart width={300} height={300}>
+    <div className="flex flex-col items-center justify-center py-4">
+      <h2 className="text-lg font-bold">Your Rating</h2>
+      <PieChart width={300} height={200}>
         <Pie
           data={data}
           dataKey="value"
@@ -35,8 +41,8 @@ const RatingChart = () => {
         </Pie>
         <Tooltip />
       </PieChart>
-      <div className='text-center'>
-        <p className='text-2xl font-bold'>{rating}%</p>
+      <div className="text-center">
+        <p className="text-2xl font-bold">{percentage.toFixed(1)}%</p>
         <p>Overall Rating</p>
       </div>
     </div>

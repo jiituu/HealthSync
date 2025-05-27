@@ -3,6 +3,7 @@ import { DoctorLoginPayload, DoctorSignupPayload } from "@/types/doctor";
 // import { get } from "http";
 import { DoctorApiResponse, DoctorsListApiResponse } from "@/types/doctor";
 import { VisitsResponse } from "@/types/visit";
+import { notificationsApi } from "./notificationsApi";
 
 interface InteractionPayload {
   medicines:string[],
@@ -87,63 +88,74 @@ export const doctorApi = createApi({
     }),
 
     // Visits
-    getVisitsByDoctorIdApproval: builder.query<any, { id: string, approval: "Approved" | "Denied" | "Scheduled" }>({
+    getVisitsByDoctorIdApproval: builder.query<
+      any,
+      { id: string; approval: "Approved" | "Denied" | "Scheduled" }
+    >({
       query: ({ id, approval }) => ({
         url: `/visits?doctor_id=${id}&approval=${approval}`,
-        method: 'GET',
+        method: "GET",
       }),
     }),
 
-    getVisitsByDoctorId: builder.query<any, {id:string}>({
-        query: ({id}) => ({
-          url: `/visits?doctor_id=${id}`,
-          method: 'GET',
-        }),
+    getVisitsByDoctorId: builder.query<any, { id: string }>({
+      query: ({ id }) => ({
+        url: `/visits?doctor_id=${id}`,
+        method: "GET",
+      }),
     }),
 
-    approveRefuseVisit: builder.mutation<void, { visitID: string, approval: 'Approved' | 'Denied' }>({
+    approveRefuseVisit: builder.mutation<
+      void,
+      { visitID: string; approval: "Approved" | "Denied" }
+    >({
       query: (visitPayload) => ({
         url: `/visits/${visitPayload.visitID}/approval`,
-        method: 'PATCH',
-        body: { approval: visitPayload.approval }
+        method: "PATCH",
+        body: { approval: visitPayload.approval },
       }),
     }),
 
-    updateVisit: builder.mutation<void, { visitID: string, body: any }>({
+
+
+    updateVisit: builder.mutation<void, { visitID: string; body: any }>({
       query: (visitPayload) => ({
         url: `/visits/${visitPayload.visitID}`,
-        method: 'PATCH',
-        body: visitPayload.body
+        method: "PATCH",
+        body: visitPayload.body,
       }),
+      async onQueryStarted(arg, { dispatch, queryFulfilled }) {
+        try {
+          await queryFulfilled;
+          dispatch(notificationsApi.util.invalidateTags(["NotificationTag"]));
+        } catch {
+          // Handle error if needed
+        }
+      },
     }),
 
+    
+
     getDoctorCompletedVisits: builder.query<VisitsResponse, string>({
-          query: (doctor_id: string) => ({
-            url: `/visits?doctor_id=${doctor_id}&status=Completed`,
-            method: "GET",
-          }),
-        }),
+      query: (doctor_id: string) => ({
+        url: `/visits?doctor_id=${doctor_id}&status=Completed`,
+        method: "GET",
+      }),
+    }),
 
     // Patients
     getAppointedPatients: builder.query<any, string>({
       query: (id) => ({
         url: `/doctors/${id}/patients`,
-        method: 'GET',
+        method: "GET",
       }),
     }),
-
-
 
     updateDoctorStatus: builder.mutation<
       any,
       { doctorId: string; status: "approved" | "denied" }
     >({
-      async queryFn(
-        { doctorId, status },
-        _queryApi,
-        _extraOptions,
-        baseQuery
-      ) {
+      async queryFn({ doctorId, status }, _queryApi, _extraOptions, baseQuery) {
         const doctorResponse = await baseQuery({
           url: `/doctors/${doctorId}`,
           method: "GET",
@@ -164,7 +176,6 @@ export const doctorApi = createApi({
       invalidatesTags: ["Doctor"],
     }),
 
-
     // update doctor
     updateDoctor: builder.mutation<any, { body: any }>({
       query: ({ body }) => ({
@@ -175,8 +186,10 @@ export const doctorApi = createApi({
       invalidatesTags: ["Doctor"],
     }),
 
-
-    getDoctorVisitPerformance: builder.query<any, { doctor_id: string; status?: string; approval?: string; new_in?: number }>({
+    getDoctorVisitPerformance: builder.query<
+      any,
+      { doctor_id: string; status?: string; approval?: string; new_in?: number }
+    >({
       query: ({ doctor_id, status, approval, new_in }) => ({
         url: `/figures/visits`,
         method: "GET",
@@ -189,7 +202,53 @@ export const doctorApi = createApi({
       }),
     }),
 
-  })
+    giveDoctorRating: builder.mutation<
+      any,
+      {
+        doctorId: string;
+        rating: number;
+        visit: string;
+        patient: string;
+        notificationId: string;
+      }
+    >({
+      async queryFn(
+        { doctorId, rating, visit, patient, notificationId },
+        queryApi,
+        _extraOptions,
+        baseQuery
+      ) {
+        const ratingResponse = await baseQuery({
+          url: `/doctors/${doctorId}/rate`,
+          method: "PATCH",
+          body: { rating, visit, patient },
+        });
+
+        if (ratingResponse.error) {
+          return { error: ratingResponse.error };
+        }
+
+        const notificationResponse = await baseQuery({
+          url: `/notifications/${notificationId}`,
+          method: "PATCH",
+          body: { isRead: true },
+        });
+
+        if (notificationResponse.error) {
+          return { error: notificationResponse.error };
+        }
+
+        queryApi.dispatch(
+          notificationsApi.util.invalidateTags(["NotificationTag"])
+        );
+
+        return { data: { ...(typeof ratingResponse.data === "object" && ratingResponse.data !== null ? ratingResponse.data : {}), notificationUpdated: true } };
+      },
+      invalidatesTags: ["Doctor"], 
+    }),
+
+
+  }),
 });
 
 export const {
@@ -209,7 +268,7 @@ export const {
   useGetDoctorCompletedVisitsQuery,
   useUpdateDoctorMutation,
   useGetDoctorVisitPerformanceQuery,
-
+  useGiveDoctorRatingMutation,
 } = doctorApi;
 
 export const fetchDoctor = async (_id: string) => {
