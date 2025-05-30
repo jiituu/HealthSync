@@ -38,7 +38,7 @@ export const EditVisitModal = ({open,visit,selectedPatient,setOpen,setScheduledV
     const [drugLoading,setDrugLoading] = useState<{[key:string]:boolean}>({});
     const [ddLoading,setDdLoading] = useState<boolean>(false);
     const [dd_interactionMsg,setDd_InteractionMsg] = useState<{interaction:string,message:string,index?:number}|null>(null);
-    const [md_interactionMsg,setMd_InteractionMsg] = useState<{interaction:string,message:string,index?:number}[]|null>([{interaction:'Yes', message:'Taking these medications together may cause a serious interaction. This could increase the risk of side effects such as dizziness, irregular heartbeat, bleeding, or other potentially harmful effects.',index:0},{interaction:'No', message:'Taking these medications together may cause a serious interaction. This could increase the risk of side effects such as dizziness, irregular heartbeat, bleeding, or other potentially harmful effects.',index:2}])
+    const [md_interactionMsg,setMd_InteractionMsg] = useState<{interaction:string,message:string,index?:number}[]|null>(null);
 
 
     const {

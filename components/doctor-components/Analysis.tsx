@@ -8,8 +8,8 @@ const Analysis = () => {
         <div className="w-full grid grid-cols-1 gap-16 md:grid-cols-10 border-b-2">
             <div className="md:col-span-6 ">
                 <div className="w-full flex justify-between items-center">
-                    <h2 className='text-start text-lg font-semibold'>Analysis</h2>
-                    <button className=' text-[#84D0CC] bg-[#FBFCFE] hover:bg-[#DDE4F0] px-4 py-2 rounded'>View Report</button>
+                    <h2 className='text-start text-2xl font-semibold py-3'>Analysis</h2>
+                    {/* <button className=' text-[#84D0CC] bg-[#FBFCFE] hover:bg-[#DDE4F0] px-4 py-2 rounded'>View Report</button> */}
                 </div>
                 <ResponsiveBarChart/>
             </div>
