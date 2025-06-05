@@ -5,6 +5,7 @@ import { Bot } from "lucide-react"
 import SidebarToggle from "./sidebar-toggle"
 import ChatMessages from "./chat-messages"
 import MessageInput from "./message-input"
+import { useChatMutation } from "@/redux/api/doctorApi"
 
 
 interface Message {
@@ -103,10 +104,11 @@ const categorizeMessage = (message: string): keyof typeof aiResponses => {
 }
 
 export default function AIChatArea() {
+  const [chat] = useChatMutation();
   const [messages, setMessages] = useState(initialMessages)
   const [isTyping, setIsTyping] = useState(false)
 
-  const handleSendMessage = (content: string) => {
+  const handleSendMessage = async (content: string) => {
     if (!content.trim()) return
 
     const userMessage = {
@@ -119,20 +121,33 @@ export default function AIChatArea() {
     setMessages((prev) => [...prev, userMessage])
     setIsTyping(true)
 
-    setTimeout(() => {
-      const category = categorizeMessage(content)
-      const aiResponse = getRandomResponse(category)
+    // setTimeout(() => {
 
-      const aiMessage = {
-        id: messages.length + 2,
-        sender: "ai" as const,
-        content: aiResponse,
-        time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-      }
+    // const category = categorizeMessage(content)
+    // const aiResponse = getRandomResponse(category)
+    let aiResponse = 'Something went wrong, please try again';
 
-      setMessages((prev) => [...prev, aiMessage])
-      setIsTyping(false)
-    }, 1500)
+    try{
+      const res = await chat({
+        text: content,
+        type: "chat"
+      }).unwrap();
+      aiResponse = res.response;
+      
+    }catch(e){
+      console.log('Error:', e);
+    }
+
+    const aiMessage = {
+      id: messages.length + 2,
+      sender: "ai" as const,
+      content: aiResponse,
+      time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+    }
+
+    setMessages((prev) => [...prev, aiMessage])
+    setIsTyping(false)
+    // }, 1500)
   }
 
   return (

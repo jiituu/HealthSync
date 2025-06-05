@@ -7,7 +7,7 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { ChevronLeft, ChevronRight, Calendar, Phone, Edit2, XCircle, ClipboardList, CheckCircle } from "lucide-react"
+import { ChevronLeft, ChevronRight, Calendar, Phone, Edit2, ClipboardList, CheckCircle } from "lucide-react"
 import type { EmblaCarouselType } from "embla-carousel"
 import Link from "next/link"
 import { useGetAppointedPatientsQuery, useGetVisitsByDoctorIdApprovalQuery, useUpdateVisitMutation } from "@/redux/api/doctorApi"
@@ -47,7 +47,7 @@ const ActiveVisits: React.FC = () => {
   const {user}:{user?: DoctorModel} = useSessionUser();
   const [scheduledVisits,setScheduledVisits] = useState<VisitCard[]>([]);
   const [completedVisits,setCompletedVisits] = useState<VisitCard[]>([]);
-  const {data,isLoading,isError} = useGetVisitsByDoctorIdApprovalQuery({id:user?._id??'',approval:'Approved'});
+  const {data,isLoading} = useGetVisitsByDoctorIdApprovalQuery({id:user?._id??'',approval:'Approved'});
   const {data:pData,isLoading: patientsIsLoading,isError: patientsIsError} = useGetAppointedPatientsQuery(user?._id??'');
   const [updateVisit] = useUpdateVisitMutation();
   const [openEditVisit,setOpenEditVisit] = useState(false);
@@ -91,7 +91,7 @@ const ActiveVisits: React.FC = () => {
     setCompletedVisits(
       v.filter((visit) => visit.status === "Completed").sort((a, b) => new Date(b.endDate).getTime() - new Date(a.endDate).getTime())
     ) 
-  },[data?.data?.visits, patientsData])
+  },[data, patientsData])
 
   const [emblaRef, emblaApi] = useEmblaCarousel({
     align: "start",
@@ -397,8 +397,6 @@ const ActiveVisits: React.FC = () => {
       setOpen={setOpenEditVisit}
       visit={selectedCard}
       selectedPatient={selectedPatient}
-      setScheduledVisits={setScheduledVisits}
-      setPatientsData={setPatientsData}
     />
 
     <ViewVisit

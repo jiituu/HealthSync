@@ -5,8 +5,8 @@ import { LabResultsModel, VisitModel } from "@/components/models/visitModel";
 import { Box, useMediaQuery } from "@mui/material";
 import { Button, DatePicker, Divider, Form, Input, message, Popover, Row, Spin, Steps, Upload, UploadProps } from "antd";
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
-import { handleDaysCalculation, VisitCard } from "@/appPages/doctor/ActiveVisits";
-import {CloseOutlined, ExperimentOutlined, LoadingOutlined, MedicineBoxOutlined, MinusCircleOutlined, UploadOutlined} from '@ant-design/icons';
+import { VisitCard } from "@/appPages/doctor/ActiveVisits";
+import { ExperimentOutlined, LoadingOutlined, MedicineBoxOutlined, MinusCircleOutlined, UploadOutlined} from '@ant-design/icons';
 import { batchUpload } from "@/utils/batchFileUpload";
 import { useEffect, useState } from "react";
 import { cloudinaryPresents } from "@/data/constants";
@@ -22,11 +22,9 @@ interface props{
     setOpen:(value:boolean)=>void,
     visit:VisitCard,
     selectedPatient:PatientModel,
-    setScheduledVisits: any,
-    setPatientsData:any
 }
 
-export const EditVisitModal = ({open,visit,selectedPatient,setOpen,setScheduledVisits,setPatientsData}:props)=>{
+export const EditVisitModal = ({open,visit,selectedPatient,setOpen}:props)=>{
     const {user}:{user?:DoctorModel} = useSessionUser();
     const allowedExtensions = ['.pdf', '.png', '.jpg', '.jpeg'];
     const allowedTypes = ['application/pdf', 'image/png', 'image/jpeg'];
@@ -94,27 +92,6 @@ export const EditVisitModal = ({open,visit,selectedPatient,setOpen,setScheduledV
                     await updatePatient({...patient, medicalConditions:mcs}).unwrap();
                 }
                 await updateVisit({visitID: visit._id,body: visitData}).unwrap();
-                const formattedVisit:VisitCard = {
-                    ...visitData,
-                    _id:visit._id,
-                    name: visit.name??'',
-                    contact: visit.contact??'',
-                    days: handleDaysCalculation(visitData.startDate)
-                }
-                // updating the current state.
-                setScheduledVisits((prev: VisitCard[]) => {
-                    return [...prev.map((v) =>
-                        v._id === visit._id ? formattedVisit : v
-                    )];
-                });
-
-                setPatientsData((prev: PatientModel[]) => {
-                    return [...prev.map((p) =>
-                        p._id === selectedPatient._id
-                            ? { ...selectedPatient, medicalConditions: mcs }
-                            : p
-                    )];
-                });
 
                 message.success("Visit edited");
                 form.resetFields();
@@ -130,8 +107,8 @@ export const EditVisitModal = ({open,visit,selectedPatient,setOpen,setScheduledV
         total: 2,
     });
 
-    const onFinish = ()=>{
-        submit()
+    const onFinish = async ()=>{
+        await submit()
     }
 
     const beforeUpload: UploadProps['beforeUpload'] = (file) => {
@@ -166,7 +143,8 @@ export const EditVisitModal = ({open,visit,selectedPatient,setOpen,setScheduledV
             const res = await drugInteraction({
                 medicines,
                 medical_conditions,
-                type: type
+                type: type,
+                text:'d'
             }).unwrap()
 
             if(type=='md_interaction'){

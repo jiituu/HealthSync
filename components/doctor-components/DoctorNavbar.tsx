@@ -31,7 +31,6 @@ const Navbar = ({ onMenuClick }: { onMenuClick: () => void }) => {
 
   useEffect(() => {
     const visitRequests: VisitModel[] = data?.data?.visits ?? [];
-    console.log(visitRequests,"visit requests");
     const visitNotifications: NotificationModel[] = visitRequests.map(vr => ({
       id: vr._id,
       targetID: user?._id ?? '',
