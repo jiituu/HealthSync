@@ -4,17 +4,22 @@ import { NotificationModel, notificationType } from "../models/notification";
 import { IoCloseOutline } from "react-icons/io5";
 import { message, Modal, Spin } from "antd";
 import { LoadingOutlined } from '@ant-design/icons';
-import { useApproveRefuseVisitMutation } from "@/redux/api/doctorApi";
+import { useApproveRefuseVisitMutation, useGetAppointedPatientsQuery } from "@/redux/api/doctorApi";
+import { PatientModel } from "../models/patient";
+import { DoctorModel } from "../models/doctor";
+import { useSessionUser } from "../context/Session";
 
 interface prob {
   notifications:NotificationModel[]
 }
 
 export default function Notification({notifications}:prob) {
+  const {user}:{user?: DoctorModel} = useSessionUser();
   const [notifList, setNotifList] = useState(notifications);
   const [closeLoading,setCloseLoading] = useState<any>({});
   const [loadingType,setLoadingType] = useState<'Approved'|'Denied'|null>(null);
-  const [approveRefuseVisit,{isLoading}] = useApproveRefuseVisitMutation()
+  const [approveRefuseVisit,{isLoading}] = useApproveRefuseVisitMutation();
+  const {data:pData,isLoading: patientsIsLoading,isError: patientsIsError} = useGetAppointedPatientsQuery(user?._id??'');
 
   const handleCloseNotification = (id:string,type:notificationType)=>{
     if(type=='visitRequest'){
@@ -59,6 +64,12 @@ export default function Notification({notifications}:prob) {
     }
   };
 
+  const getPatientFullName = (patientID?:string)=>{
+    if(!patientID) return 'Unknown Name';
+    const patient:PatientModel = pData?.data?.find((p:any)=>p?._id==patientID);
+    return patient? `${patient.firstname} ${patient.lastname}`:'Unknown Name';
+  }
+
   return (
     <div className="w-94 bg-transparent mr-2">
       <h2 className="text-lg font-semibold text-center border-b pb-2">Notifications</h2>
@@ -68,7 +79,7 @@ export default function Notification({notifications}:prob) {
             {/* <Image src={notif.avatar} alt="Avatar" width={40} height={40} className="rounded-full" /> */}
             <div className="flex-1">
               <p className="text-sm">
-                <span className="font-semibold">{notif.triggerID}</span> <span dangerouslySetInnerHTML={{__html:notif.message}}></span>
+                <span className="font-bold text-secondaryColor">{getPatientFullName(notif.triggerID)}</span> <span dangerouslySetInnerHTML={{__html:notif.message}}></span>
               </p>
               <p className="text-xs text-gray-500">{notif.time}</p>
               {

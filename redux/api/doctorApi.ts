@@ -1,6 +1,5 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { DoctorLoginPayload, DoctorSignupPayload } from "@/types/doctor";
-// import { get } from "http";
 import { DoctorApiResponse, DoctorsListApiResponse } from "@/types/doctor";
 import { VisitsResponse } from "@/types/visit";
 import { notificationsApi } from "./notificationsApi";
@@ -9,6 +8,7 @@ interface InteractionPayload {
   medicines:string[],
   medical_conditions:string[],
   type:'dd_interaction'|'md_interaction',
+  text:string
 }
 
 interface Chat{
@@ -26,7 +26,7 @@ export const doctorApi = createApi({
       return headers;
     },
   }),
-  tagTypes: ["Doctor"],
+  tagTypes: ["Doctor","Visit"],
   endpoints: (builder) => ({
     // to login a doctor
     loginDoctor: builder.mutation<any, DoctorLoginPayload>({
@@ -93,9 +93,10 @@ export const doctorApi = createApi({
       { id: string; approval: "Approved" | "Denied" | "Scheduled" }
     >({
       query: ({ id, approval }) => ({
-        url: `/visits?doctor_id=${id}&approval=${approval}`,
+        url: `/visits?doctor_id=${id}&approval=${approval}&limit=50`,
         method: "GET",
       }),
+      providesTags: ["Visit"]
     }),
 
     getVisitsByDoctorId: builder.query<any, { id: string }>({
@@ -132,6 +133,7 @@ export const doctorApi = createApi({
           // Handle error if needed
         }
       },
+      invalidatesTags:['Visit']
     }),
 
     
@@ -326,8 +328,7 @@ export const loginDoctor = async (
 export const doctorApi2 = createApi({
   reducerPath: "doctorApi2",
   baseQuery: fetchBaseQuery({
-    baseUrl: "https://localhost:8000/",
-    credentials: "include",
+    baseUrl: "https://3c0e-102-218-51-81.ngrok-free.app/",
     prepareHeaders: (headers) => {
       headers.set("Content-Type", `application/json`);
       return headers;
