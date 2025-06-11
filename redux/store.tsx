@@ -1,5 +1,5 @@
 import { configureStore } from "@reduxjs/toolkit";
-import { doctorApi } from "./api/doctorApi";
+import { doctorApi, doctorApi2 } from "./api/doctorApi";
 import { patientApi } from "./api/patientApi";
 import { adminApi } from "./api/adminApi";
 import { commonApi } from "./api/commonApi";
@@ -12,6 +12,7 @@ const store = configureStore({
   reducer: {
     [commonApi.reducerPath]: commonApi.reducer,
     [doctorApi.reducerPath]: doctorApi.reducer,
+    [doctorApi2.reducerPath]: doctorApi2.reducer,
     [patientApi.reducerPath]: patientApi.reducer,
     [adminApi.reducerPath]: adminApi.reducer,
     [hospitalApi.reducerPath]: hospitalApi.reducer,
@@ -23,6 +24,7 @@ const store = configureStore({
     getDefaultMiddleware().concat(
       commonApi.middleware,
       doctorApi.middleware,
+      doctorApi2.middleware,
       patientApi.middleware,
       adminApi.middleware,
       hospitalApi.middleware,
