@@ -47,12 +47,12 @@ export default function ChatHeader({ contact }: ChatHeaderProps) {
         </div>
       </div>
 
-      <div className="flex items-center gap-1">
+      {/* <div className="flex items-center gap-1">
         <Button variant="ghost" size="icon" className="rounded-full">
           <Calendar className="h-5 w-5" />
           <span className="sr-only">Schedule Appointment</span>
         </Button>
-      </div>
+      </div> */}
     </header>
   )
 }
