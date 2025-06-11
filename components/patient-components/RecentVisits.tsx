@@ -23,7 +23,7 @@ const RecentVisits = () => {
   const getTopRatedDoctors = (doctors: Doctor[]): Doctor[] => {
     if (!doctors || doctors.length === 0) return []
 
-    // Sort doctors by rating in descending order, then by total reviews as tiebreaker
+    // Sort doctors by rating in descending order, then by total reviews, and finally by name
     const sortedDoctors = [...doctors].sort((a, b) => {
       const ratingA = a.rating || 0
       const ratingB = b.rating || 0
@@ -35,7 +35,14 @@ const RecentVisits = () => {
       // If ratings are equal, sort by total reviews
       const reviewsA = a.totalReviews || 0
       const reviewsB = b.totalReviews || 0
-      return reviewsB - reviewsA
+      if (reviewsA !== reviewsB) {
+        return reviewsB - reviewsA
+      }
+
+      // If both ratings and reviews are equal, sort alphabetically by name
+      const nameA = `${a.firstname} ${a.lastname}`.toLowerCase()
+      const nameB = `${b.firstname} ${b.lastname}`.toLowerCase()
+      return nameA.localeCompare(nameB)
     })
 
     return sortedDoctors.slice(0, 3)
