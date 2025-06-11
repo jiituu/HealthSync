@@ -111,7 +111,7 @@ export const patientApi = createApi({
 
     getUpcomingAppointments: builder.query<VisitModel[], string>({
       query: (patient_id) => ({
-        url: `/visits?patient_id=${patient_id}&status=Scheduled&approval=Approved`,
+        url: `/visits?patient_id=${patient_id}&approval=Scheduled`,
         method: "GET",
       }),
       transformResponse: (response: VisitsResponse) => response.data.visits,
