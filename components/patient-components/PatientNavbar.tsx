@@ -147,7 +147,7 @@ const Navbar = ({ onMenuClick }: { onMenuClick: () => void }) => {
                 <FaBell className='text-[#B0C3CC]' size={25} />
               </button>
             </PopoverTrigger>
-            <PopoverContent className="w-96 h-64 bg-[#e3ffff] shadow-lg rounded-lg mr-2">
+            <PopoverContent className="w-96 h-[32rem] bg-[#e3ffff] shadow-lg rounded-lg mr-2">
               <PatientNotification notifications={onlyNotifications} />
             </PopoverContent>
           </Popover>

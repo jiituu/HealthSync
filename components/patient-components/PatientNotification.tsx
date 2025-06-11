@@ -54,9 +54,9 @@ export default function PatientNotification({ notifications }: PatientNotificati
   };
 
   return (
-    <div className="w-94 bg-transparent mr-2">
+    <div className="w-94 bg-transparent mr-2 h-[28rem]">
       <h2 className="text-lg font-semibold text-center border-b pb-2">Notifications</h2>
-      <div className="h-72 pr-2 overflow-y-auto"> {/* Changed h-52 to h-72 */}
+      <div className="h-[28rem] pr-2 overflow-y-auto">
         {/* Medication Requests */}
         <Divider orientation="center">Medication Requests</Divider>
         {notifList.filter((notif) => notif.type === "medication").length > 0 ? (
