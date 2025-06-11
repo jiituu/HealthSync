@@ -52,8 +52,8 @@ const Navbar = ({ onMenuClick }: { onMenuClick: () => void }) => {
   }, [data, data?.visits, user?._id])
 
   return (
-    <nav className="sticky top-0 bg-white border-b-2 flex items-center justify-between px-6 py-3 z-20">
-      <div className="flex items-center relative w-80">
+    <nav className="sticky top-0 bg-white border-b-2 flex items-center justify-end px-6 py-3 z-20">
+      {/* <div className="flex items-center relative w-80">
         <button
           className="md:hidden mr-4"
           onClick={onMenuClick}
@@ -69,7 +69,7 @@ const Navbar = ({ onMenuClick }: { onMenuClick: () => void }) => {
         <div className="absolute right-2 top-1/2 transform -translate-y-1/2">
           <CiSearch className='text-[#B0C3CC]' size={20} />
         </div>
-      </div>
+      </div> */}
 
       <div className="flex items-center space-x-4">
         <div className="relative">
