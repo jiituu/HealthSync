@@ -143,8 +143,13 @@ const Navbar = ({ onMenuClick }: { onMenuClick: () => void }) => {
         <div className="relative">
           <Popover>
             <PopoverTrigger asChild>
-              <button>
+              <button className="relative">
                 <FaBell className='text-[#B0C3CC]' size={25} />
+                {onlyNotifications.length > 0 && (
+                  <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                    {onlyNotifications.length}
+                  </div>
+                )}
               </button>
             </PopoverTrigger>
             <PopoverContent className="w-96 h-[32rem] bg-[#e3ffff] shadow-lg rounded-lg mr-2">
