@@ -8,7 +8,7 @@ interface InteractionPayload {
   medicines:string[],
   medical_conditions:string[],
   type:'dd_interaction'|'md_interaction',
-  text:string
+  text?:string
 }
 
 interface Chat{
@@ -328,7 +328,7 @@ export const loginDoctor = async (
 export const doctorApi2 = createApi({
   reducerPath: "doctorApi2",
   baseQuery: fetchBaseQuery({
-    baseUrl: "https://3c0e-102-218-51-81.ngrok-free.app/",
+    baseUrl: "https://6ba2-102-218-50-243.ngrok-free.app/",
     prepareHeaders: (headers) => {
       headers.set("Content-Type", `application/json`);
       return headers;
