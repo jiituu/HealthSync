@@ -52,7 +52,10 @@ const Navbar = ({ onMenuClick }: { onMenuClick: () => void }) => {
   }, []);
 
   const filteredResults = doctors?.filter((doctor) =>
-    `Dr. ${doctor.firstname} ${doctor.lastname}`.toLowerCase().includes(searchTerm.toLowerCase())
+    `Dr. ${doctor.firstname} ${doctor.lastname}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    doctor.specializations.some((specialization) =>
+      specialization.toLowerCase().includes(searchTerm.toLowerCase())
+    )
   ) ?? [];
 
   return (
