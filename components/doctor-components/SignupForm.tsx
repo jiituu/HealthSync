@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Form, Input, Select, Row, Button, message, InputNumber, Col, Divider, Modal, Tag } from "antd"
+import { Form, Input, Select, Row, Button, message, InputNumber, Col, Divider, Modal, Tag, DatePicker } from "antd"
 import { qualifications, specializations } from "@/data/DoctorData"
 import type { DoctorSignupPayload } from "@/types/doctor"
 import { useRegisterDoctorMutation } from "@/redux/api/doctorApi"
@@ -22,6 +22,7 @@ const DoctorSignupForm = ({ setParentTab, onSignupSuccess }: { setParentTab: any
     email: "",
     phoneNumber: "",
     gender: "male",
+    birthDate: null,
     age: 0,
     password: "",
     role: "doctor",
@@ -64,12 +65,14 @@ const DoctorSignupForm = ({ setParentTab, onSignupSuccess }: { setParentTab: any
       ...values,
       licenses: uploadedLicenses, 
     }
-    console.log("Final form values", finalValues)
+    // filter out birthDate from the final values
+    const { birthDate, ...restFinalValues } = finalValues;
+    console.log("Form form values", restFinalValues)
 
     try {
-      await registerDoctor(finalValues).unwrap()
+      await registerDoctor(restFinalValues).unwrap()
       message.success("Registration successful!")
-      onSignupSuccess(finalValues.email, "doctor"); 
+      onSignupSuccess(restFinalValues.email, "doctor"); 
     } catch (error: any) {
       message.error(error?.data?.error || "Registration failed, please try again")
     }
@@ -105,13 +108,24 @@ const DoctorSignupForm = ({ setParentTab, onSignupSuccess }: { setParentTab: any
     }
   }
 
+  const calculateAgeFromBirthDate = (date:Date) => {
+     const today = new Date()
+    const birthDate = new Date(date.toISOString())
+    let age = today.getFullYear() - birthDate.getFullYear()
+    const monthDiff = today.getMonth() - birthDate.getMonth()
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      age--
+    }
+    return age;
+  }
+
   const formList = [
     // Step 1: Personal Details
     <Row key="step-1" justify="center">
       <Col span={24}>
         <Divider orientation="left">Personal Details</Divider>
       </Col>
-      {["First Name", "Last Name", "Email", "Gender", "Age"].map((label) => (
+      {["First Name", "Last Name", "Email", "Gender", "Birth Date"].map((label) => (
         <Col span={24} key={label}>
           <Form.Item
             {...formItemLayout}
@@ -126,9 +140,30 @@ const DoctorSignupForm = ({ setParentTab, onSignupSuccess }: { setParentTab: any
                   { label: "Female", value: "female" },
                 ]}
               />
-            ) : label === "Age" ? (
-              <InputNumber min={1} max={120} className="w-full" />
-            ) : (
+            ) : label === "Birth Date" ? (
+                <>
+                  <DatePicker
+                    value={formValues.birthDate}
+                    className="w-full"
+                    onChange={(date) => {
+                      if (date) {
+                        const age = calculateAgeFromBirthDate(date)
+                        console.log("Calculated age:", age);
+                        form.setFieldsValue({ age })
+                        setFormValues((prev) => ({ ...prev, age, birthDate: date }))
+                      } else {
+                        setFormValues((prev) => ({ ...prev, age: 0, birthDate: null }))
+                        }
+                      }}
+
+                  />
+                  <Form.Item name="age" hidden>
+                    <InputNumber />
+                  </Form.Item>
+                </>
+                
+              ) : (
+
               <Input />
             )}
           </Form.Item>

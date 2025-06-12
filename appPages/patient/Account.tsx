@@ -491,6 +491,7 @@ const PatientProfile = () => {
                       value={profile.age}
                       onChange={(e) => handleInputChange("age", e.target.value)}
                       className="border-gray-200 focus:border-teal-500"
+                      readOnly
                     />
                   </div>
                   {/* 

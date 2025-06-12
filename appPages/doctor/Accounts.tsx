@@ -257,6 +257,7 @@ const Accounts = () => {
                           {...field}
                           onChange={event => field.onChange(+event.target.value)}
                           placeholder="Your Age"
+                          readOnly
                         />
                       </FormControl>
                       <FormMessage />
