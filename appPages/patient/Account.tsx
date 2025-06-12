@@ -11,7 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Separator } from "@/components/ui/separator"
 import { User, Phone, Calendar, X, Plus, Save, AlertCircle, Activity, Shield, Weight, Ruler, Loader2, Key, Eye, EyeOff } from "lucide-react"
 import { allergyOptions, conditionOptions, allergyOptionsEnglish, conditionOptionsEnglish } from "@/data/PatientData"
-import Logout from "@/components/auth/Logout"
+// import Logout from "@/components/auth/Logout"
 import { useToast } from "@/hooks/use-toast"
 import {
   Dialog,
@@ -24,6 +24,7 @@ import Email from "next-auth/providers/email"
 import { z } from "zod"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { message } from "antd"
 
 
 const PatientProfile = () => {
@@ -47,6 +48,7 @@ const PatientProfile = () => {
 
   const [updatePatient, { isLoading: isUpdating }] = useUpdatePatientMutation()
   const { toast } = useToast()
+  const [messageApi, contextHolder] = message.useMessage();
 
 
   const [profile, setProfile] = useState({
@@ -159,17 +161,17 @@ const PatientProfile = () => {
   }
 
   const handleSubmit = async (event: React.FormEvent) => {
-    event.preventDefault()
-    const phoneValidation = phoneSchema.safeParse(profile.phoneNumber)
+    event.preventDefault();
+    const phoneValidation = phoneSchema.safeParse(profile.phoneNumber);
     if (!phoneValidation.success) {
-      setPhoneError(phoneValidation.error.errors[0].message)
-      return
+      setPhoneError(phoneValidation.error.errors[0].message);
+      return;
     }
 
     if (!["Male", "Female"].includes(profile.gender)) {
-      console.log("Invalid gender:", profile.gender)
-      alert("Please select a valid gender")
-      return
+      console.log("Invalid gender:", profile.gender);
+      alert("Please select a valid gender");
+      return;
     }
 
     try {
@@ -184,14 +186,15 @@ const PatientProfile = () => {
         phoneNumber: profile.phoneNumber,
         medicalConditions: profile.knownConditions,
         allergies: profile.allergies,
-      }
+      };
 
-      await updatePatient(updateData).unwrap()
-      alert("Profile updated successfully!")
+      await updatePatient(updateData).unwrap();
+      messageApi.success("Profile updated successfully!");
     } catch (error) {
       if (error instanceof Error) {
+        console.error("Failed to update profile:", error);
       }
-      alert("Failed to update profile. Please try again.")
+      messageApi.error("Failed to update profile. Please try again.");
     }
   }
   const handlePasswordSubmit = async (event: React.FormEvent) => {
@@ -257,11 +260,12 @@ const PatientProfile = () => {
 
   return (
     <div className="container mx-auto p-4 md:p-6">
+      {contextHolder}
       <form onSubmit={handleSubmit}>
         <div className="space-y-6">
           {/* Profile Header Card */}
-          <Card className="overflow-hidden border-0 shadow-md">
-            <div className="bg-gradient-to-r from-teal-100 via-teal-300 to-teal-600 h-32 relative rounded-xl"></div>
+          <Card className="overflow-hidden shadow-md border-0 rounded-xl bg-gradient-to-r from-teal-50 via-teal-300 to-teal-600">
+            <div className="bg-gradient-to-r from-teal-50 via-teal-300 to-teal-600 h-32 relative rounded-xl"></div>
             <CardHeader className="relative pb-0 pt-0 -mt-16 rounded-xl">
               <div className="flex flex-col md:flex-row items-start md:items-end gap-4 md:gap-6 pb-6 rounded-xl">
                 <Avatar className="w-24 h-24 md:w-32 md:h-32 border-4 border-white shadow-lg">
@@ -285,7 +289,7 @@ const PatientProfile = () => {
                   </div>
                 </div>
                 <div className="flex flex-col gap-2 md:self-start pt-4 md:pt-0">
-                  <Logout />
+                  {/* <Logout /> */}
                   <Dialog open={isPasswordDialogOpen} onOpenChange={setIsPasswordDialogOpen}>
                     <DialogTrigger asChild>
                       <Button variant="outline" className="gap-2">
@@ -458,28 +462,6 @@ const PatientProfile = () => {
                       <p className="text-red-500 text-sm">{phoneError}</p>)}
                   </div>
 
-                  {/* <div className="space-y-2">
-                    <label htmlFor="gender" className="text-sm font-medium flex items-center gap-2">
-                      <User size={16} className="text-gray-400" />
-                      Gender
-                    </label>
-                    <Select
-                      value={profile.gender}
-                      onValueChange={(value) => handleInputChange("gender", value)}
-                    >
-                      <SelectTrigger className="border-gray-200 focus:border-teal-500">
-                        <SelectValue placeholder="Select Gender" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {genders.map((gender) => (
-                          <SelectItem key={gender} value={gender}>
-                            {gender}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div> */}
-
                   <div className="space-y-2">
                     <label htmlFor="age" className="text-sm font-medium flex items-center gap-2">
                       <Calendar size={16} className="text-gray-400" />
@@ -494,25 +476,6 @@ const PatientProfile = () => {
                       readOnly
                     />
                   </div>
-                  {/* 
-                  <div className="space-y-2">
-                    <label htmlFor="bloodType" className="text-sm font-medium flex items-center gap-2">
-                      <Droplet size={16} className="text-gray-400" />
-                      Blood Type
-                    </label>
-                    <Select value={profile.bloodType} onValueChange={(value) => handleInputChange("bloodType", value)}>
-                      <SelectTrigger className="border-gray-200 focus:border-teal-500">
-                        <SelectValue placeholder="Select Blood Type" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {bloodTypes.map((type) => (
-                          <SelectItem key={type} value={type}>
-                            {type}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div> */}
 
                   <div className="space-y-2">
                     <label htmlFor="height" className="text-sm font-medium flex items-center gap-2">
