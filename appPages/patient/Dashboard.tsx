@@ -70,6 +70,7 @@ const healthTips = [
 ]
 const Dashboard = () => {
   const { user }: { user?: PatientModel } = useSessionUser()
+  console.log("this is the current user id", user?._id)
     const [currentTip, setCurrentTip] = useState(healthTips[0])
     const [currentTime, setCurrentTime] = useState(new Date())
   

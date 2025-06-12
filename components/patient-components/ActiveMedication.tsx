@@ -2,16 +2,21 @@
 import React from 'react';
 import { Card, CardHeader, CardContent } from '@/components/ui/card';
 import { useGetScheduledVisitsQuery } from '@/redux/api/patientApi';
+import { useSessionUser } from "@/components/context/Session"
+import { PatientModel } from '../models/patient';
+import { Pill } from "lucide-react"
+
 
 const ActiveMedication = () => {
-  const patientId = '67b8554a85c8a7f8cf1f971a';
+  const { user }: { user?: PatientModel } = useSessionUser()
+  const patientId = user?._id
 
   const {
     data: prescriptions,
     isLoading,
     isError,
-    error
-  } = useGetScheduledVisitsQuery(patientId);
+    error: medicalerror
+  } = useGetScheduledVisitsQuery(patientId || "");
 
   if (isLoading) {
     return <div className="text-gray-500 text-sm p-4">Loading medications...</div>;
@@ -20,6 +25,27 @@ const ActiveMedication = () => {
   if (isError) {
     return <div className="text-red-500 text-sm p-4">Error loading medications</div>;
   }
+
+  if (medicalerror || !prescriptions?.length) {
+      return (
+        <div className="container mx-auto basis-2/5 space-y-5">
+          <h1 className="font-bold text-xl text-start text-gray-800">Active Medications</h1>
+          <Card className="rounded-2xl bg-white border-0">
+            <CardContent className="p-8 text-center">
+              <div className="flex flex-col items-center space-y-4">
+                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center">
+                  <Pill className="w-8 h-8 text-gray-400" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-medium text-gray-900">No Active Medications</h3>
+                  <p className="text-gray-500 mt-1">Talk to your Doctor about your medication options</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )
+    }
 
   return (
     <div className="container mx-auto flex flex-col basis-1/2 space-y-5">
