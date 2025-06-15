@@ -1,4 +1,4 @@
-import { PatientLoginPayload } from "@/types/patient";
+import { PatientLoginPayload, PrescriptionResponse } from "@/types/patient";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { PatientSignupPayload } from "@/types/patient";
 import {
@@ -68,7 +68,7 @@ export const patientApi = createApi({
       { doctor_id: string; patient_id: string }
     >({
       query: ({ doctor_id, patient_id }) => ({
-        url: `/visits?doctor_id=${doctor_id}&patient_id=${patient_id}`,
+        url: `/visits?doctor_id=${doctor_id}&patient_id=${patient_id}&approval=Scheduled&status=Scheduled`,
         method: "GET",
       }),
       providesTags: ["Visits"],
@@ -147,6 +147,17 @@ export const patientApi = createApi({
       }),
       invalidatesTags: ["Patient"],
     }),
+
+
+    getPrescriptionsByPatientId: builder.query<any, string>({
+      query: (patient_id) => ({
+        url: `/patients/${patient_id}/me/prescriptions?limit=1000`,
+        method: "GET",
+      }),
+      transformResponse: (response: PrescriptionResponse) => response.data.prescriptions,
+      providesTags: ["Visits"],
+    }),
+
   }),
 });
 
@@ -165,6 +176,7 @@ export const {
   useGetOnlyScheduledVisitsQuery,
   useLazyGetPatientByIdQuery,
   useGetUpcomingActiveAppointmentsQuery,
+  useGetPrescriptionsByPatientIdQuery,
 } = patientApi;
 
 export const fetchPatient = async (_id: string) => {
