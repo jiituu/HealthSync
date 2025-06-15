@@ -3,6 +3,7 @@ import { DoctorLoginPayload, DoctorSignupPayload } from "@/types/doctor";
 import { DoctorApiResponse, DoctorsListApiResponse } from "@/types/doctor";
 import { VisitsResponse } from "@/types/visit";
 import { notificationsApi } from "./notificationsApi";
+import {patientApi} from "./patientApi";
 
 interface InteractionPayload {
   medicines:string[],
@@ -129,6 +130,7 @@ export const doctorApi = createApi({
         try {
           await queryFulfilled;
           dispatch(notificationsApi.util.invalidateTags(["NotificationTag"]));
+          dispatch(patientApi.util.invalidateTags(["Visits"]));
         } catch {
           // Handle error if needed
         }

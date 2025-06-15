@@ -4,27 +4,31 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { Calendar, Clock, User, FileText, Pill, FlaskConical, AlertCircle } from "lucide-react"
-import { useGetUpcomingAppointmentsQuery } from "@/redux/api/patientApi"
-import { useGetDoctorByIdQuery } from "@/redux/api/doctorApi"
+import { useGetUpcomingActiveAppointmentsQuery } from "@/redux/api/patientApi"
+import { useGetDoctorByIdQuery, useUpdateVisitMutation } from "@/redux/api/doctorApi"
 import imgg from "@/public/images/doctor.png"
 import { useSessionUser } from "@/components/context/Session"
 import { PatientModel } from "../models/patient"
+import { message } from "antd"
+import { VisitModel } from "../models/visitModel"
+import { useState } from "react"
 
 const Appointment = () => {
   const { user }: { user?: PatientModel } = useSessionUser()
   const patientId = user?._id
-
 
   // Fetch upcoming visits
   const {
     data: visits,
     isLoading: isLoadingAppointments,
     isError: isAppointmentsError,
-  } = useGetUpcomingAppointmentsQuery(patientId || "")
+  } = useGetUpcomingActiveAppointmentsQuery(patientId || "")
 
   // Get the most recent approved appointment
   const sortedVisits = visits?.slice().sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
   const appointment = sortedVisits?.[0]
+
+  console.log("this is my appointment", appointment)
 
   // Fetch doctor details if appointment exists
   const {
@@ -71,6 +75,37 @@ const Appointment = () => {
         return "bg-gray-100 text-gray-800 border-gray-200"
       default:
         return "bg-gray-100 text-gray-800 border-gray-200"
+    }
+  }
+
+  const [updateVisit] = useUpdateVisitMutation()
+  const [isCancelling, setIsCancelling] = useState(false)
+
+  const handleCancelAppointment = async () => {
+    if (!appointment?._id) return
+
+    setIsCancelling(true)
+    const visitData: VisitModel = {
+      status: 'Cancelled',
+      approval: appointment.approval,
+      reason: appointment.reason,
+      labResults: appointment.labResults,
+      prescription: appointment.prescription,
+      startDate: appointment.startDate,
+      endDate: appointment.endDate,    
+      patient: appointment.patient,
+      doctor: appointment.doctor,
+      preferredDate: appointment.preferredDate,
+  } as VisitModel;
+
+
+    try {
+      await updateVisit({ visitID: appointment._id, body: visitData }).unwrap()
+      message.success("Your appointment has been successfully cancelled.")
+    } catch (error) {
+      message.error("Failed to cancel the appointment. Please try again.")
+    } finally {
+      setIsCancelling(false)
     }
   }
 
@@ -213,9 +248,17 @@ const Appointment = () => {
             <Button
               variant="outline"
               className="flex-1 border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300"
-              disabled={!appointment}
+              disabled={!appointment || isCancelling}
+              onClick={handleCancelAppointment}
             >
-              Cancel Appointment
+              {isCancelling ? (
+                <span className="flex items-center gap-2">
+                  <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                  Cancelling...
+                </span>
+              ) : (
+                "Cancel Appointment"
+              )}
             </Button>
           </div>
 

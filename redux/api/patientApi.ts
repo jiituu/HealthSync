@@ -118,6 +118,17 @@ export const patientApi = createApi({
       providesTags: ["Visits"],
     }),
 
+
+    getUpcomingActiveAppointments: builder.query<VisitModel[], string>({
+      query: (patient_id) => ({
+        url: `/visits?patient_id=${patient_id}&approval=Scheduled&status=Scheduled`,
+        method: "GET",
+      }),
+      transformResponse: (response: VisitsResponse) => response.data.visits,
+      providesTags: ["Visits"],
+    }),
+
+
     getCurrentPatient: builder.query<PatientResponse, void>({
       query: () => "/patients/me",
       transformResponse: (response: {
@@ -153,6 +164,7 @@ export const {
   useGetVisitsByPatientIdQuery,
   useGetOnlyScheduledVisitsQuery,
   useLazyGetPatientByIdQuery,
+  useGetUpcomingActiveAppointmentsQuery,
 } = patientApi;
 
 export const fetchPatient = async (_id: string) => {
