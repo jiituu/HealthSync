@@ -261,6 +261,9 @@ const Appointment = () => {
               )}
             </Button>
           </div>
+          <p className="text-sm text-gray-500 text-center bg-gray-50 p-2 rounded-lg mt-2">
+            You can cancel your visit request only before the doctor approves or denies it.
+          </p>
 
           {/* Appointment ID */}
           {appointment?._id && (
