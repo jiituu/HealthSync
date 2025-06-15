@@ -7,16 +7,20 @@ import { Calendar, Clock, User, FileText, Pill, FlaskConical, AlertCircle } from
 import { useGetUpcomingAppointmentsQuery } from "@/redux/api/patientApi"
 import { useGetDoctorByIdQuery } from "@/redux/api/doctorApi"
 import imgg from "@/public/images/doctor.png"
+import { useSessionUser } from "@/components/context/Session"
+import { PatientModel } from "../models/patient"
 
 const Appointment = () => {
-  const patientId = "67b8554a85c8a7f8cf1f971a"
+  const { user }: { user?: PatientModel } = useSessionUser()
+  const patientId = user?._id
 
-  // Fetch upcoming appointments
+
+  // Fetch upcoming visits
   const {
     data: visits,
     isLoading: isLoadingAppointments,
     isError: isAppointmentsError,
-  } = useGetUpcomingAppointmentsQuery(patientId)
+  } = useGetUpcomingAppointmentsQuery(patientId || "")
 
   // Get the most recent approved appointment
   const sortedVisits = visits?.slice().sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
@@ -101,18 +105,18 @@ const Appointment = () => {
   if (isAppointmentsError || !visits?.length) {
     return (
       <div className="container mx-auto basis-2/5 space-y-5">
-        <h1 className="font-bold text-xl text-start text-gray-800">Upcoming Appointment</h1>
-        <Card className="shadow-lg rounded-2xl bg-white border-0">
+        <h1 className="font-bold text-xl text-start text-gray-800">Upcoming Visits</h1>
+        <Card className="rounded-2xl bg-white border-0">
           <CardContent className="p-8 text-center">
             <div className="flex flex-col items-center space-y-4">
               <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center">
                 <Calendar className="w-8 h-8 text-gray-400" />
               </div>
               <div>
-                <h3 className="text-lg font-medium text-gray-900">No upcoming appointments</h3>
-                <p className="text-gray-500 mt-1">Schedule your next appointment with your healthcare provider</p>
+                <h3 className="text-lg font-medium text-gray-900">No upcoming Visits</h3>
+                <p className="text-gray-500 mt-1">Schedule your next Visit with your Doctor</p>
               </div>
-              <Button className="mt-4">Schedule Appointment</Button>
+              {/* <Button className="mt-4">Schedule Visit</Button> */}
             </div>
           </CardContent>
         </Card>
@@ -122,7 +126,7 @@ const Appointment = () => {
 
   return (
     <div className="container mx-auto basis-2/5 space-y-5">
-      <h1 className="font-bold text-xl text-start text-gray-800">Upcoming Appointment</h1>
+      <h1 className="font-bold text-xl text-start text-gray-800">Upcoming Visits</h1>
       <Card className="shadow-lg rounded-2xl bg-white border-0 overflow-hidden">
         <CardHeader className="bg-gradient-to-r from-blue-50 to-indigo-50 p-6">
           <div className="flex items-center gap-4">

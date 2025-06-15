@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Button, Divider, Form, Input, message, Row, Select as AntdSelect } from "antd";
+import { Button, Divider, Form, Input, message, Row, Select as AntdSelect, DatePicker, InputNumber } from "antd";
 import { useRegisterPatientMutation } from "@/redux/api/patientApi";
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "@/components/ui/select"; // Import Shadcn select component
 import {countries} from "@/data/countries"
@@ -28,6 +28,7 @@ const PatientSignupForm = ({ setParentTab, onSignupSuccess }: { setParentTab: an
     phoneNumber: "",
     gender: "male",
     age: 0,
+    birthDate: null,
     nationality: "",
     password: "",
     height: 0,
@@ -42,11 +43,13 @@ const PatientSignupForm = ({ setParentTab, onSignupSuccess }: { setParentTab: an
   const [registerPatient, {isLoading, isError, error}] = useRegisterPatientMutation();
 
   const onFinish = async (value: PatientSignupPayload) => {
-    console.log("Form Values", formValues);
+    // filter out birthDate from formValues
+    const { birthDate, ...restFormValues } = formValues;
+    console.log("Form Values", restFormValues);
     try {
-      await registerPatient(formValues).unwrap();
+      await registerPatient(restFormValues).unwrap();
       message.success("Registration successful!");
-      onSignupSuccess(formValues.email, "patient"); 
+      onSignupSuccess(restFormValues.email, "patient"); 
     } catch (error: any) {
       message.error(error?.data?.error || "Registration failed, please try again");
     }
@@ -57,6 +60,17 @@ const PatientSignupForm = ({ setParentTab, onSignupSuccess }: { setParentTab: an
   const handleStepChange = (changedValues: any) => {
     setFormValues((prevValues) => ({ ...prevValues, ...changedValues }));
   };
+
+  const calculateAgeFromBirthDate = (date:Date) => {
+     const today = new Date()
+    const birthDate = new Date(date.toISOString())
+    let age = today.getFullYear() - birthDate.getFullYear()
+    const monthDiff = today.getMonth() - birthDate.getMonth()
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      age--
+    }
+    return age;
+  }
 
   return (
     <Form
@@ -144,12 +158,31 @@ const PatientSignupForm = ({ setParentTab, onSignupSuccess }: { setParentTab: an
 
             <Form.Item
               layout="vertical"
-              label="Age"
-              name="age"
+              label="Birth Date"
+              name="birthDate"
               className="w-[40%]"
-              rules={[{ required: true, message: "Age is required" }]}
+              rules={[{ required: true, message: "Birth Date is required" }]}
             >
-              <AntdSelect className="w-[100%]" options={generateOptions(0, 120)} />
+              <>
+                <DatePicker
+                  value={formValues.birthDate}
+                  className="w-full"
+                  onChange={(date) => {
+                    if (date) {
+                        const age = calculateAgeFromBirthDate(date)
+                        console.log("Calculated age:", age);
+                        form.setFieldsValue({ age })
+                        setFormValues((prev) => ({ ...prev, age, birthDate: date }))
+                      } else {
+                        setFormValues((prev) => ({ ...prev, age: 0, birthDate: null }))
+                        }
+                    }}
+
+                />
+                <Form.Item name="age" hidden>
+                  <InputNumber />
+                </Form.Item>
+              </>
             </Form.Item>
           </Row>
 

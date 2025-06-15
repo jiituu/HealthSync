@@ -12,6 +12,7 @@ export interface PatientSignupPayload {
     password: string;
     phoneNumber: string;
     age: number;
+    birthDate?: Date | null;
     gender: 'male' | 'female';
     height: number;
     weight: number;

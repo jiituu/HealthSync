@@ -61,6 +61,8 @@ const Accounts = () => {
     },
   });
 
+  console.log("Doctor dataaaaaaaaaaaaaaa:", doctor);
+
   useEffect(() => {
     if (doctor) {
       profileForm.reset({
@@ -143,7 +145,21 @@ const Accounts = () => {
                 <h2 className="font-bold text-2xl text-slate-800">
                   Dr {doctor?.firstname || ""} {doctor?.lastname || ""}
                 </h2>
-                <p className="text-slate-500">{doctor?.email || "No email provided"}</p>
+                <div className="flex items-center gap-2">
+                  <p className="text-slate-500">{doctor?.email || "No email provided"}</p>
+                  <Badge
+                    variant="outline"
+                    className="mt-1 gap-1 text-orange-400 border-emerald-200 bg-emerald-50 w-fit"
+                  >
+                    <span>{doctor?.gender}</span>
+                  </Badge>
+                  <Badge
+                    variant="outline"
+                    className="mt-1 gap-1 text-orange-400 border-emerald-200 bg-emerald-50 w-fit"
+                  >
+                    <span>{doctor?.age} years old</span>
+                  </Badge>
+                </div>
                 {isDoctorVerified ? (
                   <Badge
                     variant="outline"
@@ -220,7 +236,7 @@ const Accounts = () => {
                     </FormItem>
                   )}
                 />
-                <FormField
+                {/* <FormField
                   control={profileForm.control}
                   name="gender"
                   render={({ field }) => (
@@ -244,8 +260,8 @@ const Accounts = () => {
                       <FormMessage />
                     </FormItem>
                   )}
-                />
-                <FormField
+                /> */}
+                {/* <FormField
                   control={profileForm.control}
                   name="age"
                   render={({ field }) => (
@@ -257,12 +273,13 @@ const Accounts = () => {
                           {...field}
                           onChange={event => field.onChange(+event.target.value)}
                           placeholder="Your Age"
+                          readOnly
                         />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
-                />
+                /> */}
                 <FormField
                   control={profileForm.control}
                   name="specializations"

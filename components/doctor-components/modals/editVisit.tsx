@@ -98,7 +98,7 @@ export const EditVisitModal = ({open,visit,selectedPatient,setOpen}:props)=>{
                 setLabResultImgs([]);
                 setOpen(false);
             } catch (error: any) {
-                console.log(error,'hhh')
+                console.log(error)
                 message.error("Something went wrong, please try again");
             }finally{
                 setSubmitLoading(false);
@@ -144,9 +144,7 @@ export const EditVisitModal = ({open,visit,selectedPatient,setOpen}:props)=>{
                 medicines,
                 medical_conditions,
                 type: type,
-                text:'d'
             }).unwrap()
-
             if(type=='md_interaction'){
                 setMd_InteractionMsg(prev=> [...prev?.filter(p=>p.index!=index)??[], {...res.response,index}])
             }else if(type=='dd_interaction'){
@@ -154,7 +152,7 @@ export const EditVisitModal = ({open,visit,selectedPatient,setOpen}:props)=>{
             }
 
         }catch(e:any){
-            console.log(e?.data)
+            console.log(e)
             message.error('Something went wrong');
         }finally{
             setDrugLoading((prev:any)=>{

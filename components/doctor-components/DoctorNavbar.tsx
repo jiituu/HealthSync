@@ -36,9 +36,6 @@ const Navbar = ({ onMenuClick }: { onMenuClick: () => void }) => {
       targetID: user?._id ?? '',
       triggerID: vr.patient,
       message: `has requested your service.</br>
-      <b style="font-weight: 500;">Name</b>: patientName</br>
-      <b style="font-weight: 500;">Age</b>: patientAge</br>
-      <b style="font-weight: 500;">Gender</b>: patientGender</br>
       <b style="font-weight: 500;">Description</b>: ${vr.reason}`,
       time: dayjs(vr.createdAt).format('DD/MM/YY hh:mm'),
       type: "visitRequest",
@@ -86,9 +83,14 @@ const Navbar = ({ onMenuClick }: { onMenuClick: () => void }) => {
             <PopoverTrigger asChild>
               <button>
                 <FaBell className='text-[#B0C3CC]' size={25} />
+                {notifications.length > 0 && (
+                  <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                    {notifications.length}
+                  </div>
+                )}
               </button>
             </PopoverTrigger>
-            <PopoverContent className="w-96 h-72 pr-0 bg-[#e3ffff] shadow-lg rounded-lg mr-2">
+            <PopoverContent className="w-96 h-[32rem] pr-0 bg-[#e3ffff] shadow-lg rounded-lg mr-2">
               <Notification notifications={notifications} />
             </PopoverContent>
           </Popover>

@@ -8,6 +8,8 @@ import { useApproveRefuseVisitMutation, useGetAppointedPatientsQuery } from "@/r
 import { PatientModel } from "../models/patient";
 import { DoctorModel } from "../models/doctor";
 import { useSessionUser } from "../context/Session";
+import { Divider } from "antd";
+
 
 interface prob {
   notifications:NotificationModel[]
@@ -67,13 +69,15 @@ export default function Notification({notifications}:prob) {
   const getPatientFullName = (patientID?:string)=>{
     if(!patientID) return 'Unknown Name';
     const patient:PatientModel = pData?.data?.find((p:any)=>p?._id==patientID);
+    console.log("this is is is is a patient", patient);
     return patient? `${patient.firstname} ${patient.lastname}`:'Unknown Name';
   }
 
   return (
     <div className="w-94 bg-transparent mr-2">
       <h2 className="text-lg font-semibold text-center border-b pb-2">Notifications</h2>
-      <div className="h-52 pr-2 overflow-y-auto">
+      <div className="h-[28rem] pr-2 overflow-y-auto">
+        <Divider orientation="center">Visit Requests</Divider>
         {notifList.map((notif) => (
           <div key={notif.id} className="flex items-start gap-3 py-3 border-b last:border-none">
             {/* <Image src={notif.avatar} alt="Avatar" width={40} height={40} className="rounded-full" /> */}
@@ -102,7 +106,7 @@ export default function Notification({notifications}:prob) {
                     Decline
                   </Button>
                 </div>
-              :<></>
+              :<p className="text-center text-gray-500 text-sm">No medication at the moment.</p>
               }
             </div>
             {
