@@ -47,3 +47,31 @@ export interface PatientResponse {
     createdAt: string;
 
 }
+
+
+
+export interface Prescription {
+    visitId: string;
+    doctor: string;
+    startDate: string;
+    endDate: string;
+    status: string;
+    prescription: Medication[];
+}
+
+export interface Medication {
+    medication: string;
+    dosage: string;
+    instructions: string;
+    _id: string;
+}
+
+export interface PrescriptionResponse {
+    success: boolean;
+    data: {
+        prescriptions: Prescription[];
+        totalCount: number;
+        currentPage: number;
+        totalPages: number;
+    };
+}

@@ -16,6 +16,7 @@ import { PatientModel } from '../models/patient';
 import Logout from '../auth/Logout';
 // import { Button } from '../ui/button';
 import {useGetAllPatientNotificationsQuery} from '@/redux/api/notificationsApi';
+import {useGetPrescriptionsByPatientIdQuery} from '@/redux/api/patientApi';
 import PatientNotification from './PatientNotification';
 
 
@@ -32,7 +33,11 @@ const Navbar = ({ onMenuClick }: { onMenuClick: () => void }) => {
 
   // Fetch notifications for the patient
   const { data: notificationsData, isLoading: notificationsLoading, error: notificationsError } = useGetAllPatientNotificationsQuery({ isRead: false });
+  const { data: prescriptionsData, refetch: refetchPrescriptions } = useGetPrescriptionsByPatientIdQuery(user?._id || "");
+
   const onlyNotifications = notificationsData?.notifications || [];
+
+  const bellNumber = onlyNotifications.length + (prescriptionsData?.prescriptions?.length || 0);
 
   // Close the modal if the user clicks outside the container
   useEffect(() => {
@@ -146,17 +151,17 @@ const Navbar = ({ onMenuClick }: { onMenuClick: () => void }) => {
         <div className="relative">
           <Popover>
             <PopoverTrigger asChild>
-              <button className="relative">
+              <button className="relative" onClick={() => refetchPrescriptions()}>
                 <FaBell className='text-[#B0C3CC]' size={25} />
                 {onlyNotifications.length > 0 && (
                   <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                    {onlyNotifications.length}
+                    {bellNumber}
                   </div>
                 )}
               </button>
             </PopoverTrigger>
             <PopoverContent className="w-96 h-[32rem] bg-[#e3ffff] shadow-lg rounded-lg mr-2">
-              <PatientNotification notifications={onlyNotifications} />
+              <PatientNotification notifications={onlyNotifications} prescriptions={prescriptionsData} />
             </PopoverContent>
           </Popover>
         </div>

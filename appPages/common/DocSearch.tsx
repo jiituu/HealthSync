@@ -28,6 +28,9 @@ export default function DoctorProfile({ doctorID }: DoctorProfileProps) {
     patient_id: user?._id ?? "",
   })
 
+  console.log("this is the visit data", visitData)
+  const visits = visitData?.data?.visits ?? []
+
   useEffect(() => {
     const doctors: DoctorModel[] = data?.data?.doctors ?? []
     const doctor = doctors.find((d) => d._id == doctorID)
@@ -192,10 +195,9 @@ export default function DoctorProfile({ doctorID }: DoctorProfileProps) {
 
             <Separator className="h-8 w-px bg-white/20 md:block" />
 
-            {visitData?.data?.visits?.length && visitData?.data?.visits?.at(0).approval === "Scheduled" ? (
-              <div className="flex items-center gap-2">
-                <span className="text-lg font-medium">Status:</span>
-                {renderStatusBadge(visitData?.data?.visits?.at(0).approval)}
+            {visits.length > 0 ? (
+              <div className="text-lg font-medium bg-gradient-to-r from-orange-300 to-orange-600 text-white px-4 py-2 rounded-full">
+                You currently have an active visit scheduled with the doctor.
               </div>
             ) : (
               <Button onClick={() => setOpenRequestVisit(true)} className="bg-white text-teal-600 hover:bg-white/90">

@@ -23,7 +23,7 @@ export const notificationsApi = createApi({
       { isRead?: boolean }
     >({
       query: ({ isRead }) => ({
-        url: "/notifications",
+        url: "/notifications?limit=1000", // Adjust limit as needed
         method: "GET",
         params: isRead !== undefined ? { isRead } : undefined,
       }),
