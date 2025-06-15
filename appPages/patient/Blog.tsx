@@ -244,12 +244,16 @@ interface BlogCardProps {
 }
 
 const BlogCard: React.FC<BlogCardProps> = ({ blog, layout, onBookmarkToggle, onReadMore }) => {
+  const truncateContent = (content: string, maxLength: number) => {
+    return content.length > maxLength ? `${content.slice(0, maxLength)}...` : content
+  }
+
   const publishedDate = blog.createdAt ? formatDistanceToNow(new Date(blog.createdAt), { addSuffix: true }) : "Recently"
   const authorName = blog.author ? `${blog.author.firstname} ${blog.author.lastname || ""}`.trim() : "Anonymous"
 
   if (layout === "grid") {
     return (
-      <Card className="overflow-hidden transition-all shadow-md bg-[#fff4e3] h-fit bg-gradient-to-br from-green-100 to-green-200 text-black/90">
+      <Card className="overflow-hidden transition-all shadow-md bg-[#fff4e3] h-[270px] bg-gradient-to-br from-green-100 to-green-200 text-black/90">
         <CardHeader className="pb-3">
           <div className="flex justify-between items-start">
             <div className="flex items-center gap-2">
@@ -282,7 +286,7 @@ const BlogCard: React.FC<BlogCardProps> = ({ blog, layout, onBookmarkToggle, onR
         </CardHeader>
         <CardContent className="pb-3">
           <h2 className="text-lg font-semibold mb-2 line-clamp-2">{blog.title}</h2>
-          <p className="text-muted-foreground text-sm line-clamp-3">{blog.content}</p>
+          <p className="text-muted-foreground text-sm line-clamp-3">{truncateContent(blog.content, 200)}</p>
         </CardContent>
         <CardFooter className="flex flex-col items-start gap-3 pt-2 pb-4">
           <div className="flex flex-wrap gap-1">
@@ -362,7 +366,7 @@ const BlogDetailDialog: React.FC<BlogDetailDialogProps> = ({ blog, onClose }) =>
   const authorName = blog?.author ? `${blog.author.firstname} ${blog.author.lastname || ""}`.trim() : "Anonymous"
   return (
     <Dialog open={!!blog} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
+      <DialogContent className="max-w-5xl w-full max-h-[90vh] overflow-y-auto">
         {blog && (
           <>
             <DialogHeader>

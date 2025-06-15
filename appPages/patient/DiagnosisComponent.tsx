@@ -136,7 +136,7 @@ const DiagnosisComponent: React.FC = () => {
           <Card>
             <CardHeader>
               <CardTitle className="text-lg">Visit Details</CardTitle>
-              <CardDescription>Information about your medical visit</CardDescription>
+              <CardDescription>Here is the information about your medical visit</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

@@ -30,46 +30,47 @@ const healthTips = [
     message: "Remember to take your medications on time for optimal effectiveness",
     icon: "💊",
     category: "Medication",
-    color: "from-blue-300 to-blue-400",
+    color: "from-teal-500 to-green-500",
   },
   {
     title: "Hydration",
     message: "Stay hydrated and drink at least 8 glasses of water daily",
     icon: "💧",
     category: "Wellness",
-    color: "from-cyan-300 to-cyan-400",
+    color: "from-teal-600 to-green-600",
   },
   {
     title: "Exercise",
     message: "Regular exercise can improve your overall health and boost immunity",
     icon: "🏃‍♂️",
     category: "Fitness",
-    color: "from-green-300 to-green-400",
+    color: "from-teal-500 to-green-500",
   },
   {
     title: "Appointments",
     message: "Don't forget to schedule your next appointment for continued care",
     icon: "📅",
     category: "Healthcare",
-    color: "from-purple-300 to-purple-400",
+    color: "from-teal-600 to-green-600",
   },
   {
     title: "Nutrition",
     message: "Maintain a balanced diet rich in fruits, vegetables, and whole grains",
     icon: "🥗",
     category: "Nutrition",
-    color: "from-orange-300 to-orange-400",
+    color: "from-teal-500 to-green-500",
   },
   {
     title: "Sleep",
     message: "Aim for 7-9 hours of quality sleep each night for better recovery",
     icon: "😴",
     category: "Rest",
-    color: "from-indigo-300 to-indigo-400",
+    color: "from-teal-600 to-green-600",
   },
 ]
 const Dashboard = () => {
   const { user }: { user?: PatientModel } = useSessionUser()
+  console.log("this is the current user id", user?._id)
     const [currentTip, setCurrentTip] = useState(healthTips[0])
     const [currentTime, setCurrentTime] = useState(new Date())
   
@@ -132,7 +133,7 @@ const Dashboard = () => {
               </p>
             </div>
           </div>
-          <Card className={`relative overflow-hidden bg-gradient-to-r ${currentTip.color} text-black shadow-xl`}>
+          <Card className={`relative overflow-hidden bg-gradient-to-r ${currentTip.color} text-white shadow-xl`}>
             <CardContent className="p-6">
               <div className="flex items-start gap-4">
                 <div className="p-3 bg-white/20 rounded-full backdrop-blur-sm">
@@ -140,16 +141,16 @@ const Dashboard = () => {
                 </div>
                 <div className="flex-1 space-y-3">
                   <div className="flex items-center gap-3">
-                    <Badge variant="secondary" className="bg-white/20 text-black border-white/30">
+                    <Badge variant="secondary" className="bg-white/20 text-whtie border-white/30">
                       {currentTip.category}
                     </Badge>
                     <span className="text-2xl">{currentTip.icon}</span>
                   </div>
                   <div>
                     <h3 className="font-bold text-lg mb-2">{currentTip.title}</h3>
-                    <p className="text-black leading-relaxed">{currentTip.message}</p>
+                    <p className="text-white leading-relaxed">{currentTip.message}</p>
                   </div>
-                  <div className="flex items-center gap-2 text-sm text-black/80">
+                  <div className="flex items-center gap-2 text-sm text-gray-200">
                     <Shield className="h-4 w-4" />
                     <span>
                       Health Tip {healthTips.indexOf(currentTip) + 1} of {healthTips.length}
@@ -166,20 +167,27 @@ const Dashboard = () => {
         </div>
 
       {/* Main Content Area */}
-      <div className="flex flex-col lg:flex-row gap-6">
-        {/* Left Column - Appointment and Active Medication */}
-        <div className="w-full lg:w-2/3 flex flex-col gap-6">
-          <Appointment />
-          <ActiveMedication />
+      <div className="flex flex-col gap-6 mt-5">
+        {/* Row 1: Appointment & FromBlogs */}
+        <div className="flex flex-col lg:flex-row gap-6 w-full">
+          <div className="flex-1">
+            <Appointment />
+          </div>
+          <div className="flex-1">
+            <FromBlogs/>
+          </div>
         </div>
-
-        {/* Right Column - Blogs and Recent Visits */}
-        <div className="w-full lg:w-1/3 flex flex-col gap-6">
-          <FromBlogs />
-          <RecentVisits />
+        {/* Row 2: ActiveMedication & RecentVisits */}
+        <div className="flex flex-col lg:flex-row gap-6 w-full">
+          <div className="flex-1">
+            <ActiveMedication />
+          </div>
+          <div className="flex-1">
+            <RecentVisits />
+          </div>
         </div>
       </div>
-
+      
       <Card className="bg-gradient-to-r from-teal-500 to-green-500 text-white shadow-lg mt-5 mb-10">
         <CardContent className="p-6">
           <div className="flex items-center justify-between">

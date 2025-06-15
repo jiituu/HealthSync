@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Button } from "../ui/button";
 import { IoCloseOutline } from "react-icons/io5";
-import { message, Modal, Spin, Slider } from "antd";
+import { message, Modal, Spin, Slider, Divider } from "antd";
 import { LoadingOutlined } from "@ant-design/icons";
 import { useGiveDoctorRatingMutation } from "@/redux/api/doctorApi";
 import type { PatientNotification } from "@/types/notifications";
@@ -54,28 +54,58 @@ export default function PatientNotification({ notifications }: PatientNotificati
   };
 
   return (
-    <div className="w-94 bg-transparent mr-2">
+    <div className="w-94 bg-transparent mr-2 h-[28rem]">
       <h2 className="text-lg font-semibold text-center border-b pb-2">Notifications</h2>
-      <div className="h-52 pr-2 overflow-y-auto">
-        {notifList.map((notif) => (
-          <div key={notif._id} className="flex items-start gap-3 py-3 border-b last:border-none">
-            <div className="flex-1">
-              {notif.type === "rate_request" ? (
-                <>
+      <div className="h-[28rem] pr-2 overflow-y-auto">
+        {/* Medication Requests */}
+        <Divider orientation="center">Your Medications</Divider>
+        {notifList.filter((notif) => notif.type === "medication").length > 0 ? (
+          notifList
+            .filter((notif) => notif.type === "medication")
+            .map((notif) => (
+              <div key={notif._id} className="flex items-start gap-3 py-3 border-b last:border-none">
+                <div className="flex-1">
+                  <p className="text-sm">{notif.message}</p>
+                  <p className="text-xs text-gray-500">{new Date(notif.createdAt).toLocaleString()}</p>
+                </div>
+                {closeLoading[notif._id] ? (
+                  <Spin className="text-secondaryColor font-[20px]" indicator={<LoadingOutlined spin />} />
+                ) : (
+                  <IoCloseOutline
+                    className="hover:text-secondaryColor cursor-pointer"
+                    size={20}
+                    onClick={() => handleCloseNotification(notif._id)}
+                  />
+                )}
+              </div>
+            ))
+        ) : (
+          <p className="text-center text-gray-500 text-sm">No medication at the moment.</p>
+        )}
+
+        {/* Rate Requests */}
+        <Divider orientation="center">Rate Requests</Divider>
+        {notifList.filter((notif) => notif.type === "rate_request").length > 0 ? (
+          notifList
+            .filter((notif) => notif.type === "rate_request")
+            .map((notif) => (
+              <div key={notif._id} className="flex items-start gap-3 py-3 border-b last:border-none">
+                <div className="flex-1">
                   <p className="text-sm">
-                    You have completed your visit with Dr. {notif.metadata.doctor.firstname} {notif.metadata.doctor.lastname}. We would like you to rate the doctor.
+                    You have completed your visit with Dr. {notif.metadata.doctor.firstname}{" "}
+                    {notif.metadata.doctor.lastname}. We would like you to rate the doctor.
                   </p>
                   <p className="text-xs text-gray-500">{new Date(notif.createdAt).toLocaleString()}</p>
                   <div className="mt-2">
                     <Button
-                      className="px-3 bg-teal-500 text-white rounded-xl hover:bg-teal-600 transition"
+                      className="px-3 bg-secondaryColor text-white rounded-xl hover:scale-105 hover:text-white duration-300 transition"
                       onClick={() =>
                         openRatingModal(
                           notif.metadata.doctor._id,
                           `Dr. ${notif.metadata.doctor.firstname} ${notif.metadata.doctor.lastname}`,
-                          notif.patient, 
-                          notif.metadata.visit, 
-                          notif._id 
+                          notif.patient,
+                          notif.metadata.visit,
+                          notif._id
                         )
                       }
                       variant="outline"
@@ -83,23 +113,21 @@ export default function PatientNotification({ notifications }: PatientNotificati
                       Rate here
                     </Button>
                   </div>
-                </>
-              ) : (
-                <p className="text-sm">{notif.message}</p>
-              )}
-            </div>
-            {
-              closeLoading[notif._id]?
-              <Spin className="text-secondaryColor font-[20px]" indicator={<LoadingOutlined spin />}  />
-              :<IoCloseOutline 
-                  className="hover:text-secondaryColor cursor-pointer" 
-                  size={20} 
-                  onClick={()=>handleCloseNotification(notif._id)}
-              />
-
-            }
-          </div>
-        ))}
+                </div>
+                {closeLoading[notif._id] ? (
+                  <Spin className="text-secondaryColor font-[20px]" indicator={<LoadingOutlined spin />} />
+                ) : (
+                  <IoCloseOutline
+                    className="hover:text-secondaryColor cursor-pointer"
+                    size={20}
+                    onClick={() => handleCloseNotification(notif._id)}
+                  />
+                )}
+              </div>
+            ))
+        ) : (
+          <p className="text-center text-gray-500">No rate requests at the moment.</p>
+        )}
       </div>
 
       {/* Rating Modal */}

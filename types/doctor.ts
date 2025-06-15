@@ -12,6 +12,7 @@ export interface DoctorSignupPayload {
   email: string;
   password: string;
   phoneNumber: string;
+  birthDate?: Date | null;
   age: number;
   hospital?: string;
   gender: "male" | "female";
