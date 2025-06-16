@@ -27,7 +27,7 @@ export const doctorApi = createApi({
       return headers;
     },
   }),
-  tagTypes: ["Doctor","Visit"],
+  tagTypes: ["Doctor","Visit","AppointedPatient"],
   endpoints: (builder) => ({
     // to login a doctor
     loginDoctor: builder.mutation<any, DoctorLoginPayload>({
@@ -153,6 +153,16 @@ export const doctorApi = createApi({
         url: `/doctors/${id}/patients`,
         method: "GET",
       }),
+      providesTags:["AppointedPatient"]
+    }),
+
+    updatePatientMedicalCondition: builder.mutation<any, {patientId:string,medicalConditions:string[]}>({
+      query: ({patientId,medicalConditions}) => ({
+        url: `/patients/${patientId}/medical-condition`,
+        method: "PATCH",
+        body:{medicalConditions},
+      }),
+      invalidatesTags: ["AppointedPatient"],
     }),
 
     updateDoctorStatus: builder.mutation<
@@ -267,6 +277,7 @@ export const {
   useUpdateVisitMutation,
   useUpdateDoctorStatusMutation,
   useGetAppointedPatientsQuery,
+  useUpdatePatientMedicalConditionMutation,
   useGetVisitsByDoctorIdQuery,
   useGetDoctorByIdQuery,
   useGetDoctorCompletedVisitsQuery,

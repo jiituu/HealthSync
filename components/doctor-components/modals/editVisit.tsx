@@ -10,11 +10,10 @@ import { ExperimentOutlined, LoadingOutlined, MedicineBoxOutlined, MinusCircleOu
 import { batchUpload } from "@/utils/batchFileUpload";
 import { useEffect, useState } from "react";
 import { cloudinaryPresents } from "@/data/constants";
-import { useDrugInteractionMutation, useUpdateVisitMutation } from "@/redux/api/doctorApi";
+import { useDrugInteractionMutation, useUpdatePatientMedicalConditionMutation, useUpdateVisitMutation } from "@/redux/api/doctorApi";
 import dayjs from "dayjs";
 import { useStepsForm } from 'sunflower-antd';
 import { DoctorModel } from "@/components/models/doctor";
-import { useUpdatePatientMutation } from "@/redux/api/patientApi";
 
 
 interface props{
@@ -29,7 +28,7 @@ export const EditVisitModal = ({open,visit,selectedPatient,setOpen}:props)=>{
     const allowedExtensions = ['.pdf', '.png', '.jpg', '.jpeg'];
     const allowedTypes = ['application/pdf', 'image/png', 'image/jpeg'];
     const [updateVisit] = useUpdateVisitMutation();
-    const [updatePatient] = useUpdatePatientMutation();
+    const [updatePatientMedicalCondition] = useUpdatePatientMedicalConditionMutation();
     const [labResultImgs,setLabResultImgs] = useState<File[]>([]);
     const [submitLoading,setSubmitLoading] = useState(false);
     const [drugInteraction] = useDrugInteractionMutation();
@@ -85,11 +84,11 @@ export const EditVisitModal = ({open,visit,selectedPatient,setOpen}:props)=>{
             
             
             try {
-                const {role,_id,...patient} = selectedPatient;
                 const mcs = medicalConditions?.map((mc:any)=>mc.condition)??[];
 
                 if(JSON.stringify(selectedPatient.medicalConditions)!=JSON.stringify(mcs) && mcs.length){
-                    await updatePatient({...patient, medicalConditions:mcs}).unwrap();
+                    await updatePatientMedicalCondition({patientId: selectedPatient._id, medicalConditions:mcs}).unwrap();
+
                 }
                 await updateVisit({visitID: visit._id,body: visitData}).unwrap();
 
@@ -302,16 +301,15 @@ export const EditVisitModal = ({open,visit,selectedPatient,setOpen}:props)=>{
                                 }
 
                                 {/* fields */}
-                                <Row className="!w-full justify-around align-top mb-5 gap-5">
-                                    <Form.Item
-                                        {...restField}
-                                        className="flex-1 mb-0"
-                                        name={[name, 'medication']}
-                                        rules={[{ required: true, message: '' }]}
-                                    >
-                                        <Input placeholder="Medication" />
-                                    </Form.Item>
+                                <Form.Item
+                                    {...restField}
+                                    name={[name, 'medication']}
+                                    rules={[{ required: true, message: '' }]}
+                                >
+                                    <Input placeholder="Medication" />
+                                </Form.Item>
 
+                                <Row className="!w-full justify-around align-top mb-5 gap-5">
                                     <Form.Item
                                         {...restField}
                                             className="flex-1 mb-0"
@@ -321,7 +319,14 @@ export const EditVisitModal = ({open,visit,selectedPatient,setOpen}:props)=>{
                                         <Input placeholder="Dosage"/>
                                     </Form.Item>
 
-                                    
+                                    <Form.Item
+                                        {...restField}
+                                        className="flex-1 mb-0"
+                                        name={[name, 'frequency']}
+                                        rules={[{ required: true, message: '' }]}
+                                    >
+                                        <Input placeholder="Frequency (within 24 hrs)" />
+                                    </Form.Item>
                                 </Row>
 
                                 <Form.Item
