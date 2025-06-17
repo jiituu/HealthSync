@@ -133,7 +133,7 @@ const Dashboard = () => {
               </p>
             </div>
           </div>
-          <Card className={`relative overflow-hidden bg-gradient-to-r ${currentTip.color} text-white shadow-xl`}>
+          <Card className={`relative overflow-hidden bg-gradient-to-r from-teal-500 to-teal-300 text-white shadow-xl rounded-lg`}>
             <CardContent className="p-6">
               <div className="flex items-start gap-4">
                 <div className="p-3 bg-white/20 rounded-full backdrop-blur-sm">

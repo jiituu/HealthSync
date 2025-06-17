@@ -86,7 +86,7 @@ const Dashboard = () => {
     }
 
   return (
-    <div className=' min-h-screen space-y-6 mr-5 pb-10'>
+    <div className='min-h-screen space-y-6 pb-10 px-4'>
       <div className="space-y-2">
           <div className="flex items-center gap-3 mb-5">
             <div className="p-2 bg-primary rounded-lg">
