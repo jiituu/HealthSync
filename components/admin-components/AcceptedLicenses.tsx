@@ -168,8 +168,8 @@ const AcceptedLicenses = () => {
               {paginatedDoctors.map((doctor) => (
                 <TableRow key={doctor._id} className="hover:bg-muted/50">
                   <TableCell className="font-medium">
-                    Dr. {doctor.firstname.charAt(0).toUpperCase() + doctor.firstname.slice(1)}{" "}
-                    {doctor.lastname.charAt(0).toUpperCase() + doctor.lastname.slice(1)}
+                    Dr. {doctor.firstname.charAt(0).toUpperCase() + doctor?.firstname.slice(1)}{" "}
+                    {doctor.lastname.charAt(0).toUpperCase() + doctor?.lastname.slice(1)}
                   </TableCell>
                   <TableCell>{doctor.age}</TableCell>
                   <TableCell>{doctor.phoneNumber}</TableCell>
@@ -186,16 +186,16 @@ const AcceptedLicenses = () => {
                       ))}
                     </div>
                   </TableCell>
-                  <TableCell className="max-w-[150px] truncate" title={doctor.hospital.name}>
-                    {doctor.hospital.name}
+                  <TableCell className="max-w-[150px] truncate" title={doctor?.hospital?.name}>
+                    {doctor?.hospital?.name}
                   </TableCell>
-                  <TableCell>{getStatusBadge(doctor.status)}</TableCell>
+                  <TableCell>{getStatusBadge(doctor?.status)}</TableCell>
                   <TableCell>
                     {doctor.licenses.length > 0 ? (
                       <Button
                         size="icon"
                         variant="ghost"
-                        onClick={() => handleViewLicense(doctor.licenses[0].url)}
+                        onClick={() => handleViewLicense(doctor?.licenses[0].url)}
                         title="View License"
                         aria-label="View License"
                       >
