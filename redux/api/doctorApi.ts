@@ -338,6 +338,7 @@ export const loginDoctor = async (
   }
 };
 
+
 export const doctorApi2 = createApi({
   reducerPath: "doctorApi2",
   baseQuery: fetchBaseQuery({
