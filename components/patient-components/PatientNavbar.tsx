@@ -14,11 +14,9 @@ import { DoctorModel } from '../models/doctor';
 import { useSessionUser } from '../context/Session';
 import { PatientModel } from '../models/patient';
 import Logout from '../auth/Logout';
-// import { Button } from '../ui/button';
-import {useGetAllPatientNotificationsQuery} from '@/redux/api/notificationsApi';
-import {useGetPrescriptionsByPatientIdQuery} from '@/redux/api/patientApi';
+import { useGetAllPatientNotificationsQuery } from '@/redux/api/notificationsApi';
+import { useGetPrescriptionsByPatientIdQuery } from '@/redux/api/patientApi';
 import PatientNotification from './PatientNotification';
-
 
 const Navbar = ({ onMenuClick }: { onMenuClick: () => void }) => {
   const { user }: { user?: PatientModel } = useSessionUser();
@@ -30,14 +28,24 @@ const Navbar = ({ onMenuClick }: { onMenuClick: () => void }) => {
   const { data, status, error, isLoading } = useGetVerifiedDoctorsQuery();
   const doctors: DoctorModel[] = data?.data?.doctors || [];
 
-
   // Fetch notifications for the patient
   const { data: notificationsData, isLoading: notificationsLoading, error: notificationsError } = useGetAllPatientNotificationsQuery({ isRead: false });
   const { data: prescriptionsData, refetch: refetchPrescriptions } = useGetPrescriptionsByPatientIdQuery(user?._id || "");
 
   const onlyNotifications = notificationsData?.notifications || [];
-
   const bellNumber = onlyNotifications.length + (prescriptionsData?.prescriptions?.length || 0);
+
+  // State to control bell animation
+  const [animateBell, setAnimateBell] = useState(false);
+
+  // Effect to trigger animation if prescriptions exist
+  // useEffect(() => {
+  //   if (prescriptionsData && prescriptionsData.prescriptions && prescriptionsData.prescriptions.length > 0) {
+  //     setAnimateBell(true);
+  //   } else {
+  //     setAnimateBell(false);
+  //   }
+  // }, [prescriptionsData]);
 
   // Close the modal if the user clicks outside the container
   useEffect(() => {
@@ -92,42 +100,39 @@ const Navbar = ({ onMenuClick }: { onMenuClick: () => void }) => {
                 <Row align='middle' justify='center'>
                   <p className="text-sm text-gray-500">Something went wrong</p>
                 </Row>
-
                 : isLoading ?
                   <Row align='middle' justify='center'>
                     <Spin indicator={<LoadingOutlined spin />} />
                   </Row>
-
-              :filteredResults.length > 0 ? (
-                <ul>
-                  {filteredResults.map((doctor, index) => (
-                    <li
-                      key={index}
-                      className="p-2 hover:bg-gray-100 rounded cursor-pointer border-b-2"
-                      onClick={()=>{
-                        router.push(`/patient/search?key=${doctor._id}`);
-                        setIsOpen(false);
-                      }}
-                    >
-                      <Row className='gap-3 items-center'>
-                        <div className="w-8 h-8 bg-teal-400 rounded-full flex items-center justify-center text-white">
-                          {doctor.firstname.at(0)??'U'}
-                        </div>
-                        <Row className='flex-col'>
-                          <span className='font-semibold'>Dr. {doctor.firstname} {doctor?.lastname?.at(0)?.toUpperCase()}.</span>
-                          <span className='text-[13px] text-gray-500'>{doctor.email}</span>
-                        </Row>
-                      </Row>
-                      <Row className='flex flex-col items-start mt-2'>
-                        <span className='text-sm text-gray-500'>📍 {doctor?.hospital?.address.city}</span>
-                        <span className='text-sm text-gray-500'>🏨 {doctor?.hospital?.name}</span>
-                        <span className='text-sm text-gray-500'>🩺 {doctor.specializations.join(', ')}</span>
-                      </Row>
-                    </li>
-                  ))}
-                </ul>
-              ) 
-
+                  : filteredResults.length > 0 ? (
+                    <ul>
+                      {filteredResults.map((doctor, index) => (
+                        <li
+                          key={index}
+                          className="p-2 hover:bg-gray-100 rounded cursor-pointer border-b-2"
+                          onClick={() => {
+                            router.push(`/patient/search?key=${doctor._id}`);
+                            setIsOpen(false);
+                          }}
+                        >
+                          <Row className='gap-3 items-center'>
+                            <div className="w-8 h-8 bg-teal-400 rounded-full flex items-center justify-center text-white">
+                              {doctor.firstname.at(0) ?? 'U'}
+                            </div>
+                            <Row className='flex-col'>
+                              <span className='font-semibold'>Dr. {doctor.firstname} {doctor?.lastname?.at(0)?.toUpperCase()}.</span>
+                              <span className='text-[13px] text-gray-500'>{doctor.email}</span>
+                            </Row>
+                          </Row>
+                          <Row className='flex flex-col items-start mt-2'>
+                            <span className='text-sm text-gray-500'>📍 {doctor?.hospital?.address.city}</span>
+                            <span className='text-sm text-gray-500'>🏨 {doctor?.hospital?.name}</span>
+                            <span className='text-sm text-gray-500'>🩺 {doctor.specializations.join(', ')}</span>
+                          </Row>
+                        </li>
+                      ))}
+                    </ul>
+                  )
                     : <Row><p className="text-sm text-gray-500">No data</p></Row>
             }
 
@@ -152,7 +157,10 @@ const Navbar = ({ onMenuClick }: { onMenuClick: () => void }) => {
           <Popover>
             <PopoverTrigger asChild>
               <button className="relative" onClick={() => refetchPrescriptions()}>
-                <FaBell className='text-[#B0C3CC]' size={25} />
+                <FaBell
+                  className={`${animateBell ? 'bell-animation' : 'text-[#ffa24a]'}`}
+                  size={25}
+                />
                 {onlyNotifications.length > 0 && (
                   <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
                     {bellNumber}
@@ -175,7 +183,7 @@ const Navbar = ({ onMenuClick }: { onMenuClick: () => void }) => {
               </button>
             </PopoverTrigger>
             <PopoverContent>
-              <Logout />  {/* Render Logout inside PopoverContent */}
+              <Logout /> {/* Render Logout inside PopoverContent */}
             </PopoverContent>
           </Popover>
         </div>
@@ -185,3 +193,6 @@ const Navbar = ({ onMenuClick }: { onMenuClick: () => void }) => {
 };
 
 export default Navbar;
+
+
+

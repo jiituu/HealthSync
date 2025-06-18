@@ -102,11 +102,19 @@ const config: Config = {
   				to: {
   					height: '0'
   				}
-  			}
+  			},
+			'bell-vibrate': {
+				'0%': { transform: 'rotate(0deg) scale(1)', color: '#ffa24a' },
+				'25%': { transform: 'rotate(15deg) scale(1.1)', color: '#00ff00' },
+				'50%': { transform: 'rotate(-15deg) scale(1.2)', color: '#ffa24a' },
+				'75%': { transform: 'rotate(10deg) scale(1.1)', color: '#00ff00' },
+				'100%': { transform: 'rotate(0deg) scale(1)', color: '#ffa24a' },
+        	},
   		},
   		animation: {
   			'accordion-down': 'accordion-down 0.2s ease-out',
-  			'accordion-up': 'accordion-up 0.2s ease-out'
+  			'accordion-up': 'accordion-up 0.2s ease-out',
+			'bell-vibrate': 'bell-vibrate 2s ease-in-out infinite alternate'
   		}
   	}
   },
