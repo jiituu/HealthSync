@@ -28,8 +28,6 @@ const Appointment = () => {
   const sortedVisits = visits?.slice().sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
   const appointment = sortedVisits?.[0]
 
-  console.log("this is my appointment", appointment)
-
   // Fetch doctor details if appointment exists
   const {
     data: doctorResponse,

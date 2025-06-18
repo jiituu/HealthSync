@@ -90,34 +90,34 @@ const DeniedLicenses = () => {
                 paginatedDoctors.map((doctor) => (
                   <TableRow key={doctor._id} className="hover:bg-muted/50">
                     <TableCell className="font-medium">
-                      Dr. {doctor.firstname.charAt(0).toUpperCase() + doctor.firstname.slice(1)}{" "}
-                      {doctor.lastname.charAt(0).toUpperCase() + doctor.lastname.slice(1)}
+                      Dr. {doctor.firstname.charAt(0).toUpperCase() + doctor?.firstname.slice(1)}{" "}
+                      {doctor?.lastname.charAt(0).toUpperCase() + doctor?.lastname.slice(1)}
                     </TableCell>
-                    <TableCell>{doctor.age}</TableCell>
-                    <TableCell>{doctor.phoneNumber}</TableCell>
+                    <TableCell>{doctor?.age}</TableCell>
+                    <TableCell>{doctor?.phoneNumber}</TableCell>
                     <TableCell className="max-w-[150px] truncate" title={doctor.email}>
-                      {doctor.email}
+                      {doctor?.email}
                     </TableCell>
-                    <TableCell>{format(new Date(doctor.createdAt), "dd MMM yyyy")}</TableCell>
+                    <TableCell>{format(new Date(doctor?.createdAt), "dd MMM yyyy")}</TableCell>
                     <TableCell>
                       <div className="flex flex-wrap gap-1">
-                        {doctor.specializations.map((spec, index) => (
+                        {doctor?.specializations.map((spec, index) => (
                           <Badge key={index} variant="outline" className="text-xs">
                             {spec}
                           </Badge>
                         ))}
                       </div>
                     </TableCell>
-                    <TableCell className="max-w-[150px] truncate" title={doctor.hospital.name}>
-                      {doctor.hospital.name}
+                    <TableCell className="max-w-[150px] truncate" title={doctor?.hospital?.name}>
+                      {doctor?.hospital?.name}
                     </TableCell>
-                    <TableCell>{getStatusBadge(doctor.status)}</TableCell>
+                    <TableCell>{getStatusBadge(doctor?.status)}</TableCell>
                     <TableCell>
-                      {doctor.licenses.length > 0 && (
+                      {doctor?.licenses.length > 0 && (
                         <Button
                           size="icon"
                           variant="ghost"
-                          onClick={() => handleViewLicense(doctor.licenses[0].url)}
+                          onClick={() => handleViewLicense(doctor?.licenses[0]?.url)}
                           title="View License"
                         >
                           <Eye className="w-4 h-4" />

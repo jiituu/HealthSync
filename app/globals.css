@@ -217,3 +217,32 @@
   color: white !important;
 }
 
+
+/* In your global CSS file or a dedicated CSS module */
+
+@keyframes bell-vibrate {
+  0% {
+    transform: rotate(0deg) scale(1);
+    color: #ffa24a; /* Original color */
+  }
+  25% {
+    transform: rotate(15deg) scale(1.1);
+    color: #00ff00; /* Red */
+  }
+  50% {
+    transform: rotate(-15deg) scale(1.2);
+    color: #ffa24a; /* Green */
+  }
+  75% {
+    transform: rotate(10deg) scale(1.1);
+    color: #00ff00; /* Blue */
+  }
+  100% {
+    transform: rotate(0deg) scale(1);
+    color: #ffa24a; /* Back to original */
+  }
+}
+
+.bell-animation {
+  animation: bell-vibrate 2s ease-in-out infinite alternate; 
+}

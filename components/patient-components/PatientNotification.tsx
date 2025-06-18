@@ -25,7 +25,8 @@ export interface PrescriptionsData {
 export interface Medication {
   medication: string
   dosage: string
-  instructions: string
+  instructions: string,
+  frequency?: string
   _id: string
 }
 
@@ -46,6 +47,7 @@ export default function PatientNotification({
     notificationId: string
   } | null>(null)
   const [rating, setRating] = useState(3)
+  const [expandedInstructions, setExpandedInstructions] = useState<{ [key: string]: boolean }>({})
 
   const handleCloseNotification = (id: string) => {
     setCloseLoading((prev: any) => ({ ...prev, [id]: true }))
@@ -86,6 +88,16 @@ export default function PatientNotification({
     setSelectedDoctor({ id: doctorId, name: doctorName, patientId, visitId, notificationId })
     setIsModalOpen(true)
   }
+
+  const toggleInstructionExpansion = (medicationId: string) => {
+    setExpandedInstructions((prev) => ({
+      ...prev,
+      [medicationId]: !prev[medicationId],
+    }))
+  }
+
+
+  console.log("Prescriptions Data###################################:", prescriptions)
 
   return (
     <div>
@@ -143,9 +155,23 @@ export default function PatientNotification({
                         <div className="w-1.5 h-1.5 bg-green-400 rounded-full mt-2 flex-shrink-0"></div>
                         <div className="flex-1">
                           <p className="text-sm font-medium text-gray-800">{medication.medication}</p>
-                          <p className="text-xs text-gray-600">{medication.dosage}</p>
+                          <p className="text-xs text-gray-600">
+                            {medication.dosage} {medication.frequency && `| ${medication.frequency}`}
+                          </p>
                           {medication.instructions && (
-                            <p className="text-xs text-gray-500 italic mt-1">{medication.instructions}</p>
+                            <p className="text-xs text-gray-500 italic mt-1">
+                              {expandedInstructions[medication._id]
+                                ? medication.instructions
+                                : `${medication.instructions.slice(0, 50)}...`}
+                              {medication.instructions.length > 50 && (
+                                <button
+                                  className="text-blue-500 underline ml-1"
+                                  onClick={() => toggleInstructionExpansion(medication._id)}
+                                >
+                                  {expandedInstructions[medication._id] ? "See Less" : "See More"}
+                                </button>
+                              )}
+                            </p>
                           )}
                         </div>
                       </div>

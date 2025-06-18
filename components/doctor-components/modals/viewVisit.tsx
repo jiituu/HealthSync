@@ -4,8 +4,7 @@ import { PatientModel } from "@/components/models/patient";
 import { Box, useMediaQuery } from "@mui/material";
 import { Descriptions, Form, Row } from "antd";
 import { VisitCard } from "@/appPages/doctor/ActiveVisits";
-import { useGetDoctorByIdQuery } from "@/redux/api/doctorApi"
-// import {useGetPatientByIdQuery} from "@/redux/api/patientApi"
+import {useGetPatientByIdQuery} from "@/redux/api/patientApi"
 
 
 interface props{
@@ -16,7 +15,9 @@ interface props{
 
 export const ViewVisit = ({ open, setOpen, visit }: props) => {
     const { user }: { user?: PatientModel } = useSessionUser();
-    const { data: doctorData } = useGetDoctorByIdQuery(visit.doctor);
+    const { data: patientData } = useGetPatientByIdQuery(visit.patient);
+
+    console.log("Patient Data:", patientData);
 
     const [form] = Form.useForm();
     const matches = useMediaQuery("(min-width:900px)");
@@ -39,9 +40,9 @@ export const ViewVisit = ({ open, setOpen, visit }: props) => {
             size="middle"
             labelStyle={{ fontWeight: 600 }}
           >
-            <Descriptions.Item label="Patient Name">{user?.firstname} {user?.lastname}</Descriptions.Item>
+            <Descriptions.Item label="Patient Name">{patientData?.data.firstname} {patientData?.data.lastname}</Descriptions.Item>
             <Descriptions.Item label="Visited Doctor">
-              Dr. {doctorData?.data?.firstname} {doctorData?.data?.lastname}
+              Dr. {user?.firstname} {user?.lastname}
             </Descriptions.Item>
             <Descriptions.Item label="Preferred Date">
               {new Date(visit.preferredDate).toLocaleString()}

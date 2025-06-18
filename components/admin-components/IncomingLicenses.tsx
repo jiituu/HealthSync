@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { message } from "antd"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
@@ -68,6 +69,24 @@ const IncomingLicenses = () => {
       day: "numeric",
     })
   }
+
+  const handleAccept = async (doctorId: string) => {
+    try {
+      await updateDoctorStatus({ doctorId, status: "approved" });
+      message.success("License document accepted successfully.");
+    } catch (error) {
+      message.error("Failed to accept the license document.");
+    }
+  };
+
+  const handleDeny = async (doctorId: string) => {
+    try {
+      await updateDoctorStatus({ doctorId, status: "denied" });
+      message.success("License document denied successfully.");
+    } catch (error) {
+      message.error("Failed to deny the license document.");
+    }
+  };
 
   if (isLoading) {
     return (
@@ -148,38 +167,40 @@ const IncomingLicenses = () => {
           </div>
           <CardContent className="mt-4 p-2 border rounded bg-gray-100">
             <h3 className="font-medium mb-2">License Documents</h3>
-            {doctor.licenses.map((license, licenseIndex) => (
-              <div key={licenseIndex} className="flex justify-between items-center bg-white p-2 my-2 rounded shadow">
-                <span>License Document {licenseIndex + 1}</span>
-                <div className="flex gap-2">
-                  <Button size="icon" variant="ghost" onClick={() => handleViewPdf(license.url)}>
-                    <Eye className="w-4 h-4" />
-                  </Button>
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    onClick={() => handleDownloadPdf(license.url, `license-${doctor.lastname}-${licenseIndex + 1}.pdf`)}
-                  >
-                    <Download className="w-4 h-4" />
-                  </Button>
+            {doctor.licenses.length > 0 ? (
+              doctor.licenses.map((license, licenseIndex) => (
+                <div key={licenseIndex} className="flex justify-between items-center bg-white p-2 my-2 rounded shadow">
+                  <span>License Document {licenseIndex + 1}</span>
+                  <div className="flex gap-2">
+                    <Button size="icon" variant="ghost" onClick={() => handleViewPdf(license.url)}>
+                      <Eye className="w-4 h-4" />
+                    </Button>
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      onClick={() => handleDownloadPdf(license.url, `license-${doctor.lastname}-${licenseIndex + 1}.pdf`)}
+                    >
+                      <Download className="w-4 h-4" />
+                    </Button>
+                  </div>
                 </div>
+              ))
+            ) : (
+              <div className="flex justify-center items-center bg-white p-2 my-2 rounded shadow">
+                <span>No License</span>
               </div>
-            ))}
+            )}
           </CardContent>
           <div className="flex justify-end gap-2 mt-4">
             <Button
               className="bg-green-500 text-white hover:bg-green-600"
-              onClick={() => {
-                updateDoctorStatus({ doctorId: doctor._id, status: "approved" });
-              }}
+              onClick={() => handleAccept(doctor._id)}
             >
               Accept
             </Button>
             <Button
               variant="destructive"
-              onClick={() => {
-                updateDoctorStatus({ doctorId: doctor._id, status: "denied" });
-              }}
+              onClick={() => handleDeny(doctor._id)}
             >
               Deny
             </Button>

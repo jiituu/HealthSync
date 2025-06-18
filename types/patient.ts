@@ -63,6 +63,7 @@ export interface Medication {
     medication: string;
     dosage: string;
     instructions: string;
+    frequency: string;
     _id: string;
 }
 

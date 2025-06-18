@@ -13,17 +13,6 @@ import dayjs from 'dayjs';
 import Logout from '../auth/Logout';
 import { useGetVisitsByDoctorIdApprovalQuery } from '@/redux/api/doctorApi';
 
-// const otherNotifications: NotificationModel[] = [
-//   {
-//     id: '2',
-//     targetID: 'e8e8-455r',
-//     triggerID: "@hunban",
-//     message: "You have an appointment in 2 days.",
-//     time: "Last Wednesday at 9:42 AM",
-//     type: "noAction"
-//   },
-// ];
-
 const Navbar = ({ onMenuClick }: { onMenuClick: () => void }) => {
   const { user }: { user?: DoctorModel } = useSessionUser();
   const [notifications, setNotifications] = useState<NotificationModel[]>([]);
@@ -50,7 +39,7 @@ const Navbar = ({ onMenuClick }: { onMenuClick: () => void }) => {
 
   return (
     <nav className="sticky top-0 bg-white border-b-2 flex items-center justify-end px-6 py-3 z-20">
-      {/* <div className="flex items-center relative w-80">
+      <div className="flex items-center relative w-80">
         <button
           className="md:hidden mr-4"
           onClick={onMenuClick}
@@ -58,15 +47,7 @@ const Navbar = ({ onMenuClick }: { onMenuClick: () => void }) => {
         >
           <HiMenu size={24} />
         </button>
-        <input
-          type="text"
-          placeholder="Search"
-          className="px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-[#F6F6FB] pr-10 w-full rounded-lg"
-        />
-        <div className="absolute right-2 top-1/2 transform -translate-y-1/2">
-          <CiSearch className='text-[#B0C3CC]' size={20} />
-        </div>
-      </div> */}
+      </div>
 
       <div className="flex items-center space-x-4">
         <div className="relative">
