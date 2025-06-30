@@ -1,3 +1,33 @@
+# 📚 Final Year Software Engineering Project  
+### **HealthSync**
+
+> A collaborative capstone project developed as part of the Software Engineering and Computing Technology program at Addis Ababa University, 2025.
+
+
+
+## 👥 Project Team
+
+| Name                | 
+|---------------------|
+| **Eyuel Demrew**     |
+| **Jitu Ewnetu**      |
+| **Mathias Wakgari**  |  
+| **Melakeselam Yitbarek** 
+| **Nathnael Fikadu**  |
+| **Yeabsra Aemro**    | 
+
+> Proudly built by a passionate team of software engineering graduates!
+
+---
+
+
+
+
+
+
+
+
+
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
 ## Getting Started
